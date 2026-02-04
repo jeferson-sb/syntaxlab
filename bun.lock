@@ -19,6 +19,9 @@
         "elysia-rate-limit": "^4.5.0",
         "pino": "^10.3.0",
       },
+      "devDependencies": {
+        "typescript": "^5.9.3",
+      },
     },
     "apps/web": {
       "name": "syntaxlab-web",
