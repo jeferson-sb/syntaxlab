@@ -17,7 +17,7 @@ type DataMapper<AR extends AggregateRoot<any>, DATA> = {
 
 type Repository<
   T extends AggregateRoot<any>,
-  ID extends AggregateId<any> = T["id"]
+  ID extends AggregateId<any> = T["id"],
 > = {
   getNextId(): Promise<ID>;
   store(entity: T): Promise<void>;
@@ -73,7 +73,7 @@ type ImageBlock = Block & {
 };
 
 const createProject = (
-  props: Omit<Project, "createdAt" | "updatedAt">
+  props: Omit<Project, "createdAt" | "updatedAt">,
 ): Project => ({
   id: props.id,
   name: props.name,
@@ -100,6 +100,51 @@ const createCodeBlock = ({ id, type, x, y, props }: CodeBlock): CodeBlock => ({
   },
 });
 
+const createNoteBlock = ({ id, type, x, y, props }: NoteBlock): NoteBlock => ({
+  id,
+  type,
+  x,
+  y,
+  props: {
+    content: props.content,
+    size: props.size,
+  },
+});
+
+const createBookmarkBlock = ({
+  id,
+  type,
+  x,
+  y,
+  props,
+}: BookmarkBlock): BookmarkBlock => ({
+  id,
+  type,
+  x,
+  y,
+  props: {
+    href: props.href,
+  },
+});
+
+const createImageBlock = ({
+  id,
+  type,
+  x,
+  y,
+  props,
+}: ImageBlock): ImageBlock => ({
+  id,
+  type,
+  x,
+  y,
+  props: {
+    href: props.href,
+    width: props.width,
+    height: props.height,
+  },
+});
+
 type DepsProject = { projectsStore: Project[] };
 type ProjectRepository = Repository<Project>;
 const makeProjectRepository = ({
@@ -115,7 +160,7 @@ const makeProjectRepository = ({
 
 type DepsBoard = { boardStore: Board[] };
 type BoardRepository = Repository<Board>;
-const makeBoardRepository = ({ boardStore }): Repository<Board> => ({
+const makeBoardRepository = ({ boardStore }: DepsBoard): Repository<Board> => ({
   async getNextId() {
     return { value: crypto.randomUUID() };
   },
@@ -126,7 +171,7 @@ const makeBoardRepository = ({ boardStore }): Repository<Board> => ({
 
 type DepsBlock = { blockStore: Block[] };
 type BlockRepository = Repository<Block>;
-const makeBlockRepository = ({ blockStore }): Repository<Block> => ({
+const makeBlockRepository = ({ blockStore }: DepsBlock): Repository<Block> => ({
   async getNextId() {
     return crypto.randomUUID();
   },
@@ -135,10 +180,19 @@ const makeBlockRepository = ({ blockStore }): Repository<Block> => ({
   },
 });
 
-// TODO: create DTOs
+type Result = {};
+type Either = {};
+
+// framework agnostic use case dto
+type CreateProjectDTO = {
+  name: string;
+  userId: string;
+  boards: Board[];
+};
+
 const makeCreateProject =
   ({ projectRepository }: { projectRepository: ProjectRepository }) =>
-  async (payload) => {
+  async (payload: CreateProjectDTO) => {
     const id = await projectRepository.getNextId();
 
     const project = createProject({
@@ -153,16 +207,22 @@ const makeCreateProject =
     return project.id;
   };
 
+type CreateBoardDTO = {
+  name: string;
+  visibility: "private" | "public";
+  blocks: Block[];
+}; 
+
 const makeCreateBoard =
   ({ boardRepository }: { boardRepository: BoardRepository }) =>
-  async (payload) => {
+  async (payload: CreateBoardDTO) => {
     const id = await boardRepository.getNextId();
 
     const board = createBoard({
       id,
       name: payload.name,
       visibility: payload.visibility,
-      blocks: [],
+      blocks: payload.blocks,
     });
 
     await boardRepository.store(board);
@@ -170,9 +230,27 @@ const makeCreateBoard =
     return board.id;
   };
 
+type BlockPropsByType = {
+  code: CodeBlock["props"];
+  note: NoteBlock["props"];
+  bookmark: BookmarkBlock["props"];
+  image: ImageBlock["props"];
+};
+
+type CreateBlockDTO<TType extends keyof BlockPropsByType = keyof BlockPropsByType> = {
+  type: TType;
+  x: number;
+  y: number;
+  props: BlockPropsByType[TType];
+};
+
+type AnyCreateBlockDTO = {
+  [K in keyof BlockPropsByType]: CreateBlockDTO<K>;
+}[keyof BlockPropsByType];
+
 const makeCreateBlock =
   ({ blockRepository }: { blockRepository: BlockRepository }) =>
-  async (payload) => {
+  async (payload: CreateBlockDTO) => {
     const id = await blockRepository.getNextId();
     let block;
 
@@ -182,13 +260,15 @@ const makeCreateBlock =
         break;
 
       case "bookmark":
+        block = createBookmarkBlock({ id, ...payload });
         break;
 
       case "image":
+        block = createImageBlock({ id, ...payload });
         break;
 
       default:
-        // note
+        block = createNoteBlock({ id, ...payload });
         break;
     }
 
@@ -223,24 +303,22 @@ const projectRouter = new Elysia({ prefix: "/projects" }).post(
       userId: t.String(),
       boards: t.Array(t.Any()),
     }),
-  }
+  },
 );
 
-const boardRouter = new Elysia({ prefix: "/boards" }).post(
-  "/",
-  ({ body }) => createBoardUseCase(body),
-  {
+const boardRouter = new Elysia({ prefix: "/boards" })
+  .post("/", ({ body }) => createBoardUseCase(body), {
     body: t.Object({
       name: t.String(),
       visibility: t.Union([t.Literal("private"), t.Literal("public")]),
       blocks: t.Array(t.Any()),
     }),
-  }
-);
+  });
 
 const blockRouter = new Elysia({ prefix: "/blocks" }).post(
   "/",
   ({ body }) => createBlockUseCase(body),
+  ({ body }) => createBlockUseCase(body as AnyCreateBlockDTO),
   {
     body: t.Object({
       type: t.Union([
@@ -253,7 +331,7 @@ const blockRouter = new Elysia({ prefix: "/blocks" }).post(
       y: t.Number(),
       props: t.Record(t.String(), t.Any()),
     }),
-  }
+  },
 );
 
 const app = new Elysia({ prefix: "/api" })
@@ -266,5 +344,5 @@ const app = new Elysia({ prefix: "/api" })
 app.listen(process.env.PORT || 3000);
 
 console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
+  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
 );
