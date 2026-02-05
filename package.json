@@ -14,5 +14,6 @@
   "license": "MIT",
   "devDependencies": {
     "turbo": "^2.8.1"
-  }
+  },
+  "packageManager": "bun@1.3.5"
 }
