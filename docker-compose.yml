@@ -1,0 +1,27 @@
+services:
+  mongodb:
+    container_name: syntaxlab-mongodb
+    image: mongodb/mongodb-atlas-local
+    hostname: mongodb
+    environment:
+      - MONGODB_INITDB_ROOT_USERNAME=syntaxlab
+      - MONGODB_INITDB_ROOT_PASSWORD=syntaxlab
+    ports:
+      - 27017:27017
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d
+      - db:/data/db
+
+  mongo-express:
+    container_name: snytaxlab-mongo-express
+    image: mongo-express
+    restart: always
+    depends_on:
+      - mongodb
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://syntaxlab:syntaxlab@mongodb:27017
+
+volumes:
+  db:

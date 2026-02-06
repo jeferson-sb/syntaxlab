@@ -1,6 +1,7 @@
 import { Elysia, t } from "elysia";
 import { openapi, fromTypes } from "@elysiajs/openapi";
 import { cors } from "@elysiajs/cors";
+import mongo from "mongoose";
 
 type AggregateId<T> = {
   value: T;
@@ -17,7 +18,7 @@ type DataMapper<AR extends AggregateRoot<any>, DATA> = {
 
 type Repository<
   T extends AggregateRoot<any>,
-  ID extends AggregateId<any> = T["id"],
+  ID extends AggregateId<any> = T["id"]
 > = {
   getNextId(): Promise<ID>;
   store(entity: T): Promise<void>;
@@ -73,7 +74,7 @@ type ImageBlock = Block & {
 };
 
 const createProject = (
-  props: Omit<Project, "createdAt" | "updatedAt">,
+  props: Omit<Project, "createdAt" | "updatedAt">
 ): Project => ({
   id: props.id,
   name: props.name,
@@ -149,7 +150,7 @@ type DepsProject = { projectsStore: Project[] };
 type ProjectRepository = Repository<Project>;
 const makeProjectRepository = ({
   projectsStore,
-}: DepsProject): Repository<Project> => ({
+}: DepsProject): ProjectRepository => ({
   async getNextId() {
     return { value: crypto.randomUUID() };
   },
@@ -160,7 +161,7 @@ const makeProjectRepository = ({
 
 type DepsBoard = { boardStore: Board[] };
 type BoardRepository = Repository<Board>;
-const makeBoardRepository = ({ boardStore }: DepsBoard): Repository<Board> => ({
+const makeBoardRepository = ({ boardStore }: DepsBoard): BoardRepository => ({
   async getNextId() {
     return { value: crypto.randomUUID() };
   },
@@ -171,7 +172,7 @@ const makeBoardRepository = ({ boardStore }: DepsBoard): Repository<Board> => ({
 
 type DepsBlock = { blockStore: Block[] };
 type BlockRepository = Repository<Block>;
-const makeBlockRepository = ({ blockStore }: DepsBlock): Repository<Block> => ({
+const makeBlockRepository = ({ blockStore }: DepsBlock): BlockRepository => ({
   async getNextId() {
     return crypto.randomUUID();
   },
@@ -211,7 +212,7 @@ type CreateBoardDTO = {
   name: string;
   visibility: "private" | "public";
   blocks: Block[];
-}; 
+};
 
 const makeCreateBoard =
   ({ boardRepository }: { boardRepository: BoardRepository }) =>
@@ -230,6 +231,28 @@ const makeCreateBoard =
     return board.id;
   };
 
+const makeMongoDBConnection = async () => {
+  try {
+    const conn = await mongo.connect(
+      "mongodb://syntaxlab:syntaxlab@127.0.0.1:27017/syntaxlab_db?authSource=admin&directConnection=true"
+    );
+    console.log("MongoDB connected:", conn.connection.host);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const projectSchema = new mongo.Schema(
+  {
+    name: String,
+    userId: String,
+    // boards: [],
+  },
+  { timestamps: true }
+);
+
+const projectModel = mongo.model("Project", projectSchema);
+
 type BlockPropsByType = {
   code: CodeBlock["props"];
   note: NoteBlock["props"];
@@ -237,7 +260,9 @@ type BlockPropsByType = {
   image: ImageBlock["props"];
 };
 
-type CreateBlockDTO<TType extends keyof BlockPropsByType = keyof BlockPropsByType> = {
+type CreateBlockDTO<
+  TType extends keyof BlockPropsByType = keyof BlockPropsByType
+> = {
   type: TType;
   x: number;
   y: number;
@@ -250,7 +275,7 @@ type AnyCreateBlockDTO = {
 
 const makeCreateBlock =
   ({ blockRepository }: { blockRepository: BlockRepository }) =>
-  async (payload: CreateBlockDTO) => {
+  async (payload: AnyCreateBlockDTO) => {
     const id = await blockRepository.getNextId();
     let block;
 
@@ -277,9 +302,21 @@ const makeCreateBlock =
     return block.id;
   };
 
+const makeMongoProjectRepository = (): ProjectRepository => ({
+  async getNextId() {
+    return { value: crypto.randomUUID() };
+  },
+  async store(entity: Project) {
+    await projectModel.create({
+      name: entity.name,
+      userId: entity.userId.value,
+    });
+  },
+});
+
 const container = {
   createProjectUseCase: makeCreateProject({
-    projectRepository: makeProjectRepository({ projectsStore: [] }),
+    projectRepository: makeMongoProjectRepository(),
   }),
   createBoardUseCase: makeCreateBoard({
     boardRepository: makeBoardRepository({ boardStore: [] }),
@@ -303,21 +340,23 @@ const projectRouter = new Elysia({ prefix: "/projects" }).post(
       userId: t.String(),
       boards: t.Array(t.Any()),
     }),
-  },
+  }
 );
 
-const boardRouter = new Elysia({ prefix: "/boards" })
-  .post("/", ({ body }) => createBoardUseCase(body), {
+const boardRouter = new Elysia({ prefix: "/boards" }).post(
+  "/",
+  ({ body }) => createBoardUseCase(body),
+  {
     body: t.Object({
       name: t.String(),
       visibility: t.Union([t.Literal("private"), t.Literal("public")]),
       blocks: t.Array(t.Any()),
     }),
-  });
+  }
+);
 
 const blockRouter = new Elysia({ prefix: "/blocks" }).post(
   "/",
-  ({ body }) => createBlockUseCase(body),
   ({ body }) => createBlockUseCase(body as AnyCreateBlockDTO),
   {
     body: t.Object({
@@ -331,8 +370,10 @@ const blockRouter = new Elysia({ prefix: "/blocks" }).post(
       y: t.Number(),
       props: t.Record(t.String(), t.Any()),
     }),
-  },
+  }
 );
+
+makeMongoDBConnection();
 
 const app = new Elysia({ prefix: "/api" })
   .use(openapi({ references: fromTypes() }))
@@ -344,5 +385,5 @@ const app = new Elysia({ prefix: "/api" })
 app.listen(process.env.PORT || 3000);
 
 console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
+  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
 );
