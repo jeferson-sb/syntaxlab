@@ -2,6 +2,7 @@ import { Elysia, t } from "elysia";
 import { openapi, fromTypes } from "@elysiajs/openapi";
 import { cors } from "@elysiajs/cors";
 import mongo from "mongoose";
+import { logger } from "@bogeychan/elysia-logger";
 
 type AggregateId<T> = {
   value: T;
@@ -18,7 +19,7 @@ type DataMapper<AR extends AggregateRoot<any>, DATA> = {
 
 type Repository<
   T extends AggregateRoot<any>,
-  ID extends AggregateId<any> = T["id"],
+  ID extends AggregateId<any> = T["id"]
 > = {
   getNextId(): Promise<ID>;
   store(entity: T): Promise<void>;
@@ -76,7 +77,7 @@ type ImageBlock = Block & {
 };
 
 const createProject = (
-  props: Omit<Project, "createdAt" | "updatedAt">,
+  props: Omit<Project, "createdAt" | "updatedAt">
 ): Project => ({
   id: props.id,
   name: props.name,
@@ -160,7 +161,9 @@ const makeProjectRepository = ({
     projectsStore.push(entity);
   },
   async delete(id) {
-    const index = projectsStore.findIndex((project) => project.id.value === id.value);
+    const index = projectsStore.findIndex(
+      (project) => project.id.value === id.value
+    );
 
     if (index !== -1) {
       projectsStore.splice(index, 1);
@@ -168,7 +171,7 @@ const makeProjectRepository = ({
   },
   async index() {
     return projectsStore;
-  }
+  },
 });
 
 type DepsBoard = { boardStore: Board[] };
@@ -189,7 +192,7 @@ const makeBoardRepository = ({ boardStore }: DepsBoard): BoardRepository => ({
   },
   async index() {
     return boardStore;
-  }
+  },
 });
 
 type DepsBlock = { blockStore: Block[] };
@@ -210,7 +213,7 @@ const makeBlockRepository = ({ blockStore }: DepsBlock): BlockRepository => ({
   },
   async index() {
     return blockStore;
-  }
+  },
 });
 
 type Result = {};
@@ -284,7 +287,7 @@ const makeGetBoards =
     return boards;
   };
 
-const makeDeleteBoard = 
+const makeDeleteBoard =
   ({ boardRepository }: { boardRepository: BoardRepository }) =>
   async (id: BoardId) => {
     await boardRepository.delete(id);
@@ -293,7 +296,7 @@ const makeDeleteBoard =
 const makeMongoDBConnection = async () => {
   try {
     const conn = await mongo.connect(
-      "mongodb://syntaxlab:syntaxlab@127.0.0.1:27017/syntaxlab_db?authSource=admin&directConnection=true",
+      "mongodb://syntaxlab:syntaxlab@127.0.0.1:27017/syntaxlab_db?authSource=admin&directConnection=true"
     );
     console.log("MongoDB connected:", conn.connection.host);
   } catch (error) {
@@ -307,7 +310,7 @@ const projectSchema = new mongo.Schema(
     userId: String,
     // boards: [],
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const projectModel = mongo.model("Project", projectSchema);
@@ -321,7 +324,7 @@ const boardSchema = new mongo.Schema(
       enum: ["private", "public"],
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const boardModel = mongo.model("Board", boardSchema);
@@ -346,7 +349,7 @@ type BlockPropsByType = {
 };
 
 type CreateBlockDTO<
-  TType extends keyof BlockPropsByType = keyof BlockPropsByType,
+  TType extends keyof BlockPropsByType = keyof BlockPropsByType
 > = {
   type: TType;
   x: number;
@@ -395,7 +398,7 @@ const makeGetBlocks =
     return blocks;
   };
 
-const makeDeleteBlock = 
+const makeDeleteBlock =
   ({ blockRepository }: { blockRepository: BlockRepository }) =>
   async (id: string) => {
     await blockRepository.delete(id);
@@ -439,7 +442,7 @@ const makeMongoBoardRepository = (): BoardRepository => ({
 
 type AnyBlock = {
   [K in keyof BlockPropsByType]: Block & { props: BlockPropsByType[K] };
-}[keyof BlockPropsByType]
+}[keyof BlockPropsByType];
 
 const makeMongoBlockRepository = (): BlockRepository => ({
   async getNextId() {
@@ -458,7 +461,7 @@ const makeMongoBlockRepository = (): BlockRepository => ({
   },
   async delete(id: string) {
     await blockModel.deleteOne({ _id: id });
-  }
+  },
 });
 
 const container = {
@@ -488,7 +491,7 @@ const container = {
   }),
   deleteBlockUseCase: makeDeleteBlock({
     blockRepository: makeMongoBlockRepository(),
-  })
+  }),
 };
 
 type Container = typeof container;
@@ -515,8 +518,8 @@ const projectRouter = new Elysia({ prefix: "/projects" })
   })
   .get("/", () => getProjectsUseCase())
   .delete("/:id", ({ params, set }) => {
-    deleteProjectUseCase({ value: params.id })
-    set.status = 204
+    deleteProjectUseCase({ value: params.id });
+    set.status = 204;
   });
 
 const boardRouter = new Elysia({ prefix: "/boards" })
@@ -529,8 +532,8 @@ const boardRouter = new Elysia({ prefix: "/boards" })
   })
   .get("/", () => getBoardsUseCase())
   .delete("/:id", ({ params, set }) => {
-    deleteBoardUseCase({ value: params.id })
-    set.status = 204
+    deleteBoardUseCase({ value: params.id });
+    set.status = 204;
   });
 
 const blockRouter = new Elysia({ prefix: "/blocks" })
@@ -549,8 +552,8 @@ const blockRouter = new Elysia({ prefix: "/blocks" })
   })
   .get("/", () => getBlocksUseCase())
   .delete("/:id", ({ params, set }) => {
-    deleteBlockUseCase(params.id)
-    set.status = 204
+    deleteBlockUseCase(params.id);
+    set.status = 204;
   });
 
 makeMongoDBConnection();
@@ -558,6 +561,7 @@ makeMongoDBConnection();
 const app = new Elysia({ prefix: "/api" })
   .use(openapi({ references: fromTypes() }))
   .use(cors())
+  .use(logger({ level: "info" }))
   .use(projectRouter)
   .use(boardRouter)
   .use(blockRouter);
@@ -565,5 +569,5 @@ const app = new Elysia({ prefix: "/api" })
 app.listen(process.env.PORT || 3000);
 
 console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
+  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
 );
