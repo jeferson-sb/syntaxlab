@@ -304,31 +304,6 @@ const makeMongoDBConnection = async () => {
   }
 };
 
-const projectSchema = new mongo.Schema(
-  {
-    name: String,
-    userId: String,
-    // boards: [],
-  },
-  { timestamps: true }
-);
-
-const projectModel = mongo.model("Project", projectSchema);
-
-const boardSchema = new mongo.Schema(
-  {
-    name: String,
-    // blocks: [],
-    visibility: {
-      type: String,
-      enum: ["private", "public"],
-    },
-  },
-  { timestamps: true }
-);
-
-const boardModel = mongo.model("Board", boardSchema);
-
 const blockSchema = new mongo.Schema({
   type: {
     type: String,
@@ -340,6 +315,31 @@ const blockSchema = new mongo.Schema({
 });
 
 const blockModel = mongo.model("Block", blockSchema);
+
+const boardSchema = new mongo.Schema(
+  {
+    name: String,
+    blocks: [blockSchema],
+    visibility: {
+      type: String,
+      enum: ["private", "public"],
+    },
+  },
+  { timestamps: true }
+);
+
+const boardModel = mongo.model("Board", boardSchema);
+
+const projectSchema = new mongo.Schema(
+  {
+    name: String,
+    userId: String,
+    boards: [boardSchema],
+  },
+  { timestamps: true }
+);
+
+const projectModel = mongo.model("Project", projectSchema);
 
 type BlockPropsByType = {
   code: CodeBlock["props"];
