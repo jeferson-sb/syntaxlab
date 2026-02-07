@@ -418,6 +418,12 @@ const makeMongoProjectRepository = (): ProjectRepository => ({
     return await projectModel.find();
   },
   async delete(id: ProjectId) {
+    if (!mongo.isValidObjectId(id.value)) throw new Error("Invalid project id");
+
+    const project = await projectModel.findOne({ _id: id.value });
+
+    if (!project) throw new Error("Project not found");
+
     await projectModel.deleteOne({ _id: id.value });
   },
 });
@@ -436,6 +442,12 @@ const makeMongoBoardRepository = (): BoardRepository => ({
     return boardModel.find();
   },
   async delete(id: BoardId) {
+    if (!mongo.isValidObjectId(id.value)) throw new Error("Invalid board id");
+
+    const board = await boardModel.findOne({ _id: id.value });
+
+    if (!board) throw new Error("Board not found");
+
     await boardModel.deleteOne({ _id: id.value });
   },
 });
@@ -460,6 +472,12 @@ const makeMongoBlockRepository = (): BlockRepository => ({
     return blockModel.find();
   },
   async delete(id: string) {
+    if (!mongo.isValidObjectId(id)) throw new Error("Invalid block id");
+
+    const block = await blockModel.findOne({ _id: id });
+
+    if (!block) throw new Error("Block not found");
+
     await blockModel.deleteOne({ _id: id });
   },
 });
@@ -517,9 +535,13 @@ const projectRouter = new Elysia({ prefix: "/projects" })
     }),
   })
   .get("/", () => getProjectsUseCase())
-  .delete("/:id", ({ params, set }) => {
-    deleteProjectUseCase({ value: params.id });
-    set.status = 204;
+  .delete("/:id", async ({ params, status }) => {
+    try {
+      await deleteProjectUseCase({ value: params.id });
+      return status(204);
+    } catch (error) {
+      return status(404, error.message);
+    }
   });
 
 const boardRouter = new Elysia({ prefix: "/boards" })
@@ -531,9 +553,13 @@ const boardRouter = new Elysia({ prefix: "/boards" })
     }),
   })
   .get("/", () => getBoardsUseCase())
-  .delete("/:id", ({ params, set }) => {
-    deleteBoardUseCase({ value: params.id });
-    set.status = 204;
+  .delete("/:id", async ({ params, status }) => {
+    try {
+      await deleteBoardUseCase({ value: params.id });
+      return status(204);
+    } catch (error) {
+      return status(404, error.message);
+    }
   });
 
 const blockRouter = new Elysia({ prefix: "/blocks" })
@@ -551,9 +577,13 @@ const blockRouter = new Elysia({ prefix: "/blocks" })
     }),
   })
   .get("/", () => getBlocksUseCase())
-  .delete("/:id", ({ params, set }) => {
-    deleteBlockUseCase(params.id);
-    set.status = 204;
+  .delete("/:id", async ({ params, status }) => {
+    try {
+      await deleteBlockUseCase(params.id);
+      return status(204);
+    } catch (error) {
+      return status(404, error.message);
+    }
   });
 
 makeMongoDBConnection();

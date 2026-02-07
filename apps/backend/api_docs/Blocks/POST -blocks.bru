@@ -1,0 +1,27 @@
+meta {
+  name: POST /blocks
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/api/blocks
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "type": "code",
+    "x": 10,
+    "y": 5, 
+    "props": {
+      "inlineCode": "const greeting = `hello world`"
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

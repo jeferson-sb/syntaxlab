@@ -1,12 +1,12 @@
 meta {
-  name: code
+  name: DELETE /blocks/:id
   type: http
-  seq: 2
+  seq: 3
 }
 
-post {
-  url: http://localhost:3000/api/blocks
-  body: json
+delete {
+  url: http://localhost:3000/api/blocks/123
+  body: none
   auth: inherit
 }
 
