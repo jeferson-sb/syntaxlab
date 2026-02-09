@@ -1,19 +1,17 @@
 import { Elysia, t } from "elysia";
-import { container } from "@/modules/container";
-
-const { createProjectUseCase, getProjectsUseCase, deleteProjectUseCase } =
-  container;
+import { registerProjectContainer } from "@/modules/project/container";
 
 export const projectController = new Elysia({ prefix: "/projects" })
-  .post("/", ({ body }) => createProjectUseCase(body), {
+  .use(registerProjectContainer())
+  .post("/", ({ body, createProjectUseCase }) => createProjectUseCase(body), {
     body: t.Object({
       name: t.String(),
       userId: t.String(),
       boards: t.Array(t.Any()),
     }),
   })
-  .get("/", () => getProjectsUseCase())
-  .delete("/:id", async ({ params, status }) => {
+  .get("/", ({ getProjectsUseCase }) => getProjectsUseCase())
+  .delete("/:id", async ({ params, status, deleteProjectUseCase }) => {
     try {
       await deleteProjectUseCase({ value: params.id });
       return status(204);

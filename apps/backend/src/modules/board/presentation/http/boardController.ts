@@ -1,18 +1,17 @@
 import { Elysia, t } from "elysia";
-import { container } from "@/modules/container";
-
-const { createBoardUseCase, getBoardsUseCase, deleteBoardUseCase } = container;
+import { registerBoardContainer } from "@/modules/board/container";
 
 export const boardController = new Elysia({ prefix: "/boards" })
-  .post("/", ({ body }) => createBoardUseCase(body), {
+  .use(registerBoardContainer())
+  .post("/", ({ body, createBoardUseCase }) => createBoardUseCase(body), {
     body: t.Object({
       name: t.String(),
       visibility: t.Union([t.Literal("private"), t.Literal("public")]),
       blocks: t.Array(t.Any()),
     }),
   })
-  .get("/", () => getBoardsUseCase())
-  .delete("/:id", async ({ params, status }) => {
+  .get("/", ({ getBoardsUseCase }) => getBoardsUseCase())
+  .delete("/:id", async ({ params, status, deleteBoardUseCase }) => {
     try {
       await deleteBoardUseCase({ value: params.id });
       return status(204);

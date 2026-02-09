@@ -1,11 +1,10 @@
 import { Elysia, t } from "elysia";
-import { container } from "@/modules/container";
+import { registerBlockContainer } from "@/modules/block/container";
 import { AnyCreateBlockDTO } from "@/modules/block/application/createBlock";
 
-const { createBlockUseCase, getBlocksUseCase, deleteBlockUseCase } = container;
-
 export const blockController = new Elysia({ prefix: "/blocks" })
-  .post("/", ({ body }) => createBlockUseCase(body as AnyCreateBlockDTO), {
+  .use(registerBlockContainer())
+  .post("/", ({ body, createBlockUseCase }) => createBlockUseCase(body as AnyCreateBlockDTO), {
     body: t.Object({
       type: t.Union([
         t.Literal("code"),
@@ -18,8 +17,8 @@ export const blockController = new Elysia({ prefix: "/blocks" })
       props: t.Record(t.String(), t.Any()),
     }),
   })
-  .get("/", () => getBlocksUseCase())
-  .delete("/:id", async ({ params, status }) => {
+  .get("/", ({ getBlocksUseCase }) => getBlocksUseCase())
+  .delete("/:id", async ({ params, status, deleteBlockUseCase }) => {
     try {
       await deleteBlockUseCase(params.id);
       return status(204);
