@@ -17,6 +17,16 @@ export const makeMongoProjectRepository = (): ProjectRepository => ({
       userId: entity.userId.value,
     });
   },
+  async update(entity: Partial<Project>) {
+    await projectModel.updateOne(
+      { _id: entity.id?.value },
+      {
+        name: entity.name,
+        userId: entity.userId?.value,
+        boards: entity.boards,
+      }
+    );
+  },
   async index() {
     return await projectModel.find();
   },

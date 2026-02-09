@@ -13,7 +13,9 @@ export type Project = AggregateRoot<ProjectId> & {
 
 export type ProjectId = AggregateId<string>;
 
-export type ProjectRepository = Repository<Project>;
+export type ProjectRepository = Repository<Project> & {
+  update(entity: Partial<Project>): Promise<void>;
+};
 
 export const createProject = (
   props: Omit<Project, "createdAt" | "updatedAt">
