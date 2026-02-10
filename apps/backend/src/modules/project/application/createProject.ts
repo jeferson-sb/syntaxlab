@@ -1,5 +1,8 @@
 import { Board } from "@/modules/board/domain/Board";
-import { createProject, ProjectRepository } from "../domain/Project";
+import {
+  createProject,
+  ProjectRepository,
+} from "@/modules/project/domain/Project";
 
 type CreateProjectDTO = {
   name: string;

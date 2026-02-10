@@ -1,0 +1,22 @@
+meta {
+  name: PATCH /projects/:id
+  type: http
+  seq: 4
+}
+
+patch {
+  url: http://localhost:3000/api/projects/69869fb4af4c411be57b672b
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "{{$randomWord}}"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

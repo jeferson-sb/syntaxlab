@@ -18,7 +18,7 @@ import { config } from "@/shared/infra/config";
 // type Either = {};
 
 const makeServer = () => {
-  const app = new Elysia({ prefix: "/api" })
+  const server = new Elysia({ prefix: "/api" })
     .use(openapi({ references: fromTypes() }))
     .use(cors())
     .use(logger())
@@ -26,14 +26,15 @@ const makeServer = () => {
     .use(boardController)
     .use(blockController);
 
-  return app;
+  return server;
 };
 
 makeMongoDBConnection();
 
-const app = makeServer();
-app.listen(config.serverPort);
+export const server = makeServer();
+
+server.listen(config.serverPort);
 
 console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
+  `🦊 Elysia is running at ${server.server?.hostname}:${server.server?.port}`
 );

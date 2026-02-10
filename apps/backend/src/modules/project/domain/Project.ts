@@ -2,7 +2,7 @@ import { Board } from "@/modules/board/domain/Board";
 import { AggregateId, AggregateRoot } from "@/shared/domain/AggregateRoot";
 import { Repository } from "@/shared/domain/Repository";
 
-type UserId = AggregateId<string>;
+export type UserId = AggregateId<string>;
 export type Project = AggregateRoot<ProjectId> & {
   name: string;
   userId: UserId;

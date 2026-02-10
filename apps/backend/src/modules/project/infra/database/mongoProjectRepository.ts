@@ -9,7 +9,7 @@ import projectModel from "./projectModel";
 
 export const makeMongoProjectRepository = (): ProjectRepository => ({
   async getNextId() {
-    return { value: crypto.randomUUID() };
+    return { value: crypto.randomUUID() }; // TODO: change to object id ?
   },
   async store(entity: Project) {
     await projectModel.create({
@@ -21,9 +21,8 @@ export const makeMongoProjectRepository = (): ProjectRepository => ({
     await projectModel.updateOne(
       { _id: entity.id?.value },
       {
-        name: entity.name,
+        name: entity?.name,
         userId: entity.userId?.value,
-        boards: entity.boards,
       }
     );
   },
