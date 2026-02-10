@@ -23,7 +23,7 @@ export const projectController = new Elysia({ prefix: "/projects" })
     async ({ params, body, status, updateProjectUseCase }) => {
       try {
         await updateProjectUseCase({
-          value: params.id,
+          id: { value: params.id },
           name: body?.name,
           userId: body?.userId ? { value: body.userId } : undefined,
         });
@@ -33,12 +33,12 @@ export const projectController = new Elysia({ prefix: "/projects" })
       }
     },
     {
-      body: t.Optional(
+      body: 
         t.Object({
           name: t.String(),
-          userId: t.String(),
+          userId: t.Optional(t.String()),
         })
-      ),
+      ,
     }
   )
   .delete("/:id", async ({ params, status, deleteProjectUseCase }) => {

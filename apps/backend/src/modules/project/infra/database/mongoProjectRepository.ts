@@ -9,7 +9,7 @@ import projectModel from "./projectModel";
 
 export const makeMongoProjectRepository = (): ProjectRepository => ({
   async getNextId() {
-    return { value: crypto.randomUUID() }; // TODO: change to object id ?
+    return { value: new mongoose.Types.ObjectId().toString() };
   },
   async store(entity: Project) {
     await projectModel.create({

@@ -9,7 +9,7 @@ import boardModel from "./boardModel";
 
 export const makeMongoBoardRepository = (): BoardRepository => ({
   async getNextId() {
-    return { value: crypto.randomUUID() };
+    return { value: new mongoose.Types.ObjectId().toString() };
   },
   async store(entity: Board) {
     await boardModel.create({

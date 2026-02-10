@@ -1,9 +1,11 @@
 import type {
+  ProjectId,
   ProjectRepository,
   UserId,
 } from "@/modules/project/domain/Project";
 
 type UpdateProjectDTO = {
+  id: ProjectId;
   name: string;
   userId: UserId;
 };

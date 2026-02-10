@@ -10,7 +10,7 @@ type AnyBlock = {
 
 export const makeMongoBlockRepository = (): BlockRepository => ({
   async getNextId() {
-    return crypto.randomUUID();
+    return new mongoose.Types.ObjectId().toString();
   },
   async store(entity: AnyBlock) {
     await blockModel.create({
