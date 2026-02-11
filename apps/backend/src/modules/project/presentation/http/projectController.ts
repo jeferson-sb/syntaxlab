@@ -18,6 +18,13 @@ export const projectController = new Elysia({ prefix: "/projects" })
     }
   )
   .get("/", ({ getProjectsUseCase }) => getProjectsUseCase())
+  .get("/:id", async ({ params, getProjectUseCase, status }) => {
+    try {
+      return await getProjectUseCase({ value: params.id });
+    } catch (error) {
+      if (error instanceof Error) return status(404, error.message);
+    }
+  })
   .patch(
     "/:id",
     async ({ params, body, status, updateProjectUseCase }) => {
@@ -50,13 +57,12 @@ export const projectController = new Elysia({ prefix: "/projects" })
   .post(
     "/:id/boards",
     async ({ status, params, body, addBoardToProjectUseCase }) => {
-      addBoardToProjectUseCase({ value: params.id }, body);
+      addBoardToProjectUseCase({ value: params.id }, body.boards);
       return status(201);
     },
     {
       body: t.Object({
-        name: t.String(),
-        visibility: t.Union([t.Literal("private"), t.Literal("public")]),
+        boards: t.Array(t.String()),
       }),
     }
   );

@@ -1,6 +1,6 @@
-import { Board } from "@/modules/board/domain/Board";
+import type { Board, BoardId } from "@/modules/board/domain/Board";
 import { AggregateId, AggregateRoot } from "@/shared/domain/AggregateRoot";
-import { Repository } from "@/shared/domain/Repository";
+import type { Repository } from "@/shared/domain/Repository";
 
 export type UserId = AggregateId<string>;
 export type Project = AggregateRoot<ProjectId> & {
@@ -14,8 +14,9 @@ export type Project = AggregateRoot<ProjectId> & {
 export type ProjectId = AggregateId<string>;
 
 export type ProjectRepository = Repository<Project> & {
+  get(id: ProjectId): Promise<Project>;
   update(entity: Partial<Project>): Promise<void>;
-  addBoard(projectId: ProjectId, board: Board): Promise<void>;
+  addBoard(projectId: ProjectId, board: BoardId[]): Promise<void>;
 };
 
 export const createProject = (
