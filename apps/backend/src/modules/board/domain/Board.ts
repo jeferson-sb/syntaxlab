@@ -4,7 +4,10 @@ import { Repository } from "@/shared/domain/Repository";
 
 export type BoardId = AggregateId<string>;
 
-export type BoardRepository = Repository<Board>;
+export type BoardRepository = Repository<Board> & {
+  get(id: BoardId): Promise<Board>;
+  update(entity: Partial<Board>): Promise<void>;
+};
 
 export type Board = AggregateRoot<BoardId> & {
   name: string;
