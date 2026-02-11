@@ -1,0 +1,22 @@
+meta {
+  name: PATCH /boards/:id
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:3000/api/boards/69869fbcaf4c411be57b672d
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "{{$randomWord}}"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
