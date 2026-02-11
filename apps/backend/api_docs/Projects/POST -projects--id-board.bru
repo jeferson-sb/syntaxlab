@@ -1,0 +1,22 @@
+meta {
+  name: POST /projects/:id/board
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:3000/api/projects/698bce1dab109da043f1d569/boards
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "GIMMY board"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

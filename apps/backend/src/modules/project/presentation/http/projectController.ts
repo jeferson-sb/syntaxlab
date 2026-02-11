@@ -33,12 +33,10 @@ export const projectController = new Elysia({ prefix: "/projects" })
       }
     },
     {
-      body: 
-        t.Object({
-          name: t.String(),
-          userId: t.Optional(t.String()),
-        })
-      ,
+      body: t.Object({
+        name: t.String(),
+        userId: t.Optional(t.String()),
+      }),
     }
   )
   .delete("/:id", async ({ params, status, deleteProjectUseCase }) => {
@@ -48,4 +46,17 @@ export const projectController = new Elysia({ prefix: "/projects" })
     } catch (error) {
       if (error instanceof Error) return status(404, error.message);
     }
-  });
+  })
+  .post(
+    "/:id/boards",
+    async ({ status, params, body, addBoardToProjectUseCase }) => {
+      addBoardToProjectUseCase({ value: params.id }, body);
+      return status(201);
+    },
+    {
+      body: t.Object({
+        name: t.String(),
+        visibility: t.Union([t.Literal("private"), t.Literal("public")]),
+      }),
+    }
+  );

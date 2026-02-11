@@ -1,10 +1,9 @@
-import { blockSchema } from "@/modules/block/infra/database/blockModel";
 import mongoose from "mongoose";
 
 export const boardSchema = new mongoose.Schema(
   {
     name: String,
-    blocks: [blockSchema],
+    blocks: [{ type: mongoose.Schema.Types.ObjectId, ref: "Block" }],
     visibility: {
       type: String,
       enum: ["private", "public"],

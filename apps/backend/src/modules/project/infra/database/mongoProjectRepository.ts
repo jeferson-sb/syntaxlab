@@ -26,6 +26,11 @@ export const makeMongoProjectRepository = (): ProjectRepository => ({
       }
     );
   },
+  async addBoard(projectId: ProjectId, board: any) {
+    const project = await projectModel.findOne({ _id: projectId.value });
+    project?.boards.push(board);
+    project?.save();
+  },
   async index() {
     return await projectModel.find();
   },
