@@ -10,4 +10,7 @@ const projectSchema = new mongoose.Schema(
 );
 
 export const projectModel = mongoose.model("Project", projectSchema);
+export type ProjectDocument = mongoose.InferSchemaType<typeof projectSchema> & {
+  _id: mongoose.Types.ObjectId;
+};;
 export default projectModel;

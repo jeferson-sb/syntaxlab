@@ -4,9 +4,13 @@ import { Repository } from "@/shared/domain/Repository";
 
 export type BoardId = AggregateId<string>;
 
+type UpdateBoardData = Partial<Omit<Board, 'blocks'>> & {
+  blockIds?: Block["id"][];
+};
+
 export type BoardRepository = Repository<Board> & {
   get(id: BoardId): Promise<Board>;
-  update(entity: Partial<Board>): Promise<void>;
+  update(entity: UpdateBoardData): Promise<void>;
 };
 
 export type Board = AggregateRoot<BoardId> & {

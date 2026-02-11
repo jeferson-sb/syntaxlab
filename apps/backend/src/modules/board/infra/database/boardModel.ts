@@ -11,6 +11,9 @@ export const boardSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+export type BoardDocument = mongoose.InferSchemaType<typeof boardSchema> & {
+  _id: mongoose.Types.ObjectId;
+};;
 
 export const boardModel = mongoose.model("Board", boardSchema);
 export default boardModel;

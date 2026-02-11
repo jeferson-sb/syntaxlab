@@ -6,16 +6,16 @@ import type {
   BoardRepository,
 } from "@/modules/board/domain/Board";
 import boardModel from "./boardModel";
+import { BoardMapper } from "./boardMapper";
 
 export const makeMongoBoardRepository = (): BoardRepository => ({
   async getNextId() {
     return { value: new mongoose.Types.ObjectId().toString() };
   },
   async store(entity: Board) {
-    await boardModel.create({
-      name: entity.name,
-      visibility: entity.visibility,
-    });
+    const data = BoardMapper.toData(entity);
+
+    await boardModel.create(data);
   },
   async update(entity: Partial<Board>) {
     await boardModel.updateOne(
@@ -39,13 +39,7 @@ export const makeMongoBoardRepository = (): BoardRepository => ({
 
     if (!board) throw new Error("Board not found");
 
-    // TODO: Refactor this to use a mapper instead of returning a plain object BoardMapper.toEntity(board)
-    return {
-      id: { value: board._id.toString() },
-      name: board.name,
-      visibility: board.visibility,
-      blocks: board.blocks,
-    };
+    return BoardMapper.toEntity(board);
   },
   async index() {
     return boardModel.find();

@@ -6,16 +6,16 @@ import type {
   ProjectRepository,
 } from "@/modules/project/domain/Project";
 import projectModel from "./projectModel";
+import { ProjectMapper } from "./projectMapper";
 
 export const makeMongoProjectRepository = (): ProjectRepository => ({
   async getNextId() {
     return { value: new mongoose.Types.ObjectId().toString() };
   },
   async store(entity: Project) {
-    await projectModel.create({
-      name: entity.name,
-      userId: entity.userId.value,
-    });
+    const data = ProjectMapper.toData(entity);
+
+    await projectModel.create(data);
   },
   async update(entity: Partial<Project>) {
     await projectModel.updateOne(
@@ -46,13 +46,7 @@ export const makeMongoProjectRepository = (): ProjectRepository => ({
 
     if (!project) throw new Error("Project not found");
 
-    // TODO: Refactor this to use a mapper instead of returning a plain object ProjectMapper.toEntity(board)
-    return {
-      id: { value: project._id.toString() },
-      name: project.name,
-      userId: { value: project.userId },
-      boards: project.boards,
-    };
+    return ProjectMapper.toEntity(project);
   },
   async index() {
     return await projectModel.find();
