@@ -19,7 +19,7 @@ export const makeCreateProject =
       id,
       name: payload.name,
       userId: { value: payload.userId },
-      boards: [],
+      boards: payload.boards,
     });
 
     await projectRepository.store(project);

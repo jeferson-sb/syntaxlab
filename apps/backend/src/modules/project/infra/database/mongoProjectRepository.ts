@@ -26,7 +26,7 @@ export const makeMongoProjectRepository = (): ProjectRepository => ({
       }
     );
   },
-  async addBoard(projectId: ProjectId, boards: any[]) {
+  async addBoard(projectId: ProjectId, boards: string[]) {
     await projectModel.updateOne(
       { _id: projectId.value },
       {

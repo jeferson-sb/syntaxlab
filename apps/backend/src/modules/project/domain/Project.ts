@@ -16,7 +16,7 @@ export type ProjectId = AggregateId<string>;
 export type ProjectRepository = Repository<Project> & {
   get(id: ProjectId): Promise<Project>;
   update(entity: Partial<Project>): Promise<void>;
-  addBoard(projectId: ProjectId, board: BoardId[]): Promise<void>;
+  addBoard(projectId: ProjectId, board: string[]): Promise<void>;
 };
 
 export const createProject = (
