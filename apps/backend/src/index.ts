@@ -9,11 +9,6 @@ import { blockController } from "@/modules/block/presentation/http/blockControll
 import { makeMongoDBConnection } from "@/bootstrap/db";
 import { config } from "@/shared/infra/config";
 
-// type DataMapper<AR extends AggregateRoot<any>, DATA> = {
-//   toEntity(data: DATA): AR;
-//   toData(entity: AR): DATA;
-// };
-
 // type Result = {};
 // type Either = {};
 
