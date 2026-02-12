@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": ".",
+    "paths": {
+    	"@backend": ["./apps/backend/src"],
+    	"@backend/*": ["./apps/backend/src/*"],
+    	"@web": ["./apps/web/src"],
+    	"@web/*": ["./apps/web/src/*"]
+    }
+  }
+}

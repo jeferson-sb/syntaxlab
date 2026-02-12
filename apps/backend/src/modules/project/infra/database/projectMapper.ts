@@ -2,7 +2,7 @@ import type { Project } from "@/modules/project/domain/Project";
 import type { DataMapper } from "@/shared/domain/DataMapper";
 import type { ProjectDocument } from "./projectModel";
 
-export const ProjectMapper: DataMapper<Project, Omit<ProjectDocument, '_id' | 'createdAt' | 'updatedAt'>> = {
+export const ProjectMapper: DataMapper<Project, ProjectDocument> = {
   toData: (entity) => ({
     name: entity.name,
     userId: entity.userId.value,
