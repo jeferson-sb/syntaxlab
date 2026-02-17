@@ -1,0 +1,194 @@
+<script lang="ts" setup>
+import { ref } from 'vue'
+import {
+  MousePointer2,
+  Type,
+  PenTool,
+  ImageIcon,
+  Trash2,
+  Plus,
+  Minus
+} from 'lucide-vue-next';
+
+const zoom = ref(1)
+const colors = ['#ffffff', '#fef9c3', '#dcfce7', '#dbeafe', '#f3e8ff']
+</script>
+
+<template>
+  <div class="toolbar-wrapper">
+    <div class="toolbar-container">
+
+      <ToolbarButton active="true">
+        <template #icon>
+          <MousePointer2 :size="18" />
+        </template>
+        <template #label>Select</template>
+      </ToolbarButton>
+
+      <div class="toolbar-divider"></div>
+
+      <ToolbarButton>
+        <template #icon>
+          <Type :size="18" />
+        </template>
+        <template #label></template>
+      </ToolbarButton>
+
+      <ToolbarButton>
+        <template #icon>
+          <PenTool :size="18" />
+        </template>
+        <template #label></template>
+      </ToolbarButton>
+
+      <ToolbarButton>
+        <template #icon>
+          <ImageIcon :size="18" />
+        </template>
+        <template #label></template>
+      </ToolbarButton>
+
+      <div class="toolbar-divider"></div>
+
+      <div class="toolbar-group">
+        <button class="tool-btn-secondary" title="Change Font Size">
+          <Type :size="16" />
+          <span class="badge-text">base</span>
+        </button>
+
+        <div class="color-picker">
+          <button v-for="color in colors" :key="color" class="color-swatch" :style="{ backgroundColor: color }" />
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <button class="tool-btn-danger" title="Remove block">
+          <Trash2 :size="16" />
+        </button>
+      </div>
+
+      <div class="toolbar-divider"></div>
+
+      <div class="zoom-controls">
+        <button class="zoom-control-minus">
+          <Minus :size="16" />
+        </button>
+        <span class="zoom-label">{{ Math.round(zoom * 100) }}%</span>
+        <button class="zoom-control-plus">
+          <Plus :size="16" />
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style lang="css" scoped>
+@import "open-props/style";
+
+.toolbar-wrapper {
+  position: absolute;
+  top: var(--size-5);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--layer-4);
+}
+
+.toolbar-container {
+  display: flex;
+  align-items: center;
+  gap: var(--size-2);
+  padding-inline: var(--size-3);
+  padding-block: var(--size-2);
+
+  background: var(--gray-0);
+  border: var(--border-size-1) solid var(--gray-1);
+  border-radius: var(--radius-3);
+  box-shadow: var(--shadow-1), var(--shadow-2);
+  animation: var(--animation-slide-in-down) forwards;
+  animation-duration: 300ms;
+}
+
+.toolbar-divider {
+  height: var(--size-5);
+  width: var(--border-size-1);
+  background: var(--gray-2);
+  margin-inline: var(--size-1);
+}
+
+.toolbar-group,
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--size-1);
+}
+
+.tool-btn-secondary,
+.tool-btn-icon-only {
+  display: flex;
+  align-items: center;
+  gap: var(--size-1);
+  padding: var(--size-2);
+  border-radius: var(--radius-2);
+  border: none;
+  background: var(--gray-0);
+  color: var(--gray-7);
+  cursor: pointer;
+  transition: background 300ms;
+}
+
+.tool-btn-secondary:hover,
+.tool-btn-icon-only:hover {
+  background: var(--slate-1);
+}
+
+.tool-btn-danger {
+  padding: var(--size-2);
+  border-radius: var(--radius-2);
+  border: none;
+  background: transparent;
+  color: var(--red-5);
+  cursor: pointer;
+  transition: background 300ms;
+}
+
+.tool-btn-danger:hover {
+  background: var(--red-0);
+  color: var(--red-7);
+}
+
+.badge-text {
+  font-size: var(--font-size-00);
+  font-weight: var(--font-weight-7);
+  text-transform: uppercase;
+}
+
+.zoom-label {
+  font-size: var(--font-size-0);
+  font-weight: var(--font-weight-7);
+  color: var(--gray-6);
+  width: var(--size-9);
+  text-align: center;
+}
+
+.zoom-control-minus,
+.zoom-control-plus {
+  padding: var(--size-2);
+  border-radius: var(--size-2);
+  color: var(--gray-6);
+  background: var(--gray-0);
+}
+
+.color-picker {
+  display: flex;
+  gap: var(--size-1);
+  padding-inline: var(--size-1);
+}
+
+.color-swatch {
+  width: var(--size-4);
+  height: var(--size-4);
+  border-radius: var(--radius-round);
+  border: var(--border-size-1) solid var(--slate-2);
+  cursor: pointer;
+}
+</style>

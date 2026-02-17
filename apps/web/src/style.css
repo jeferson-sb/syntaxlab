@@ -2,23 +2,12 @@
 @import "open-props/normalize" layer(reset);
 
 @layer base {
-
-  /* TODO: use OKCLH */
   :root {
     --ff-serif: "Space Grotesk", sans-serif;
-    --color-primary: #259df4;
-    --bg-light: #f5f7f8;
-    --bg-dark: #101a22;
-    --sidebar-dark: #111a22;
   }
 
   body {
     font-family: var(--ff-serif);
-  }
-
-  .dot-grid {
-    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-    background-size: 24px 24px;
   }
 
   ::-webkit-scrollbar {
