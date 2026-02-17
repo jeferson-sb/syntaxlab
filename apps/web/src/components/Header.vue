@@ -1,0 +1,142 @@
+<script lang="ts" setup>
+import { Share2, Bell, Edit3, Menu } from 'lucide-vue-next';
+import { ref } from 'vue';
+
+const isSidebarOpen = ref();
+const boardName = ref('Ideation Canvas');
+</script>
+
+<template>
+  <header class="app-header">
+    <div class="app-header__left">
+      <button v-if="isSidebarOpen" class="header__toggle">
+        <Menu :size="20" />
+      </button>
+
+      <div class="header__title">
+        <Edit3 class="text-primary" :size="18" />
+        <h2 class="title">{{ boardName }}</h2>
+        <span class="badge-live">LIVE</span>
+      </div>
+    </div>
+
+    <div class="header__actions">
+      <button class="button__share">
+        <Share2 :size="14" />
+        Share
+      </button>
+
+      <button class="button__bell">
+        <Bell :size="18" />
+      </button>
+    </div>
+  </header>
+</template>
+
+<style lang="css" scoped>
+.app-header {
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 1.5rem;
+  border-bottom: 1px solid var(--surface-3, #e6eef8);
+  background: var(--gray-1);
+  backdrop-filter: blur(12px);
+  z-index: var(--layer-3);
+}
+
+.app-header__left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header__toggle {
+  padding: 0.5rem;
+  border-radius: var(--radius-3, 0.5rem);
+  background: transparent;
+  transition: background 150ms ease;
+}
+
+.header__toggle:hover {
+  background: var(--surface-2, #f1f5f9);
+}
+
+.header__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  & svg {
+    color: var(--blue-5);
+  }
+}
+
+.icon-primary {
+  color: var(--primary, #7c3aed);
+}
+
+.title {
+  font-size: var(--font-size-1);
+  line-height: var(--font-lineheight-2);
+  font-weight: var(--font-weight-7);
+  color: var(--gray-7);
+}
+
+.badge-live {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.625rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: rgba(16, 185, 129, 0.95);
+  margin-left: 0.5rem;
+}
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--size-2);
+}
+
+.button__share {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--size-2);
+  background: var(--blue-5);
+  color: white;
+  font-weight: var(--font-weight-7);
+  font-size: var(--font-size-0);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-3);
+  box-shadow: 0 0 #0000,
+    0 0 #0000,
+    0 6px 15px -3px var(--blue-3),
+    0 4px 6px -4px var(--blue-3);
+  transition: transform 120ms ease, background 120ms ease;
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &:hover {
+    background: color-mix(in srgb, var(--blue-5) 90%, black 0%);
+  }
+}
+
+.button__bell {
+  padding: var(--size-2);
+  border-radius: var(--radius-3);
+  background: var(--gray-4);
+  color: var(--gray-7);
+  transition: background 150ms ease;
+
+  &:hover {
+    background: var(--gray-5);
+  }
+}
+</style>

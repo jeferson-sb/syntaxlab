@@ -8,6 +8,9 @@ import {
   ChevronLeft,
   Sparkles
 } from 'lucide-vue-next';
+import { ref } from 'vue';
+
+const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
 </script>
 
 <template>
@@ -48,9 +51,7 @@ import {
         <div class="recent-section">
           <p class="section-label">Recent</p>
           <div class="recent-list">
-            <div class="recent-item">Project Phoenix</div>
-            <div class="recent-item">Auth Flow 2.0</div>
-            <div class="recent-item">Landing Page V3</div>
+            <div class="recent-item" v-for="recentItem in recent">{{ recentItem }}</div>
           </div>
         </div>
       </div>
@@ -193,6 +194,7 @@ import {
     0 10px 15px -3px var(--blue-3),
     0 4px 6px -4px var(--blue-3);
   cursor: pointer;
+  transition: transform 120ms ease;
 
   &:hover {
     background-color: color-mix(in srgb, var(--blue-4) 90%, #fff 10%);
