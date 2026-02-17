@@ -40,7 +40,7 @@ const boardName = ref('Ideation Canvas');
   align-items: center;
   justify-content: space-between;
   padding-inline: 1.5rem;
-  border-bottom: 1px solid var(--surface-3, #e6eef8);
+  border-block-end: 1px solid var(--gray-3);
   background: var(--gray-1);
   backdrop-filter: blur(12px);
   z-index: var(--layer-3);

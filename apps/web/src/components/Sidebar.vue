@@ -74,7 +74,7 @@ const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
   top: 0;
   z-index: var(--layer-1);
   background: var(--gray-1);
-  border-inline-end: var(--border-size-1) solid var(--gray-2);
+  border-inline-end: var(--border-size-1) solid var(--gray-3);
 
   animation: var(--animation-slide-in-left);
 }
