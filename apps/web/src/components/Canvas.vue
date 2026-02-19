@@ -2,7 +2,35 @@
 import { ref, useTemplateRef } from 'vue';
 
 const canvas = useTemplateRef('canvas')
-const nodes = ref([])
+const blocks = ref([
+  {
+    id: '1',
+    type: 'note',
+    x: 400,
+    y: 150,
+    props: {
+      title: 'Main Value Prop',
+      content: 'A workspace that feels like a developer’s notebook, but acts like a powerful visual architect. Speed over formality.',
+    }
+  },
+  {
+    id: '2',
+    type: 'code',
+    x: 50,
+    y: 120,
+    props: {
+      title: 'auth-provider.js',
+      inlineCode: `
+        export const useAuth = () => {
+          const [user, setUser] = useState(null)
+          const login = (credentials) => {
+            return api.post('/auth/login', credentials)
+          }
+        }
+      `
+    }
+  }
+])
 
 // TODO: handle mouse up, mouse down, mouse wheel, panning, etc
 
@@ -18,7 +46,7 @@ const nodes = ref([])
       </svg>
 
       <div class="canvas-interaction-layer">
-        <!-- TODO: add node renderer -->
+        <BlockRenderer v-for="block in blocks" v-bind:key="block.id" :block="block" />
       </div>
     </div>
   </div>
