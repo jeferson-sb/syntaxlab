@@ -24,8 +24,8 @@ const selected = ref(false)
   user-select: none;
   pointer-events: auto;
   cursor: move;
-  left: var(--x, unset);
-  top: var(--y, unset);
+  left: calc(var(--x, unset) * 1px);
+  top: calc(var(--y, unset) * 1px);
 
   &.selected {
     box-shadow: 0 0 0 4px #fff, 0 0 0 6px var(--blue-3), 0 0 #0000;
