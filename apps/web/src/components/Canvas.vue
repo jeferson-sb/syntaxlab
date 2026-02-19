@@ -6,7 +6,7 @@ const blocks = ref([
   {
     id: '1',
     type: 'note',
-    x: 400,
+    x: 100,
     y: 150,
     props: {
       title: 'Main Value Prop',
@@ -28,6 +28,38 @@ const blocks = ref([
           }
         }
       `
+    }
+  },
+  {
+    id: '3',
+    type: 'image',
+    x: 400,
+    y: 150,
+    props: {
+      title: 'mount-fuji.jpeg',
+      href: 'https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+    }
+  },
+  {
+    id: '4',
+    type: 'bookmark',
+    x: 120,
+    y: 400,
+    props: {
+      title: 'facebook/react',
+      content: 'A declarative, efficient, and flexible JavaScript library for building user interfaces',
+      href: 'https://github.com/facebook/react',
+      imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=400&auto=format&fit=crop'
+    }
+  },
+  {
+    id: '5',
+    type: 'sticky',
+    x: 700,
+    y: 400,
+    props: {
+      title: 'facebook/react',
+      content: 'A declarative, efficient, and flexible JavaScript library for building user interfaces',
     }
   }
 ])
@@ -90,7 +122,7 @@ const blocks = ref([
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: var(--layer-1);
+  z-index: 0;
   overflow: visible;
 }
 
