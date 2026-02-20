@@ -1,76 +1,61 @@
 <script lang="ts" setup>
-import { ref, useTemplateRef } from 'vue';
+import { ref, useTemplateRef, onMounted, onUnmounted } from 'vue';
+
+const { zoom, offset, blocks } = defineProps(['zoom', 'offset', 'blocks'])
+const emit = defineEmits<{
+  (e: 'onZoom', amount: number): void
+  (e: 'onOffset', offset: { x: number; y: number; }): void
+}>()
 
 const canvas = useTemplateRef('canvas')
-const blocks = ref([
-  {
-    id: '1',
-    type: 'note',
-    x: 100,
-    y: 150,
-    props: {
-      title: 'Main Value Prop',
-      content: 'A workspace that feels like a developer’s notebook, but acts like a powerful visual architect. Speed over formality.',
-    }
-  },
-  {
-    id: '2',
-    type: 'code',
-    x: 900,
-    y: 120,
-    props: {
-      title: 'auth-provider.js',
-      lang: 'javascript',
-      inlineCode: `export const useAuth = () => {
-  const [user, setUser] = useState(null)
-  const login = (credentials) => {
-    return api.post('/auth/login', credentials)
+
+const isPanning = ref(false)
+const lastMousePos = ref({ x: 0, y: 0 });
+
+const onMouseDown = (e: MouseEvent) => {
+  isPanning.value = true;
+  lastMousePos.value.x = e.clientX;
+  lastMousePos.value.y = e.clientY;
+};
+
+const onMouseMove = (e: MouseEvent) => {
+  if (!isPanning.value) return;
+  const dx = e.clientX - lastMousePos.value.x;
+  const dy = e.clientY - lastMousePos.value.y;
+  lastMousePos.value.x = e.clientX;
+  lastMousePos.value.y = e.clientY;
+}
+
+const onMouseUp = () => {
+  isPanning.value = false
+}
+
+const onWheel = (e: WheelEvent) => {
+  if (e.ctrlKey || e.metaKey) {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.05 : 0.05;
+    emit('onZoom', Math.min(Math.max(zoom + delta, 0.2), 2.5))
+  } else if (!isPanning) {
+    emit('onOffset', { x: offset.x - e.deltaX, y: offset.y - e.deltaY })
   }
 }
-      `
-    }
-  },
-  {
-    id: '3',
-    type: 'image',
-    x: 400,
-    y: 150,
-    props: {
-      title: 'mount-fuji.jpeg',
-      href: 'https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-    }
-  },
-  {
-    id: '4',
-    type: 'bookmark',
-    x: 120,
-    y: 400,
-    props: {
-      title: 'facebook/react',
-      content: 'A declarative, efficient, and flexible JavaScript library for building user interfaces',
-      href: 'https://github.com/facebook/react',
-      imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=400&auto=format&fit=crop'
-    }
-  },
-  {
-    id: '5',
-    type: 'sticky',
-    x: 700,
-    y: 400,
-    props: {
-      title: 'Feature XYZ',
-      content: 'A new breaking feature about gamification and user-feedback',
-    }
-  }
-])
 
-// TODO: handle mouse up, mouse down, mouse wheel, panning, etc
+onMounted(() => {
+  if (isPanning) {
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  }
+})
+onUnmounted(() => {
+  window.removeEventListener('mousemove', onMouseMove);
+  window.removeEventListener('mouseup', onMouseUp);
+})
 
 </script>
 
 <template>
-  <div ref="canvas" class="canvas-viewport">
-    <div class="canvas-stage">
+  <div ref="canvas" class="canvas-viewport" @wheel.passive="onWheel" @mousedown="onMouseDown">
+    <div class="canvas-stage" :style="{ transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})` }">
       <div class="canvas-grid dot-grid" />
 
       <svg class="canvas-vector-layer">

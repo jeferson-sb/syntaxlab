@@ -9,9 +9,18 @@ import {
   Plus,
   Minus
 } from 'lucide-vue-next';
+import type { Block } from '@/types/block';
 
 const zoom = ref(1)
 const colors = ['#ffffff', '#fef9c3', '#dcfce7', '#dbeafe', '#f3e8ff']
+
+const emit = defineEmits<{
+  (e: 'addBlock', type: Block['type']): void
+  (e: 'updateBlock', partial: any): void
+  (e: 'removeBlock'): void
+  (e: 'zoomIn'): void
+  (e: 'zoomOut'): void
+}>()
 </script>
 
 <template>
@@ -25,30 +34,30 @@ const colors = ['#ffffff', '#fef9c3', '#dcfce7', '#dbeafe', '#f3e8ff']
         <template #label>Select</template>
       </ToolbarButton>
 
-      <div class="toolbar-divider"></div>
+      <div class="toolbar-divider" role="separator" aria-orientation="vertical"></div>
 
-      <ToolbarButton>
+      <ToolbarButton @click="$emit('addBlock', 'note')">
         <template #icon>
           <Type :size="18" />
         </template>
         <template #label></template>
       </ToolbarButton>
 
-      <ToolbarButton>
+      <ToolbarButton @click="$emit('addBlock', 'sticky')">
         <template #icon>
           <PenTool :size="18" />
         </template>
         <template #label></template>
       </ToolbarButton>
 
-      <ToolbarButton>
+      <ToolbarButton @click="$emit('addBlock', 'image')">
         <template #icon>
           <ImageIcon :size="18" />
         </template>
         <template #label></template>
       </ToolbarButton>
 
-      <div class="toolbar-divider"></div>
+      <div class="toolbar-divider" role="separator" aria-orientation="vertical"></div>
 
       <div class="toolbar-group">
         <button class="tool-btn-secondary" title="Change Font Size">
@@ -57,24 +66,25 @@ const colors = ['#ffffff', '#fef9c3', '#dcfce7', '#dbeafe', '#f3e8ff']
         </button>
 
         <div class="color-picker">
-          <button v-for="color in colors" :key="color" class="color-swatch" :style="{ backgroundColor: color }" />
+          <button v-for="color in colors" :key="color" @click="$emit('updateBlock', { color })" class="color-swatch"
+            :style="{ backgroundColor: color }" />
         </div>
 
-        <div class="toolbar-divider"></div>
+        <div class="toolbar-divider" role="separator" aria-orientation="vertical"></div>
 
-        <button class="tool-btn-danger" title="Remove block">
+        <button class="tool-btn-danger" title="Remove block" @click="$emit('removeBlock')">
           <Trash2 :size="16" />
         </button>
       </div>
 
-      <div class="toolbar-divider"></div>
+      <div class="toolbar-divider" role="separator" aria-orientation="vertical"></div>
 
       <div class="zoom-controls">
-        <button class="zoom-control-minus">
+        <button class="zoom-control-minus" aria-label="Zoom In" @click="$emit('zoomOut')">
           <Minus :size="16" />
         </button>
         <span class="zoom-label">{{ Math.round(zoom * 100) }}%</span>
-        <button class="zoom-control-plus">
+        <button class="zoom-control-plus" aria-label="Zoom Out" @click="$emit('zoomIn')">
           <Plus :size="16" />
         </button>
       </div>
