@@ -11,12 +11,18 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    BlockRenderer: typeof import('./src/components/BlockRenderer.vue')['default']
     Button: typeof import('./src/components/Button.vue')['default']
     Canvas: typeof import('./src/components/Canvas.vue')['default']
+    CodeSnippet: typeof import('./src/components/CodeSnippet.vue')['default']
     Header: typeof import('./src/components/Header.vue')['default']
+    ImageCard: typeof import('./src/components/ImageCard.vue')['default']
+    LinkCard: typeof import('./src/components/LinkCard.vue')['default']
     NavItem: typeof import('./src/components/NavItem.vue')['default']
     NodeRenderer: typeof import('./src/components/NodeRenderer.vue')['default']
     Sidebar: typeof import('./src/components/Sidebar.vue')['default']
+    StickyNote: typeof import('./src/components/StickyNote.vue')['default']
+    TextCard: typeof import('./src/components/TextCard.vue')['default']
     Toolbar: typeof import('./src/components/Toolbar.vue')['default']
     ToolbarButton: typeof import('./src/components/ToolbarButton.vue')['default']
   }

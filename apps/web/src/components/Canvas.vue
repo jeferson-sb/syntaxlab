@@ -16,17 +16,17 @@ const blocks = ref([
   {
     id: '2',
     type: 'code',
-    x: 50,
+    x: 900,
     y: 120,
     props: {
       title: 'auth-provider.js',
-      inlineCode: `
-        export const useAuth = () => {
-          const [user, setUser] = useState(null)
-          const login = (credentials) => {
-            return api.post('/auth/login', credentials)
-          }
-        }
+      lang: 'javascript',
+      inlineCode: `export const useAuth = () => {
+  const [user, setUser] = useState(null)
+  const login = (credentials) => {
+    return api.post('/auth/login', credentials)
+  }
+}
       `
     }
   },
@@ -58,8 +58,8 @@ const blocks = ref([
     x: 700,
     y: 400,
     props: {
-      title: 'facebook/react',
-      content: 'A declarative, efficient, and flexible JavaScript library for building user interfaces',
+      title: 'Feature XYZ',
+      content: 'A new breaking feature about gamification and user-feedback',
     }
   }
 ])
