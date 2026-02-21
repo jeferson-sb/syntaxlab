@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 import { ref, useTemplateRef, onMounted, onUnmounted } from 'vue';
 
-const { zoom, offset, blocks } = defineProps(['zoom', 'offset', 'blocks'])
+const { zoom, offset, blocks, selected } = defineProps(['zoom', 'offset', 'blocks', 'selected'])
 const emit = defineEmits<{
   (e: 'onZoom', amount: number): void
   (e: 'onOffset', offset: { x: number; y: number; }): void
+  (e: 'selectBlock', id: string): void
+  (e: 'updateBlock', payload: any): void
 }>()
 
 const canvas = useTemplateRef('canvas')
@@ -63,7 +65,8 @@ onUnmounted(() => {
       </svg>
 
       <div class="canvas-interaction-layer">
-        <BlockRenderer v-for="block in blocks" v-bind:key="block.id" :block="block" />
+        <BlockRenderer v-for="block in blocks" v-bind:key="block.id" :block="block"
+          @select-block="$emit('selectBlock', block.id)" :selected="block.id === selected" />
       </div>
     </div>
   </div>

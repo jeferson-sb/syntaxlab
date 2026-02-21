@@ -45,7 +45,6 @@ onMounted(async () => {
   border-radius: var(--radius-3);
   box-shadow: var(--shadow-2);
   overflow: clip;
-  border: var(--gray-2) var(--border-size-1) solid;
   font-family: var(--font-monospace-code);
 }
 

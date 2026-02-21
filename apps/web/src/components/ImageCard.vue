@@ -20,7 +20,6 @@ const props = defineProps(['block'])
   overflow: hidden;
   background: white;
   border-radius: var(--radius-3);
-  border: var(--gray-2) var(--border-size-1) solid;
   width: var(--size-14);
 
   & .image-card__metadata {

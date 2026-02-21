@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, useTemplateRef } from 'vue'
 import { treaty, edenFetch } from '@elysiajs/eden'
 import type { App } from 'syntaxlab-backend'
 
@@ -8,7 +8,7 @@ const fetch = edenFetch<App>('http://localhost:3000')
 
 const zoom = ref(1)
 const offset = ref({ x: 0, y: 0 })
-const selected = ref({ id: '1' })
+const selected = ref(null)
 const blocks = ref([
   {
     id: '1',
@@ -70,9 +70,15 @@ const blocks = ref([
     }
   }
 ])
+const fileInputRef = useTemplateRef('file')
+
+function uniqueId() {
+  return Math.floor(Math.random() * 1e15).toString()
+}
 
 const addBlock = (type) => {
   if (type === 'image') {
+    fileInputRef.value?.click();
     return;
   }
 
@@ -80,7 +86,7 @@ const addBlock = (type) => {
   const centerY = (-offset.value.y + window.innerHeight / 2) / zoom.value;
 
   const newBlock = {
-    id: Math.random().toString(36).slice(2, 9),
+    id: uniqueId(),
     type,
     x: centerX - 100,
     y: centerY - 100,
@@ -91,7 +97,46 @@ const addBlock = (type) => {
     }
   };
   blocks.value.push(newBlock);
-  selected.value.id = newBlock.id;
+  selected.value = newBlock.id;
+};
+
+const updateBlock = (id: string | null, updates: any) => {
+  console.log('Updating block', id, updates)
+
+  if (!id) return
+
+  blocks.value = blocks.value.map(blck => blck.id === id ? { ...blck, ...updates } : blck)
+};
+
+const removeBlock = () => {
+  if (!selected.value)
+    blocks.value = blocks.value.filter(block => block.id !== selected.value)
+};
+
+const onImageUpload = (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    const imageUrl = event.target?.result as string;
+    const centerX = (-offset.value.x + window.innerWidth / 2) / zoom.value;
+    const centerY = (-offset.value.y + window.innerHeight / 2) / zoom.value;
+
+    const newBlock = {
+      id: uniqueId(),
+      type: 'image',
+      x: centerX - 150,
+      y: centerY - 150,
+      props: {
+        title: file.name,
+        imageUrl
+      },
+    };
+    blocks.value.push(newBlock)
+    selected.value = newBlock.id
+  };
+  reader.readAsDataURL(file);
 };
 
 </script>
@@ -103,10 +148,14 @@ const addBlock = (type) => {
     <div class="shell">
       <Header />
 
+      <input type="file" ref="file" accept="image/*" @change="onImageUpload" hidden />
+
       <main>
-        <Canvas :zoom="zoom" :offset="offset" :blocks="blocks" />
-        <Toolbar @addBlock="addBlock" @zoomIn="zoom = Math.min(zoom + 0.1, 2.5)"
-          @zoomOut="zoom = Math.max(zoom - 0.1, 0.2)" />
+        <Canvas :zoom="zoom" :offset="offset" :blocks="blocks" :selected="selected" @update-block="updateBlock"
+          @select-block="id => selected = id" />
+        <Toolbar :zoom="zoom" @add-block="addBlock" @update-block="partial => updateBlock(selected, partial)"
+          @remove-block="removeBlock" @zoom-in="zoom = Math.min(zoom + 0.1, 2.5)"
+          @zoom-out="zoom = Math.max(zoom - 0.1, 0.2)" />
       </main>
     </div>
   </div>

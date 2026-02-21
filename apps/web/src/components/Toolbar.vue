@@ -11,7 +11,8 @@ import {
 } from 'lucide-vue-next';
 import type { Block } from '@/types/block';
 
-const zoom = ref(1)
+defineProps(['zoom'])
+
 const colors = ['#ffffff', '#fef9c3', '#dcfce7', '#dbeafe', '#f3e8ff']
 
 const emit = defineEmits<{
