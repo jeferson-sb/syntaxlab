@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-const props = defineProps(['block'])
-
-const isEditing = false
+const props = defineProps(['block', 'isEditing'])
 </script>
 
 <template>

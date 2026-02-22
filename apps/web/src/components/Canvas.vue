@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, useTemplateRef, onMounted, onUnmounted } from 'vue';
 
-const { zoom, offset, blocks, selected } = defineProps(['zoom', 'offset', 'blocks', 'selected'])
+const { zoom, offset, blocks, selected, connections } = defineProps(['zoom', 'offset', 'blocks', 'selected', 'connections'])
 const emit = defineEmits<{
   (e: 'onZoom', amount: number): void
   (e: 'onOffset', offset: { x: number; y: number; }): void
@@ -24,6 +24,7 @@ const onMouseMove = (e: MouseEvent) => {
   if (!isPanning.value) return;
   const dx = e.clientX - lastMousePos.value.x;
   const dy = e.clientY - lastMousePos.value.y;
+  emit('onOffset', { x: offset.x + dx, y: offset.y + dy })
   lastMousePos.value.x = e.clientX;
   lastMousePos.value.y = e.clientY;
 }
@@ -56,17 +57,19 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="canvas" class="canvas-viewport" @wheel.passive="onWheel" @mousedown="onMouseDown">
+  <div ref="canvas" class="canvas-viewport" @wheel="onWheel" @mousedown="onMouseDown">
     <div class="canvas-stage" :style="{ transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})` }">
       <div class="canvas-grid dot-grid" />
 
       <svg class="canvas-vector-layer">
         <!-- TODO: add <path> connections -->
+        <path v-for="conn in connections" :key="conn" />
       </svg>
 
       <div class="canvas-interaction-layer">
-        <BlockRenderer v-for="block in blocks" v-bind:key="block.id" :block="block"
-          @select-block="$emit('selectBlock', block.id)" :selected="block.id === selected" />
+        <BlockRenderer v-for="block in blocks" v-bind:key="block.id" :block="block" :zoom="zoom"
+          @select-block="$emit('selectBlock', block.id)" @change-position="payload => $emit('updateBlock', payload)"
+          :selected="block.id === selected" />
       </div>
     </div>
   </div>

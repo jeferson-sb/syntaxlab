@@ -6,6 +6,7 @@ import type { App } from 'syntaxlab-backend'
 const api = treaty<App>('http://localhost:3000')
 const fetch = edenFetch<App>('http://localhost:3000')
 
+// TODO: migrate local state to pinia
 const zoom = ref(1)
 const offset = ref({ x: 0, y: 0 })
 const selected = ref(null)
@@ -70,12 +71,14 @@ const blocks = ref([
     }
   }
 ])
+const connections = ref([])
 const fileInputRef = useTemplateRef('file')
 
 function uniqueId() {
   return Math.floor(Math.random() * 1e15).toString()
 }
 
+// TODO: fix typing
 const addBlock = (type) => {
   if (type === 'image') {
     fileInputRef.value?.click();
@@ -101,17 +104,23 @@ const addBlock = (type) => {
 };
 
 const updateBlock = (id: string | null, updates: any) => {
-  console.log('Updating block', id, updates)
-
+  console.log('[updateBlock]', id, updates)
   if (!id) return
 
-  blocks.value = blocks.value.map(blck => blck.id === id ? { ...blck, ...updates } : blck)
+  blocks.value = blocks.value.map(blck => {
+    const patch = updates?.props ? { ...blck, props: { ...blck.props, ...updates.props } } : { ...blck, ...updates }
+    return blck.id === id ? patch : blck
+  })
 };
 
 const removeBlock = () => {
-  if (!selected.value)
-    blocks.value = blocks.value.filter(block => block.id !== selected.value)
+  if (!selected.value) return
+
+  blocks.value = blocks.value.filter(block => block.id !== selected.value)
 };
+
+// TODO: add gemini integration for note/sticky blocks
+const aiExpand = () => { }
 
 const onImageUpload = (e) => {
   const file = e.target.files?.[0];
@@ -130,7 +139,7 @@ const onImageUpload = (e) => {
       y: centerY - 150,
       props: {
         title: file.name,
-        imageUrl
+        href: imageUrl
       },
     };
     blocks.value.push(newBlock)
@@ -151,11 +160,13 @@ const onImageUpload = (e) => {
       <input type="file" ref="file" accept="image/*" @change="onImageUpload" hidden />
 
       <main>
-        <Canvas :zoom="zoom" :offset="offset" :blocks="blocks" :selected="selected" @update-block="updateBlock"
-          @select-block="id => selected = id" />
-        <Toolbar :zoom="zoom" @add-block="addBlock" @update-block="partial => updateBlock(selected, partial)"
-          @remove-block="removeBlock" @zoom-in="zoom = Math.min(zoom + 0.1, 2.5)"
-          @zoom-out="zoom = Math.max(zoom - 0.1, 0.2)" />
+        <Canvas :zoom="zoom" :offset="offset" :blocks="blocks" :connections="connections" :selected="selected"
+          @update-block="partial => updateBlock(selected, partial)" @select-block="id => selected = id"
+          @on-offset="data => offset = data" @on-zoom="amount => zoom = amount" />
+        <Toolbar :zoom="zoom" :selected="selected" @add-block="addBlock"
+          @update-block="partial => updateBlock(selected, partial)" @remove-block="removeBlock"
+          @zoom-in="zoom = Math.min(zoom + 0.1, 2.5)" @zoom-out="zoom = Math.max(zoom - 0.1, 0.2)"
+          @unselect="selected = null" />
       </main>
     </div>
   </div>

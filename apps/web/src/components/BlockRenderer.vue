@@ -1,39 +1,41 @@
 <script lang="ts" setup>
 import { ref, useTemplateRef } from 'vue';
+import { useDraggable } from '@vueuse/core'
 
 const { block, selected } = defineProps(['block', 'selected'])
 const emit = defineEmits<{
   (e: 'selectBlock'): void
+  (e: 'changePosition', update: any): void
 }>()
 
-
+const isEditing = ref(false)
 const blockRef = useTemplateRef('block')
-
-const onMouseDown = () => {
-  emit('selectBlock')
-}
-
+const { style } = useDraggable(blockRef, {
+  initialValue: { x: block.x, y: block.y },
+  preventDefault: true,
+  onEnd(position) {
+    emit('changePosition', { x: position.x, y: position.y })
+  }
+})
 </script>
 
 <template>
-  <div ref="block" @mousedown="onMouseDown" class="block" :style="{ '--x': block.x, '--y': block.y }">
+  <div ref="block" @click="$emit('selectBlock')" @dblclick="isEditing = true" class="block" :style="style">
     <StickyNote v-if="block.type === 'sticky'" :block="block" :class="{ selected: selected }" />
     <CodeSnippet v-else-if="block.type === 'code'" :block="block" :class="{ selected: selected }" />
     <LinkCard v-else-if="block.type === 'bookmark'" :block="block" :class="{ selected: selected }" />
-    <TextCard v-else-if="block.type === 'note'" :block="block" :class="{ selected: selected }" />
+    <TextCard v-else-if="block.type === 'note'" :block="block" :isEditing="isEditing" :class="{ selected: selected }" />
     <ImageCard v-else-if="block.type === 'image'" :block="block" :class="{ selected: selected }" />
   </div>
 </template>
 
 <style lang="css" scoped>
 .block {
-  position: absolute;
+  position: fixed;
   z-index: var(--layer-1);
   user-select: none;
   pointer-events: auto;
   cursor: move;
-  left: calc(var(--x, unset) * 1px);
-  top: calc(var(--y, unset) * 1px);
   translate: 0 0;
   transition: opacity 500ms ease-out, translate 500ms ease-out;
 

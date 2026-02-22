@@ -110,6 +110,7 @@ onMounted(async () => {
     resize: none;
     background: transparent;
     border: none;
+    outline: none;
     padding: 0;
     color: var(--gray-1);
   }
