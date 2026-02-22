@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
 import {
   MousePointer2,
   Type,
@@ -11,7 +10,7 @@ import {
 } from 'lucide-vue-next';
 import type { Block } from '@/types/block';
 
-defineProps(['zoom'])
+defineProps(['zoom', 'selected'])
 
 const colors = ['#ffffff', '#fef9c3', '#dcfce7', '#dbeafe', '#f3e8ff']
 
@@ -21,6 +20,7 @@ const emit = defineEmits<{
   (e: 'removeBlock'): void
   (e: 'zoomIn'): void
   (e: 'zoomOut'): void
+  (e: 'unselect'): void
 }>()
 </script>
 
@@ -28,11 +28,11 @@ const emit = defineEmits<{
   <div class="toolbar-wrapper">
     <div class="toolbar-container">
 
-      <ToolbarButton active="true">
+      <ToolbarButton active="true" @click="$emit('unselect')">
         <template #icon>
           <MousePointer2 :size="18" />
         </template>
-        <template #label>Select</template>
+        <template #label>{{ selected ? 'Unselect' : 'Select' }}</template>
       </ToolbarButton>
 
       <div class="toolbar-divider" role="separator" aria-orientation="vertical"></div>
@@ -67,8 +67,8 @@ const emit = defineEmits<{
         </button>
 
         <div class="color-picker">
-          <button v-for="color in colors" :key="color" @click="$emit('updateBlock', { color })" class="color-swatch"
-            :style="{ backgroundColor: color }" />
+          <button v-for="color in colors" :key="color" @click="$emit('updateBlock', { props: { color } })"
+            class="color-swatch" :style="{ backgroundColor: color }" />
         </div>
 
         <div class="toolbar-divider" role="separator" aria-orientation="vertical"></div>
