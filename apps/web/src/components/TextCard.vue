@@ -5,7 +5,7 @@ const isEditing = false
 </script>
 
 <template>
-  <div class="text-card">
+  <div class="text-card" :style="{ '--color': block.props.color }">
     <textarea v-if="isEditing" autofocus="true" :defaultValue="block.props.content" />
     <p v-else>{{ block.props.content }}</p>
   </div>
@@ -18,7 +18,7 @@ const isEditing = false
   box-shadow: var(--shadow-2);
   border-radius: var(--radius-4);
   border: var(--gray-2) var(--border-size-1) solid;
-  background: white;
+  background: var(--color, white);
   color: var(--gray-7);
   line-height: var(--font-lineheight-4);
   font-weight: var(--font-weight-6);
