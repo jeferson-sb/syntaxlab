@@ -1,15 +1,18 @@
 <script lang="ts" setup>
 import { ref, useTemplateRef, onMounted, onUnmounted } from 'vue';
+import { storeToRefs } from 'pinia'
+import { useCanvasStore } from '@/store/canvas'
 
-const { zoom, offset, blocks, selected, connections } = defineProps(['zoom', 'offset', 'blocks', 'selected', 'connections'])
+const toolbarState = useCanvasStore()
+
+const { pinchZoom, changeOffset } = toolbarState
+const { zoom, offset } = storeToRefs(toolbarState)
+
+const { blocks, selected, connections } = defineProps(['blocks', 'selected', 'connections'])
 const emit = defineEmits<{
-  (e: 'onZoom', amount: number): void
-  (e: 'onOffset', offset: { x: number; y: number; }): void
   (e: 'selectBlock', id: string): void
   (e: 'updateBlock', payload: any): void
 }>()
-
-const canvas = useTemplateRef('canvas')
 
 const isPanning = ref(false)
 const lastMousePos = ref({ x: 0, y: 0 });
@@ -24,7 +27,7 @@ const onMouseMove = (e: MouseEvent) => {
   if (!isPanning.value) return;
   const dx = e.clientX - lastMousePos.value.x;
   const dy = e.clientY - lastMousePos.value.y;
-  emit('onOffset', { x: offset.x + dx, y: offset.y + dy })
+  changeOffset({ x: offset.value.x + dx, y: offset.value.y + dy })
   lastMousePos.value.x = e.clientX;
   lastMousePos.value.y = e.clientY;
 }
@@ -37,9 +40,9 @@ const onWheel = (e: WheelEvent) => {
   if (e.ctrlKey || e.metaKey) {
     e.preventDefault();
     const delta = e.deltaY > 0 ? -0.05 : 0.05;
-    emit('onZoom', Math.min(Math.max(zoom + delta, 0.2), 2.5))
+    pinchZoom(delta)
   } else if (!isPanning) {
-    emit('onOffset', { x: offset.x - e.deltaX, y: offset.y - e.deltaY })
+    changeOffset({ x: offset.value.x - e.deltaX, y: offset.value.y - e.deltaY })
   }
 }
 
@@ -67,7 +70,7 @@ onUnmounted(() => {
       </svg>
 
       <div class="canvas-interaction-layer">
-        <BlockRenderer v-for="block in blocks" v-bind:key="block.id" :block="block" :zoom="zoom"
+        <BlockRenderer v-for="block in blocks" v-bind:key="block.id" :block="block"
           @select-block="$emit('selectBlock', block.id)" @change-position="payload => $emit('updateBlock', payload)"
           :selected="block.id === selected" />
       </div>

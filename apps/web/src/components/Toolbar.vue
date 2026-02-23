@@ -9,8 +9,11 @@ import {
   Minus
 } from 'lucide-vue-next';
 import type { Block } from '@/types/block';
+import { useCanvasStore } from '@/store/canvas'
 
-defineProps(['zoom', 'selected'])
+const canvasState = useCanvasStore()
+
+defineProps(['selected'])
 
 const colors = ['#ffffff', '#fef9c3', '#dcfce7', '#dbeafe', '#f3e8ff']
 
@@ -18,8 +21,6 @@ const emit = defineEmits<{
   (e: 'addBlock', type: Block['type']): void
   (e: 'updateBlock', partial: any): void
   (e: 'removeBlock'): void
-  (e: 'zoomIn'): void
-  (e: 'zoomOut'): void
   (e: 'unselect'): void
 }>()
 </script>
@@ -81,11 +82,11 @@ const emit = defineEmits<{
       <div class="toolbar-divider" role="separator" aria-orientation="vertical"></div>
 
       <div class="zoom-controls">
-        <button class="zoom-control-minus" aria-label="Zoom In" @click="$emit('zoomOut')">
+        <button class="zoom-control-minus" aria-label="Zoom Out" @click="canvasState.zoomOut">
           <Minus :size="16" />
         </button>
-        <span class="zoom-label">{{ Math.round(zoom * 100) }}%</span>
-        <button class="zoom-control-plus" aria-label="Zoom Out" @click="$emit('zoomIn')">
+        <span class="zoom-label">{{ Math.round(canvasState.zoom * 100) }}%</span>
+        <button class="zoom-control-plus" aria-label="Zoom In" @click="canvasState.zoomIn">
           <Plus :size="16" />
         </button>
       </div>

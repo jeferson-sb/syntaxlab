@@ -2,13 +2,15 @@
 import { ref, useTemplateRef } from 'vue'
 import { treaty, edenFetch } from '@elysiajs/eden'
 import type { App } from 'syntaxlab-backend'
+import { useCanvasStore } from '@/store/canvas'
 
 const api = treaty<App>('http://localhost:3000')
 const fetch = edenFetch<App>('http://localhost:3000')
 
 // TODO: migrate local state to pinia
-const zoom = ref(1)
-const offset = ref({ x: 0, y: 0 })
+
+const canvasState = useCanvasStore()
+
 const selected = ref(null)
 const blocks = ref([
   {
@@ -85,8 +87,8 @@ const addBlock = (type) => {
     return;
   }
 
-  const centerX = (-offset.value.x + window.innerWidth / 2) / zoom.value;
-  const centerY = (-offset.value.y + window.innerHeight / 2) / zoom.value;
+  const centerX = (-canvasState.offset.x + window.innerWidth / 2) / canvasState.zoom;
+  const centerY = (-canvasState.offset.y + window.innerHeight / 2) / canvasState.zoom;
 
   const newBlock = {
     id: uniqueId(),
@@ -129,8 +131,8 @@ const onImageUpload = (e) => {
   const reader = new FileReader();
   reader.onload = (event) => {
     const imageUrl = event.target?.result as string;
-    const centerX = (-offset.value.x + window.innerWidth / 2) / zoom.value;
-    const centerY = (-offset.value.y + window.innerHeight / 2) / zoom.value;
+    const centerX = (-canvasState.offset.x + window.innerWidth / 2) / canvasState.zoom;
+    const centerY = (-canvasState.offset.y + window.innerHeight / 2) / canvasState.zoom;
 
     const newBlock = {
       id: uniqueId(),
@@ -160,13 +162,10 @@ const onImageUpload = (e) => {
       <input type="file" ref="file" accept="image/*" @change="onImageUpload" hidden />
 
       <main>
-        <Canvas :zoom="zoom" :offset="offset" :blocks="blocks" :connections="connections" :selected="selected"
-          @update-block="partial => updateBlock(selected, partial)" @select-block="id => selected = id"
-          @on-offset="data => offset = data" @on-zoom="amount => zoom = amount" />
-        <Toolbar :zoom="zoom" :selected="selected" @add-block="addBlock"
-          @update-block="partial => updateBlock(selected, partial)" @remove-block="removeBlock"
-          @zoom-in="zoom = Math.min(zoom + 0.1, 2.5)" @zoom-out="zoom = Math.max(zoom - 0.1, 0.2)"
-          @unselect="selected = null" />
+        <Canvas :blocks="blocks" :connections="connections" :selected="selected"
+          @update-block="partial => updateBlock(selected, partial)" @select-block="id => selected = id" />
+        <Toolbar :selected="selected" @add-block="addBlock" @update-block="partial => updateBlock(selected, partial)"
+          @remove-block="removeBlock" @unselect="selected = null" />
       </main>
     </div>
   </div>
