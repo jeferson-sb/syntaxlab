@@ -1,18 +1,14 @@
 <script lang="ts" setup>
-import { ref, useTemplateRef, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia'
 import { useCanvasStore } from '@/store/canvas'
+import { useBlockStore } from '@/store/block'
 
-const toolbarState = useCanvasStore()
+const canvasState = useCanvasStore()
+const blockState = useBlockStore()
 
-const { pinchZoom, changeOffset } = toolbarState
-const { zoom, offset } = storeToRefs(toolbarState)
-
-const { blocks, selected, connections } = defineProps(['blocks', 'selected', 'connections'])
-const emit = defineEmits<{
-  (e: 'selectBlock', id: string): void
-  (e: 'updateBlock', payload: any): void
-}>()
+const { pinchZoom, changeOffset } = canvasState
+const { zoom, offset } = storeToRefs(canvasState)
 
 const isPanning = ref(false)
 const lastMousePos = ref({ x: 0, y: 0 });
@@ -46,6 +42,14 @@ const onWheel = (e: WheelEvent) => {
   }
 }
 
+const selectBlock = (id: string | null) => {
+  blockState.selected = id
+}
+
+const changePosition = (payload: any) => {
+  blockState.updateBlock(payload)
+}
+
 onMounted(() => {
   if (isPanning) {
     window.addEventListener('mousemove', onMouseMove);
@@ -60,19 +64,19 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="canvas" class="canvas-viewport" @wheel="onWheel" @mousedown="onMouseDown">
+  <div class="canvas-viewport" @wheel="onWheel" @mousedown="onMouseDown">
     <div class="canvas-stage" :style="{ transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})` }">
       <div class="canvas-grid dot-grid" />
 
       <svg class="canvas-vector-layer">
         <!-- TODO: add <path> connections -->
-        <path v-for="conn in connections" :key="conn" />
+        <path v-for="conn in blockState.connections" :key="conn" />
       </svg>
 
       <div class="canvas-interaction-layer">
-        <BlockRenderer v-for="block in blocks" v-bind:key="block.id" :block="block"
-          @select-block="$emit('selectBlock', block.id)" @change-position="payload => $emit('updateBlock', payload)"
-          :selected="block.id === selected" />
+        <BlockRenderer v-for="block in blockState.blocks" v-bind:key="block.id" :block="block"
+          :selected="block.id === blockState.selected" @select-block="selectBlock(block.id)"
+          @change-position="changePosition" />
       </div>
     </div>
   </div>

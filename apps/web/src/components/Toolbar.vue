@@ -8,56 +8,104 @@ import {
   Plus,
   Minus
 } from 'lucide-vue-next';
-import type { Block } from '@/types/block';
 import { useCanvasStore } from '@/store/canvas'
+import { useBlockStore } from '@/store/block';
+import { uniqueId } from '@/lib/uniqueId';
+import { useTemplateRef } from 'vue';
 
 const canvasState = useCanvasStore()
-
-defineProps(['selected'])
+const blockState = useBlockStore()
 
 const colors = ['#ffffff', '#fef9c3', '#dcfce7', '#dbeafe', '#f3e8ff']
+const fileInputRef = useTemplateRef('file')
 
-const emit = defineEmits<{
-  (e: 'addBlock', type: Block['type']): void
-  (e: 'updateBlock', partial: any): void
-  (e: 'removeBlock'): void
-  (e: 'unselect'): void
-}>()
+const addBlock = (type) => {
+  if (type === "image") {
+    fileInputRef.value?.click();
+    return;
+  }
+
+  const centerX =
+    (-canvasState.offset.x + window.innerWidth / 2) / canvasState.zoom;
+  const centerY =
+    (-canvasState.offset.y + window.innerHeight / 2) / canvasState.zoom;
+
+  const newBlock = {
+    id: uniqueId(),
+    type,
+    x: centerX - 100,
+    y: centerY - 100,
+    props: {
+      content:
+        type === "code" ? "// New snippet" : "Double click to edit content",
+      title: type === "code" ? "new_file.js" : "New Idea",
+      color: "#ffffff",
+    },
+  };
+  blockState.appendBlock(newBlock);
+};
+
+const onImageUpload = (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    const imageUrl = event.target?.result as string;
+    const centerX = (-canvasState.offset.x + window.innerWidth / 2) / canvasState.zoom;
+    const centerY = (-canvasState.offset.y + window.innerHeight / 2) / canvasState.zoom;
+
+    const newBlock = {
+      id: uniqueId(),
+      type: 'image',
+      x: centerX - 150,
+      y: centerY - 150,
+      props: {
+        title: file.name,
+        href: imageUrl
+      },
+    };
+    blockState.appendBlock(newBlock)
+  };
+  reader.readAsDataURL(file);
+};
 </script>
 
 <template>
   <div class="toolbar-wrapper">
     <div class="toolbar-container">
 
-      <ToolbarButton active="true" @click="$emit('unselect')">
+      <ToolbarButton active="true" @click="blockState.unselect">
         <template #icon>
           <MousePointer2 :size="18" />
         </template>
-        <template #label>{{ selected ? 'Unselect' : 'Select' }}</template>
+        <template #label>{{ blockState.selected ? 'Unselect' : 'Select' }}</template>
       </ToolbarButton>
 
       <div class="toolbar-divider" role="separator" aria-orientation="vertical"></div>
 
-      <ToolbarButton @click="$emit('addBlock', 'note')">
+      <ToolbarButton @click="addBlock('note')">
         <template #icon>
           <Type :size="18" />
         </template>
         <template #label></template>
       </ToolbarButton>
 
-      <ToolbarButton @click="$emit('addBlock', 'sticky')">
+      <ToolbarButton @click="addBlock('sticky')">
         <template #icon>
           <PenTool :size="18" />
         </template>
         <template #label></template>
       </ToolbarButton>
 
-      <ToolbarButton @click="$emit('addBlock', 'image')">
+      <ToolbarButton @click="addBlock('image')">
         <template #icon>
           <ImageIcon :size="18" />
         </template>
         <template #label></template>
       </ToolbarButton>
+
+      <input type="file" ref="file" accept="image/*" @change="onImageUpload" hidden />
 
       <div class="toolbar-divider" role="separator" aria-orientation="vertical"></div>
 
@@ -68,13 +116,13 @@ const emit = defineEmits<{
         </button>
 
         <div class="color-picker">
-          <button v-for="color in colors" :key="color" @click="$emit('updateBlock', { props: { color } })"
+          <button v-for="color in colors" :key="color" @click="blockState.updateBlock({ props: { color } })"
             class="color-swatch" :style="{ backgroundColor: color }" />
         </div>
 
         <div class="toolbar-divider" role="separator" aria-orientation="vertical"></div>
 
-        <button class="tool-btn-danger" title="Remove block" @click="$emit('removeBlock')">
+        <button class="tool-btn-danger" title="Remove block" @click="blockState.removeSelectedBlock">
           <Trash2 :size="16" />
         </button>
       </div>
