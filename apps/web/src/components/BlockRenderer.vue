@@ -12,6 +12,7 @@ const isEditing = ref(false)
 const blockRef = useTemplateRef('block')
 const { style } = useDraggable(blockRef, {
   initialValue: { x: block.x, y: block.y },
+  containerElement: () => blockRef.value?.parentElement as HTMLElement | null,
   stopPropagation: true,
   onEnd(position) {
     emit('changePosition', { x: position.x, y: position.y })
@@ -34,7 +35,7 @@ const { style } = useDraggable(blockRef, {
 
 <style lang="css" scoped>
 .block {
-  position: fixed;
+  position: absolute;
   z-index: var(--layer-1);
   user-select: none;
   pointer-events: auto;

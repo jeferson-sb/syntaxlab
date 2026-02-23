@@ -14,18 +14,20 @@ const isPanning = ref(false)
 const lastMousePos = ref({ x: 0, y: 0 });
 
 const onMouseDown = (e: MouseEvent) => {
+  if ((e.target as Element | null)?.closest('.block')) return;
+
   isPanning.value = true;
   lastMousePos.value.x = e.clientX;
   lastMousePos.value.y = e.clientY;
 };
 
 const onMouseMove = (e: MouseEvent) => {
-  // if (!isPanning.value) return;
-  // const dx = e.clientX - lastMousePos.value.x;
-  // const dy = e.clientY - lastMousePos.value.y;
-  // changeOffset({ x: offset.value.x + dx, y: offset.value.y + dy })
-  // lastMousePos.value.x = e.clientX;
-  // lastMousePos.value.y = e.clientY;
+  if (!isPanning.value) return;
+  const dx = e.clientX - lastMousePos.value.x;
+  const dy = e.clientY - lastMousePos.value.y;
+  changeOffset({ x: offset.value.x + dx, y: offset.value.y + dy })
+  lastMousePos.value.x = e.clientX;
+  lastMousePos.value.y = e.clientY;
 }
 
 const onMouseUp = () => {
@@ -37,7 +39,7 @@ const onWheel = (e: WheelEvent) => {
     e.preventDefault();
     const delta = e.deltaY > 0 ? -0.05 : 0.05;
     pinchZoom(delta)
-  } else if (!isPanning) {
+  } else if (!isPanning.value) {
     changeOffset({ x: offset.value.x - e.deltaX, y: offset.value.y - e.deltaY })
   }
 }
@@ -51,10 +53,8 @@ const changePosition = (payload: any) => {
 }
 
 onMounted(() => {
-  if (isPanning) {
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-  }
+  window.addEventListener('mousemove', onMouseMove);
+  window.addEventListener('mouseup', onMouseUp);
 })
 onUnmounted(() => {
   window.removeEventListener('mousemove', onMouseMove);

@@ -51,6 +51,8 @@ const props = defineProps(['block'])
     overflow: clip;
 
     & img {
+      user-select: none;
+      pointer-events: none;
       object-fit: cover;
       width: 100%;
       height: 100%;
