@@ -4,7 +4,8 @@ const props = defineProps(['block', 'isEditing'])
 
 <template>
   <div class="text-card" :style="{ '--color': block.props.color }">
-    <textarea v-if="isEditing" autofocus="true" :defaultValue="block.props.content" />
+    <textarea v-if="isEditing" autofocus="true" :defaultValue="block.props.content" v-model="block.props.content"
+      @focus="e => e.target?.select()" />
     <p v-else>{{ block.props.content }}</p>
   </div>
 </template>
@@ -24,9 +25,12 @@ const props = defineProps(['block', 'isEditing'])
 
   textarea {
     background: transparent;
-    border: none;
     padding: 0;
     resize: none;
+
+    &:focus {
+      outline: 0;
+    }
   }
 
   p {

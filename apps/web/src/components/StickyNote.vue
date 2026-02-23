@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { Lightbulb } from 'lucide-vue-next'
-const props = defineProps(['block'])
 
-const isEditing = false
+const props = defineProps(['block', 'isEditing'])
 </script>
 
 <template>
@@ -10,13 +9,15 @@ const isEditing = false
     <div class="sticky-note__header">
       <Lightbulb :size="36" class="icon" />
 
-      <input v-if="isEditing" autofocus="true" :defaultValue="block.props.title" class="title-input" />
+      <input v-if="isEditing" autofocus="true" :defaultValue="block.props.title" v-model="block.props.title"
+        @focus="e => e.target?.select()" class="title-input" />
       <h3 v-else class="title">
         {{ block.props.title || 'Untitled' }}
       </h3>
     </div>
 
-    <textarea v-if="isEditing" autofocus="true" :defaultValue="block.props.content" />
+    <textarea v-if="isEditing" autofocus="true" :defaultValue="block.props.content" v-model="block.props.content"
+      @focus="e => e.target?.select()" />
     <p v-else>{{ block.props.content }}</p>
 
   </div>
@@ -40,6 +41,11 @@ const isEditing = false
     font-weight: var(--font-weight-5);
     color: var(--gray-6);
     line-height: var(--font-lineheight-4);
+  }
+
+  & textarea:focus,
+  & input:focus {
+    outline: 0;
   }
 
   & p {

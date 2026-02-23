@@ -47,7 +47,6 @@ const props = defineProps(['block'])
   }
 
   & img {
-    width: 100%;
     user-select: none;
     pointer-events: none;
   }

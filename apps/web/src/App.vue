@@ -28,7 +28,6 @@ const aiExpand = () => { }
 .app {
   display: flex;
   min-height: 100vh;
-  width: 100%;
   background: var(--gray-2);
   color: var(--gray-9);
   transition: background 200ms ease, color 200ms ease;

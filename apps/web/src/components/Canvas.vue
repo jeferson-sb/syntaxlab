@@ -20,12 +20,12 @@ const onMouseDown = (e: MouseEvent) => {
 };
 
 const onMouseMove = (e: MouseEvent) => {
-  if (!isPanning.value) return;
-  const dx = e.clientX - lastMousePos.value.x;
-  const dy = e.clientY - lastMousePos.value.y;
-  changeOffset({ x: offset.value.x + dx, y: offset.value.y + dy })
-  lastMousePos.value.x = e.clientX;
-  lastMousePos.value.y = e.clientY;
+  // if (!isPanning.value) return;
+  // const dx = e.clientX - lastMousePos.value.x;
+  // const dy = e.clientY - lastMousePos.value.y;
+  // changeOffset({ x: offset.value.x + dx, y: offset.value.y + dy })
+  // lastMousePos.value.x = e.clientX;
+  // lastMousePos.value.y = e.clientY;
 }
 
 const onMouseUp = () => {

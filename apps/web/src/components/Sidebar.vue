@@ -83,7 +83,7 @@ const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
   padding: var(--size-6);
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
   justify-content: space-between;
 }
 

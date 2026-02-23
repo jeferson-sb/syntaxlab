@@ -3,13 +3,14 @@ import { ref, onMounted } from 'vue'
 import { Copy } from 'lucide-vue-next'
 import { codeToHtml } from 'shiki/bundle/web'
 
-const props = defineProps(['block'])
+const props = defineProps(['block', 'isEditing'])
 const code = ref('')
-const isEditing = false
 
 onMounted(async () => {
   code.value = await codeToHtml(props.block.props.inlineCode, { lang: props.block.props.lang, theme: 'tokyo-night', cssVariablePrefix: 'code' })
 })
+
+// TODO: add blur event to trigger highlight
 </script>
 
 <template>
@@ -30,7 +31,8 @@ onMounted(async () => {
       </div>
     </div>
     <div class="code-snippet__body">
-      <textarea v-if="isEditing" autofocus="true" :defaultValue="block.props.inlineCode" />
+      <textarea v-if="isEditing" autofocus="true" :defaultValue="block.props.inlineCode"
+        v-model="block.props.inlineCode" @focus="e => e.target?.select()" />
       <div v-html="code" v-else></div>
     </div>
   </div>

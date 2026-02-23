@@ -33,8 +33,8 @@ const addBlock = (type) => {
   const newBlock = {
     id: uniqueId(),
     type,
-    x: centerX - 100,
-    y: centerY - 100,
+    x: (centerX - 100) + Math.floor(Math.random() * 100),
+    y: (centerY - 100) + Math.floor(Math.random() * 100),
     props: {
       content:
         type === "code" ? "// New snippet" : "Double click to edit content",
