@@ -11,6 +11,7 @@
   "dependencies": {
     "@elysiajs/eden": "^1.4.6",
     "@vueuse/core": "^14.2.1",
+    "dompurify": "^3.3.1",
     "lucide-vue-next": "^0.564.0",
     "open-props": "^1.7.23",
     "pinia": "^3.0.4",

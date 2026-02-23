@@ -1,16 +1,44 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import DOMPurify from 'dompurify';
 import { Copy } from 'lucide-vue-next'
 import { codeToHtml } from 'shiki/bundle/web'
 
 const props = defineProps(['block', 'isEditing'])
 const code = ref('')
+const draftCode = ref('')
+
+const highlightCode = async () => {
+  const clean = DOMPurify.sanitize(props.block.props.inlineCode ?? '')
+  code.value = await codeToHtml(clean, {
+    lang: props.block.props.lang || 'plaintext',
+    theme: 'tokyo-night',
+    cssVariablePrefix: 'code'
+  })
+}
+
+const onBlur = async () => {
+  props.block.props.inlineCode = draftCode.value
+  await highlightCode()
+}
+
+const onFocus = (event: FocusEvent) => {
+  ;(event.target as HTMLTextAreaElement | null)?.select()
+}
 
 onMounted(async () => {
-  code.value = await codeToHtml(props.block.props.inlineCode, { lang: props.block.props.lang, theme: 'tokyo-night', cssVariablePrefix: 'code' })
+  draftCode.value = props.block.props.inlineCode ?? ''
+  await highlightCode()
 })
 
-// TODO: add blur event to trigger highlight
+watch(
+  () => props.block.props.inlineCode,
+  (next) => {
+    if (!props.isEditing) {
+      draftCode.value = next ?? ''
+    }
+  }
+)
 </script>
 
 <template>
@@ -31,8 +59,7 @@ onMounted(async () => {
       </div>
     </div>
     <div class="code-snippet__body">
-      <textarea v-if="isEditing" autofocus="true" :defaultValue="block.props.inlineCode"
-        v-model="block.props.inlineCode" @focus="e => e.target?.select()" />
+      <textarea v-if="isEditing" autofocus="true" v-model="draftCode" @blur="onBlur" @focus="onFocus" />
       <div v-html="code" v-else></div>
     </div>
   </div>
