@@ -2,16 +2,18 @@
 import {
   MousePointer2,
   Type,
-  PenTool,
   ImageIcon,
   Trash2,
   Plus,
-  Minus
+  Minus,
+  StickyNote
 } from 'lucide-vue-next';
+import { onKeyStroke } from '@vueuse/core'
+import { useTemplateRef } from 'vue';
+
 import { useCanvasStore } from '@/store/canvas'
 import { useBlockStore } from '@/store/block';
 import { uniqueId } from '@/lib/uniqueId';
-import { useTemplateRef } from 'vue';
 
 const canvasState = useCanvasStore()
 const blockState = useBlockStore()
@@ -69,6 +71,13 @@ const onImageUpload = (e) => {
   };
   reader.readAsDataURL(file);
 };
+
+onKeyStroke('Delete', () => {
+  if (blockState.selected) blockState.removeSelectedBlock()
+})
+onKeyStroke(['t', 'T'], () => addBlock('note'))
+onKeyStroke(['u', 'U'], () => addBlock('image'))
+onKeyStroke(['s', 'S'], () => addBlock('sticky'))
 </script>
 
 <template>
@@ -93,7 +102,7 @@ const onImageUpload = (e) => {
 
       <ToolbarButton @click="addBlock('sticky')">
         <template #icon>
-          <PenTool :size="18" />
+          <StickyNote :size="18" />
         </template>
         <template #label></template>
       </ToolbarButton>
