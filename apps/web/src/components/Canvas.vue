@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia'
 import { useCanvasStore } from '@/store/canvas'
 import { useBlockStore } from '@/store/block'
+import type { Block } from '@/types/block';
 
 const canvasState = useCanvasStore()
 const blockState = useBlockStore()
@@ -48,7 +49,7 @@ const selectBlock = (id: string | null) => {
   blockState.selected = id
 }
 
-const changePosition = (payload: any) => {
+const changePosition = (payload: Partial<Block>) => {
   blockState.updateBlock(payload)
 }
 

@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-defineProps(['label', 'active'])
+defineProps<{ label: string; active?: boolean }>()
 </script>
 
 <template>
-  <div :class="{ 'nav-item': true, 'active': active }">
+  <li :class="{ 'nav-item': true, 'active': active }">
     <slot />
     <p class="nav-item__text">{{ label }}</p>
-  </div>
+  </li>
 </template>
 
 <style lang="css" scoped>

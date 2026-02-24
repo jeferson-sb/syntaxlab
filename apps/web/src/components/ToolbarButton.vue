@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-defineProps(['active'])
+defineProps<{ active?: boolean }>()
 </script>
 
 <template>
-  <button :class="{ 'toolbar-button': true, active }">
+  <button type="button" :class="{ 'toolbar-button': true, active }">
     <div class="toolbar-icon">
       <slot name="icon" />
     </div>

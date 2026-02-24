@@ -1,23 +1,28 @@
 <script lang="ts" setup>
+import type { StickyBlock } from '@/types/block';
 import { Lightbulb } from 'lucide-vue-next'
 
-const props = defineProps(['block', 'isEditing'])
+const props = defineProps<{ block: StickyBlock, isEditing: false }>()
+const onFocus = (event: FocusEvent) => {
+  const target = event.target as HTMLInputElement;
+  target?.select()
+}
 </script>
 
 <template>
-  <div class="sticky-note" :style="{ 'background-color': block.props.color }">
+  <div class="sticky-note" :style="{ '--sticky-color': block.props.color }">
     <div class="sticky-note__header">
       <Lightbulb :size="36" class="icon" />
 
       <input v-if="isEditing" autofocus="true" :defaultValue="block.props.title" v-model="block.props.title"
-        @focus="e => e.target?.select()" class="title-input" />
+        @focus="onFocus" class="title-input" />
       <h3 v-else class="title">
         {{ block.props.title || 'Untitled' }}
       </h3>
     </div>
 
     <textarea v-if="isEditing" autofocus="true" :defaultValue="block.props.content" v-model="block.props.content"
-      @focus="e => e.target?.select()" />
+      @focus="onFocus" />
     <p v-else>{{ block.props.content }}</p>
 
   </div>
@@ -30,7 +35,7 @@ const props = defineProps(['block', 'isEditing'])
   width: 20rem;
   box-shadow: var(--shadow-2);
   border-radius: var(--radius-3);
-  background: white;
+  background: var(--sticky-color, oklch(99.107% 0.00011 271));
 
   & textarea {
     background: transparent;
@@ -65,10 +70,13 @@ const props = defineProps(['block', 'isEditing'])
   margin-block-end: 0.5rem;
 
   & .icon {
-    background-color: var(--orange-1);
-    color: var(--orange-5);
+    --sticky-highlight-bg: var(--sticky-color, var(--orange-1));
+    --sticky-highlight-fg: var(--sticky-color, var(--orange-5));
+
+    background-color: color-mix(in srgb, var(--sticky-highlight-bg) 50%, white 50%);
+    color: color-mix(in srgb, var(--sticky-highlight-fg) 80%, black 20%);
     border-radius: var(--size-2);
-    fill: var(--orange-5);
+    fill: color-mix(in srgb, var(--sticky-highlight-fg) 80%, black 20%);
     padding: var(--size-2);
   }
 

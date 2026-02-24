@@ -1,18 +1,19 @@
 <script lang="ts" setup>
 import { ref, useTemplateRef } from 'vue';
 import { useDraggable } from '@vueuse/core'
+import type { Block } from '@/types/block';
 
-const { block, selected } = defineProps(['block', 'selected'])
+const { block, selected } = defineProps<{ block: Block; selected: boolean }>()
 const emit = defineEmits<{
   (e: 'selectBlock'): void
-  (e: 'changePosition', update: any): void
+  (e: 'changePosition', update: Partial<Block>): void
 }>()
 
 const isEditing = ref(false)
 const blockRef = useTemplateRef('block')
 const { style } = useDraggable(blockRef, {
   initialValue: { x: block.x, y: block.y },
-  containerElement: () => blockRef.value?.parentElement as HTMLElement | null,
+  containerElement: () => blockRef.value?.parentElement,
   stopPropagation: true,
   onEnd(position) {
     emit('changePosition', { x: position.x, y: position.y })
@@ -22,12 +23,12 @@ const { style } = useDraggable(blockRef, {
 
 <template>
   <div ref="block" @click="$emit('selectBlock')" @dblclick="isEditing = true" class="block" :style="style">
-    <StickyNote v-if="block.type === 'sticky'" :block="block" :isEditing="isEditing && !!selected"
+    <StickyNote v-if="block.type === 'sticky'" :block="block" :isEditing="isEditing && selected"
       :class="{ selected: selected }" />
-    <CodeSnippet v-else-if="block.type === 'code'" :block="block" :isEditing="isEditing && !!selected"
+    <CodeSnippet v-else-if="block.type === 'code'" :block="block" :isEditing="isEditing && selected"
       :class="{ selected: selected }" />
     <LinkCard v-else-if="block.type === 'bookmark'" :block="block" :class="{ selected: selected }" />
-    <TextCard v-else-if="block.type === 'note'" :block="block" :isEditing="isEditing && !!selected"
+    <TextCard v-else-if="block.type === 'note'" :block="block" :isEditing="isEditing && selected"
       :class="{ selected: selected }" />
     <ImageCard v-else-if="block.type === 'image'" :block="block" :class="{ selected: selected }" />
   </div>
@@ -43,6 +44,7 @@ const { style } = useDraggable(blockRef, {
   translate: 0 0;
   transition: opacity 500ms ease-out, translate 500ms ease-out;
   transform-origin: center;
+  will-change: left, top;
 
   & .selected {
     box-shadow: 0 0 0 6px var(--blue-2);

@@ -1,17 +1,16 @@
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import { defineStore } from "pinia";
 import { useLocalStorage } from "@vueuse/core";
 
-import type { Block } from "@/types/block";
+import type { AnyBlock } from "@/types/block";
 
-const initialState = [
+const initialState: AnyBlock[] = [
   {
     id: "1",
     type: "note",
     x: 100,
     y: 150,
     props: {
-      title: "Main Value Prop",
       content:
         "A workspace that feels like a developer’s notebook, but acts like a powerful visual architect. Speed over formality.",
     },
@@ -63,8 +62,8 @@ const initialState = [
     x: 700,
     y: 400,
     props: {
-      title: "Feature XYZ",
-      content: "A new breaking feature about gamification and user-feedback",
+      title: "User-centric",
+      content: "Focus on user experience and fast feedback",
     },
   },
 ];
@@ -74,7 +73,7 @@ export const useBlockStore = defineStore("block", () => {
   const selected = ref<string | null>(null);
   const connections = ref([]);
 
-  const appendBlock = (newBlock) => {
+  const appendBlock = (newBlock: AnyBlock) => {
     blocks.value.push(newBlock);
     selected.value = newBlock.id;
   };
@@ -85,7 +84,7 @@ export const useBlockStore = defineStore("block", () => {
     blocks.value = blocks.value.filter((block) => block.id !== selected.value);
   };
 
-  const updateBlock = (updates: any) => {
+  const updateBlock = (updates: Partial<AnyBlock>) => {
     if (!selected.value) return;
 
     blocks.value = blocks.value.map((blck) => {

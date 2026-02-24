@@ -6,7 +6,8 @@ import {
   Trash2,
   Plus,
   Minus,
-  StickyNote
+  StickyNote,
+  Code
 } from 'lucide-vue-next';
 import { onKeyStroke } from '@vueuse/core'
 import { useTemplateRef } from 'vue';
@@ -18,37 +19,40 @@ import { uniqueId } from '@/lib/uniqueId';
 const canvasState = useCanvasStore()
 const blockState = useBlockStore()
 
-const colors = ['#ffffff', '#fef9c3', '#dcfce7', '#dbeafe', '#f3e8ff']
+const colors = ['#fcfcfc', '#fef9c3', '#dcfce7', '#dbeafe', '#f3e8ff']
 const fileInputRef = useTemplateRef('file')
 
-const addBlock = (type) => {
-  if (type === "image") {
-    fileInputRef.value?.click();
-    return;
-  }
-
+const addTemplateBlock = (type: 'code' | 'note' | 'bookmark' | 'sticky') => {
   const centerX =
     (-canvasState.offset.x + window.innerWidth / 2) / canvasState.zoom;
   const centerY =
     (-canvasState.offset.y + window.innerHeight / 2) / canvasState.zoom;
 
-  const newBlock = {
+  blockState.appendBlock({
     id: uniqueId(),
     type,
     x: (centerX - 100) + Math.floor(Math.random() * 100),
     y: (centerY - 100) + Math.floor(Math.random() * 100),
     props: {
-      content:
-        type === "code" ? "// New snippet" : "Double click to edit content",
+      content: "Double click to edit content",
       title: type === "code" ? "new_file.js" : "New Idea",
-      color: "#ffffff",
+      color: colors[0],
+      inlineCode: type === 'code' ? `const myfunction = () => {}` : '',
+      lang: type === 'code' ? 'javascript' : '',
+      href: '',
+      imageUrl: '',
     },
-  };
-  blockState.appendBlock(newBlock);
+  });
 };
 
-const onImageUpload = (e) => {
-  const file = e.target.files?.[0];
+const addImageBlock = () => {
+  fileInputRef.value?.focus();
+  fileInputRef.value?.click();
+}
+
+const onImageUpload = (e: Event) => {
+  const target = e.target as HTMLInputElement;
+  const file = target?.files?.[0];
   if (!file) return;
 
   const reader = new FileReader();
@@ -57,7 +61,7 @@ const onImageUpload = (e) => {
     const centerX = (-canvasState.offset.x + window.innerWidth / 2) / canvasState.zoom;
     const centerY = (-canvasState.offset.y + window.innerHeight / 2) / canvasState.zoom;
 
-    const newBlock = {
+    blockState.appendBlock({
       id: uniqueId(),
       type: 'image',
       x: centerX - 150,
@@ -65,9 +69,8 @@ const onImageUpload = (e) => {
       props: {
         title: file.name,
         href: imageUrl
-      },
-    };
-    blockState.appendBlock(newBlock)
+      }
+    })
   };
   reader.readAsDataURL(file);
 };
@@ -75,16 +78,17 @@ const onImageUpload = (e) => {
 onKeyStroke('Delete', () => {
   if (blockState.selected) blockState.removeSelectedBlock()
 })
-onKeyStroke(['t', 'T'], () => addBlock('note'))
-onKeyStroke(['u', 'U'], () => addBlock('image'))
-onKeyStroke(['s', 'S'], () => addBlock('sticky'))
+onKeyStroke(['t', 'T'], () => addTemplateBlock('note'))
+onKeyStroke(['u', 'U'], () => addImageBlock())
+onKeyStroke(['c', 'C'], () => addTemplateBlock('code'))
+onKeyStroke(['s', 'S'], () => addTemplateBlock('sticky'))
 </script>
 
 <template>
   <div class="toolbar-wrapper">
     <div class="toolbar-container">
 
-      <ToolbarButton active="true" @click="blockState.unselect">
+      <ToolbarButton :active="true" @click="blockState.unselect">
         <template #icon>
           <MousePointer2 :size="18" />
         </template>
@@ -93,25 +97,28 @@ onKeyStroke(['s', 'S'], () => addBlock('sticky'))
 
       <div class="toolbar-divider" role="separator" aria-orientation="vertical"></div>
 
-      <ToolbarButton @click="addBlock('note')">
+      <ToolbarButton @click="addTemplateBlock('note')">
         <template #icon>
           <Type :size="18" />
         </template>
-        <template #label></template>
       </ToolbarButton>
 
-      <ToolbarButton @click="addBlock('sticky')">
+      <ToolbarButton @click="addTemplateBlock('sticky')">
         <template #icon>
           <StickyNote :size="18" />
         </template>
-        <template #label></template>
       </ToolbarButton>
 
-      <ToolbarButton @click="addBlock('image')">
+      <ToolbarButton @click="addTemplateBlock('code')">
+        <template #icon>
+          <Code :size="18" />
+        </template>
+      </ToolbarButton>
+
+      <ToolbarButton @click="addImageBlock()">
         <template #icon>
           <ImageIcon :size="18" />
         </template>
-        <template #label></template>
       </ToolbarButton>
 
       <input type="file" ref="file" accept="image/*" @change="onImageUpload" hidden />

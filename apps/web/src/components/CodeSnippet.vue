@@ -4,7 +4,9 @@ import DOMPurify from 'dompurify';
 import { Copy } from 'lucide-vue-next'
 import { codeToHtml } from 'shiki/bundle/web'
 
-const props = defineProps(['block', 'isEditing'])
+import type { CodeBlock } from '@/types/block';
+
+const props = defineProps<{ block: CodeBlock, isEditing: boolean }>()
 const code = ref('')
 const draftCode = ref('')
 
@@ -22,9 +24,7 @@ const onBlur = async () => {
   await highlightCode()
 }
 
-const onFocus = (event: FocusEvent) => {
-  ;(event.target as HTMLTextAreaElement | null)?.select()
-}
+const onFocus = (event: FocusEvent) => (event.target as HTMLTextAreaElement)?.select()
 
 onMounted(async () => {
   draftCode.value = props.block.props.inlineCode ?? ''

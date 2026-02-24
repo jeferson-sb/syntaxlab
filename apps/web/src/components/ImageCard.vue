@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-const props = defineProps(['block'])
+import type { ImageBlock } from '@/types/block';
+
+const props = defineProps<{ block: ImageBlock }>()
 </script>
 
 <template>

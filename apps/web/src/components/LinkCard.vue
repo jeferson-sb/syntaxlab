@@ -1,7 +1,8 @@
 <script lang="ts" setup>
+import type { BookmarkBlock } from '@/types/block';
 import { Link2 } from 'lucide-vue-next'
 
-const props = defineProps(['block'])
+const props = defineProps<{ block: BookmarkBlock }>()
 </script>
 
 <template>
@@ -38,7 +39,7 @@ const props = defineProps(['block'])
   display: flex;
   gap: var(--size-4);
   width: var(--size-px-15);
-  background: white;
+  background: oklch(99.107% 0.00011 271);
   border-radius: var(--radius-3);
   box-shadow: var(--shadow-2);
   border: var(--gray-2) var(--border-size-1) solid;
