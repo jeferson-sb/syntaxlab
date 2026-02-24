@@ -3,9 +3,15 @@ import { ref, useTemplateRef } from 'vue';
 import { useDraggable } from '@vueuse/core'
 import type { Block } from '@/types/block';
 
-const { block, selected } = defineProps<{ block: Block; selected: boolean }>()
+const { block, selected, isLinkSource } = defineProps<{
+  block: Block;
+  selected: boolean;
+  isLinkSource?: boolean;
+}>()
 const emit = defineEmits<{
   (e: 'selectBlock'): void
+  (e: 'previewPosition', payload: { id: string; x: number; y: number }): void
+  (e: 'previewEnd', blockId: string): void
   (e: 'changePosition', update: Partial<Block>): void
 }>()
 
@@ -15,14 +21,19 @@ const { style } = useDraggable(blockRef, {
   initialValue: { x: block.x, y: block.y },
   containerElement: () => blockRef.value?.parentElement,
   stopPropagation: true,
+  onMove(position) {
+    emit('previewPosition', { id: block.id, x: position.x, y: position.y })
+  },
   onEnd(position) {
-    emit('changePosition', { x: position.x, y: position.y })
+    emit('previewEnd', block.id)
+    emit('changePosition', { id: block.id, x: position.x, y: position.y })
   }
 })
 </script>
 
 <template>
-  <div ref="block" @click="$emit('selectBlock')" @dblclick="isEditing = true" class="block" :style="style">
+  <div ref="block" @click="$emit('selectBlock')" @dblclick="isEditing = true"
+    :class="{ 'is-link-source': isLinkSource, block: true }" :style="style">
     <StickyNote v-if="block.type === 'sticky'" :block="block" :isEditing="isEditing && selected"
       :class="{ selected: selected }" />
     <CodeSnippet v-else-if="block.type === 'code'" :block="block" :isEditing="isEditing && selected"
@@ -49,6 +60,10 @@ const { style } = useDraggable(blockRef, {
   & .selected {
     box-shadow: 0 0 0 6px var(--blue-2);
     transition: 200ms ease-in-out;
+  }
+
+  &.is-link-source {
+    opacity: 0.65;
   }
 
   @starting-style {

@@ -72,7 +72,6 @@ export const useBlockStore = defineStore(
   () => {
     const blocks = ref(initialState);
     const selected = ref<string | null>(null);
-    const connections = ref([]);
 
     const appendBlock = (newBlock: AnyBlock) => {
       blocks.value.push(newBlock);
@@ -80,21 +79,27 @@ export const useBlockStore = defineStore(
     };
 
     const removeSelectedBlock = () => {
-      if (!selected.value) return;
+      if (!selected.value) return null;
+
+      const removedBlockId = selected.value;
 
       blocks.value = blocks.value.filter(
-        (block) => block.id !== selected.value
+        (block) => block.id !== selected.value,
       );
+      selected.value = null;
+
+      return removedBlockId;
     };
 
     const updateBlock = (updates: Partial<AnyBlock>) => {
-      if (!selected.value) return;
+      const targetId = updates.id ?? selected.value;
+      if (!targetId) return;
 
       blocks.value = blocks.value.map((blck) => {
         const patch = updates?.props
           ? { ...blck, props: { ...blck.props, ...updates.props } }
           : { ...blck, ...updates };
-        return blck.id === selected.value ? patch : blck;
+        return blck.id === targetId ? patch : blck;
       });
     };
 
@@ -104,7 +109,6 @@ export const useBlockStore = defineStore(
 
     return {
       blocks,
-      connections,
       selected,
       unselect,
       appendBlock,
@@ -120,5 +124,5 @@ export const useBlockStore = defineStore(
         storeName: "blocks",
       },
     },
-  }
+  },
 );

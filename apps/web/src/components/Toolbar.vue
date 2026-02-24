@@ -7,20 +7,73 @@ import {
   Plus,
   Minus,
   StickyNote,
-  Code
+  Code,
+  Link2,
 } from 'lucide-vue-next';
 import { onKeyStroke } from '@vueuse/core'
-import { useTemplateRef } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 
 import { useCanvasStore } from '@/store/canvas'
 import { useBlockStore } from '@/store/block';
+import { useConnectionStore } from '@/store/connection';
 import { uniqueId } from '@/lib/uniqueId';
 
 const canvasState = useCanvasStore()
 const blockState = useBlockStore()
+const connectionState = useConnectionStore()
 
 const colors = ['#fcfcfc', '#fef9c3', '#dcfce7', '#dbeafe', '#f3e8ff']
 const fileInputRef = useTemplateRef('file')
+
+const linkStatusLabel = computed(() => {
+  if (connectionState.isUnlinkModeActive) {
+    if (!connectionState.linkSourceBlockId) {
+      return 'Unlink mode on: choose source block';
+    }
+
+    return 'Unlink mode on: choose target block';
+  }
+
+  if (!connectionState.isLinkModeActive) return 'Link mode off';
+
+  if (!connectionState.linkSourceBlockId) {
+    return 'Link mode on: choose source block';
+  }
+
+  return 'Link mode on: choose target block';
+})
+
+const isTypingInEditableElement = () => {
+  const active = document.activeElement as HTMLElement | null;
+  if (!active) return false;
+
+  const tag = active.tagName;
+  return (
+    tag === 'INPUT' ||
+    tag === 'TEXTAREA' ||
+    active.isContentEditable
+  );
+};
+
+const removeSelectedBlock = () => {
+  const removedBlockId = blockState.removeSelectedBlock();
+  if (!removedBlockId) return;
+
+  connectionState.removeConnectionsForBlock(removedBlockId);
+};
+
+const removeConnectionsFromSelectedBlock = () => {
+  if (!blockState.selected) return;
+  connectionState.removeConnectionsForBlock(blockState.selected);
+};
+
+const toggleLinkMode = () => {
+  connectionState.toggleLinkMode(blockState.selected);
+}
+
+const toggleUnlinkMode = () => {
+  connectionState.toggleUnlinkMode(blockState.selected);
+}
 
 const addTemplateBlock = (type: 'code' | 'note' | 'bookmark' | 'sticky') => {
   const centerX =
@@ -76,13 +129,32 @@ const onImageUpload = (e: Event) => {
 };
 
 onKeyStroke('Delete', () => {
-  if (blockState.selected) blockState.removeSelectedBlock()
+  if (isTypingInEditableElement()) return;
+  if (blockState.selected) removeSelectedBlock()
 })
-onKeyStroke('Escape', () => blockState.unselect())
+onKeyStroke('Backspace', (event) => {
+  if (isTypingInEditableElement()) return;
+  event.preventDefault();
+  removeConnectionsFromSelectedBlock();
+})
+onKeyStroke('Escape', () => {
+  connectionState.cancelLinkMode()
+  blockState.unselect()
+})
 onKeyStroke(['t', 'T'], () => { if (!blockState.selected) addTemplateBlock('note') })
 onKeyStroke(['u', 'U'], () => { if (!blockState.selected) addImageBlock() })
 onKeyStroke(['c', 'C'], () => { if (!blockState.selected) addTemplateBlock('code') })
 onKeyStroke(['s', 'S'], () => { if (!blockState.selected) addTemplateBlock('sticky') })
+onKeyStroke(['l', 'L'], (event) => {
+  if (isTypingInEditableElement()) return;
+  event.preventDefault();
+  if (event.shiftKey) {
+    toggleUnlinkMode();
+    return;
+  }
+
+  toggleLinkMode();
+})
 </script>
 
 <template>
@@ -94,6 +166,15 @@ onKeyStroke(['s', 'S'], () => { if (!blockState.selected) addTemplateBlock('stic
           <MousePointer2 :size="18" />
         </template>
         <template #label>{{ blockState.selected ? 'Unselect' : 'Select' }}</template>
+      </ToolbarButton>
+
+      <ToolbarButton :active="connectionState.isLinkModeActive" @click="toggleLinkMode"
+        :aria-pressed="connectionState.isLinkModeActive"
+        :title="connectionState.isLinkModeActive ? 'Exit link mode (L)' : 'Enter link mode (L)'">
+        <template #icon>
+          <Link2 :size="18" />
+        </template>
+        <template #label>Link (L)</template>
       </ToolbarButton>
 
       <div class="toolbar-divider" role="separator" aria-orientation="vertical"></div>
@@ -139,7 +220,7 @@ onKeyStroke(['s', 'S'], () => { if (!blockState.selected) addTemplateBlock('stic
 
         <div class="toolbar-divider" role="separator" aria-orientation="vertical"></div>
 
-        <button class="tool-btn-danger" title="Remove block" @click="blockState.removeSelectedBlock">
+        <button class="tool-btn-danger" title="Remove block" @click="removeSelectedBlock">
           <Trash2 :size="16" />
         </button>
       </div>
@@ -156,6 +237,10 @@ onKeyStroke(['s', 'S'], () => { if (!blockState.selected) addTemplateBlock('stic
         </button>
       </div>
     </div>
+
+    <p class="toolbar-assistive-status" aria-live="polite" role="status">
+      {{ connectionState.statusMessage || linkStatusLabel }}
+    </p>
   </div>
 </template>
 
@@ -168,6 +253,9 @@ onKeyStroke(['s', 'S'], () => { if (!blockState.selected) addTemplateBlock('stic
   left: 50%;
   transform: translateX(-50%);
   z-index: var(--layer-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-2);
 }
 
 .toolbar-container {
@@ -267,5 +355,16 @@ onKeyStroke(['s', 'S'], () => { if (!blockState.selected) addTemplateBlock('stic
   border-radius: var(--radius-round);
   border: var(--border-size-1) solid var(--slate-2);
   cursor: pointer;
+}
+
+.toolbar-assistive-status {
+  margin: 0;
+  align-self: center;
+  padding: var(--size-1) var(--size-2);
+  font-size: var(--font-size-0);
+  color: var(--gray-7);
+  border-radius: var(--radius-2);
+  background: var(--gray-0);
+  border: var(--border-size-1) solid var(--gray-2);
 }
 </style>

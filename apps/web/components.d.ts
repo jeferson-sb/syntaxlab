@@ -11,6 +11,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    ArrowConnection: typeof import('./src/components/ArrowConnection.vue')['default']
     BlockRenderer: typeof import('./src/components/BlockRenderer.vue')['default']
     Button: typeof import('./src/components/Button.vue')['default']
     Canvas: typeof import('./src/components/Canvas.vue')['default']

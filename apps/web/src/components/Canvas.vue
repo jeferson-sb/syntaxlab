@@ -1,18 +1,34 @@
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { computed, reactive, ref, onMounted, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia'
 import { useCanvasStore } from '@/store/canvas'
 import { useBlockStore } from '@/store/block'
+import { useConnectionStore } from '@/store/connection'
 import type { Block } from '@/types/block';
 
 const canvasState = useCanvasStore()
 const blockState = useBlockStore()
+const connectionState = useConnectionStore()
 
 const { pinchZoom, changeOffset } = canvasState
 const { zoom, offset } = storeToRefs(canvasState)
 
 const isPanning = ref(false)
 const lastMousePos = ref({ x: 0, y: 0 });
+const dragPreviewPositions = reactive<Record<string, { x: number; y: number }>>({})
+
+const blocksWithDragPreview = computed(() => {
+  return blockState.blocks.map((block) => {
+    const preview = dragPreviewPositions[block.id]
+    if (!preview) return block
+
+    return {
+      ...block,
+      x: preview.x,
+      y: preview.y,
+    }
+  })
+})
 
 const onMouseDown = (e: MouseEvent) => {
   if ((e.target as Element | null)?.closest('.block')) return;
@@ -46,11 +62,25 @@ const onWheel = (e: WheelEvent) => {
 }
 
 const selectBlock = (id: string | null) => {
-  blockState.selected = id
+  if (!id) {
+    blockState.selected = null
+    return
+  }
+
+  const { selectedBlockId } = connectionState.handleBlockClick(id)
+  blockState.selected = selectedBlockId
 }
 
 const changePosition = (payload: Partial<Block>) => {
   blockState.updateBlock(payload)
+}
+
+const previewPosition = (payload: { id: string; x: number; y: number }) => {
+  dragPreviewPositions[payload.id] = { x: payload.x, y: payload.y }
+}
+
+const clearPreviewPosition = (blockId: string) => {
+  delete dragPreviewPositions[blockId]
 }
 
 onMounted(() => {
@@ -70,14 +100,15 @@ onUnmounted(() => {
       <div class="canvas-grid dot-grid" />
 
       <svg class="canvas-vector-layer">
-        <!-- TODO: add <path> connections -->
-        <path v-for="conn in blockState.connections" :key="conn" />
+        <ArrowConnection v-for="conn in connectionState.connections" :key="conn.id" :conn="conn"
+          :blocks="blocksWithDragPreview" />
       </svg>
 
       <div class="canvas-interaction-layer">
         <BlockRenderer v-for="block in blockState.blocks" v-bind:key="block.id" :block="block"
           :selected="block.id === blockState.selected" @select-block="selectBlock(block.id)"
-          @change-position="changePosition" />
+          :is-link-source="(connectionState.isLinkModeActive || connectionState.isUnlinkModeActive) && connectionState.linkSourceBlockId === block.id"
+          @preview-position="previewPosition" @preview-end="clearPreviewPosition" @change-position="changePosition" />
       </div>
     </div>
   </div>
