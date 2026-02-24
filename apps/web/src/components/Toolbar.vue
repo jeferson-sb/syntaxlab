@@ -78,10 +78,11 @@ const onImageUpload = (e: Event) => {
 onKeyStroke('Delete', () => {
   if (blockState.selected) blockState.removeSelectedBlock()
 })
-onKeyStroke(['t', 'T'], () => addTemplateBlock('note'))
-onKeyStroke(['u', 'U'], () => addImageBlock())
-onKeyStroke(['c', 'C'], () => addTemplateBlock('code'))
-onKeyStroke(['s', 'S'], () => addTemplateBlock('sticky'))
+onKeyStroke('Escape', () => blockState.unselect())
+onKeyStroke(['t', 'T'], () => { if (!blockState.selected) addTemplateBlock('note') })
+onKeyStroke(['u', 'U'], () => { if (!blockState.selected) addImageBlock() })
+onKeyStroke(['c', 'C'], () => { if (!blockState.selected) addTemplateBlock('code') })
+onKeyStroke(['s', 'S'], () => { if (!blockState.selected) addTemplateBlock('sticky') })
 </script>
 
 <template>

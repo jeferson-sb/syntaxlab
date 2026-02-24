@@ -30,6 +30,7 @@
       "version": "0.0.0",
       "dependencies": {
         "@elysiajs/eden": "^1.4.6",
+        "@erlihs/pinia-plugin-storage": "^1.1.3",
         "@vueuse/core": "^14.2.1",
         "dompurify": "^3.3.1",
         "lucide-vue-next": "^0.564.0",
@@ -79,6 +80,8 @@
     "@emnapi/runtime": ["@emnapi/runtime@1.8.1", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-mehfKSMWjjNol8659Z8KxEMrdSJDDot5SXMq00dM8BN4o+CLNXQ0xH2V7EchNHV4RmbZLmmPdEaXZc5H2FXmDg=="],
 
     "@emnapi/wasi-threads": ["@emnapi/wasi-threads@1.1.0", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-WI0DdZ8xFSbgMjR1sFsKABJ/C5OnRrjT06JXbZKexJGrDuPTzZdDYfFlsgcCXCyf+suG5QU2e/y1Wo2V/OapLQ=="],
+
+    "@erlihs/pinia-plugin-storage": ["@erlihs/pinia-plugin-storage@1.1.3", "", { "peerDependencies": { "pinia": "^2.0.0 || ^3.0.0", "vue": "^3.0.0" } }, "sha512-4Ac4devUX0e4CypHyXX19u6O0Hp9GmsCFaXFCRl4K7VXwlvvPoUCkIy6bzQUAAHXtrHXb+S0cmwJmLjsA52skA=="],
 
     "@floating-ui/core": ["@floating-ui/core@1.7.4", "", { "dependencies": { "@floating-ui/utils": "^0.2.10" } }, "sha512-C3HlIdsBxszvm5McXlB8PeOEWfBhcGBTZGkGlWc2U0KFY5IwG5OQEuQ8rq52DZmcHDlPLd+YFBK+cZcytwIFWg=="],
 

@@ -1,6 +1,5 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { useLocalStorage } from "@vueuse/core";
 
 import type { AnyBlock } from "@/types/block";
 
@@ -68,47 +67,58 @@ const initialState: AnyBlock[] = [
   },
 ];
 
-export const useBlockStore = defineStore("block", () => {
-  const blocks = ref(initialState);
-  const selected = ref<string | null>(null);
-  const connections = ref([]);
+export const useBlockStore = defineStore(
+  "block",
+  () => {
+    const blocks = ref(initialState);
+    const selected = ref<string | null>(null);
+    const connections = ref([]);
 
-  const appendBlock = (newBlock: AnyBlock) => {
-    blocks.value.push(newBlock);
-    selected.value = newBlock.id;
-  };
+    const appendBlock = (newBlock: AnyBlock) => {
+      blocks.value.push(newBlock);
+      selected.value = newBlock.id;
+    };
 
-  const removeSelectedBlock = () => {
-    if (!selected.value) return;
+    const removeSelectedBlock = () => {
+      if (!selected.value) return;
 
-    blocks.value = blocks.value.filter((block) => block.id !== selected.value);
-  };
+      blocks.value = blocks.value.filter(
+        (block) => block.id !== selected.value
+      );
+    };
 
-  const updateBlock = (updates: Partial<AnyBlock>) => {
-    if (!selected.value) return;
+    const updateBlock = (updates: Partial<AnyBlock>) => {
+      if (!selected.value) return;
 
-    blocks.value = blocks.value.map((blck) => {
-      const patch = updates?.props
-        ? { ...blck, props: { ...blck.props, ...updates.props } }
-        : { ...blck, ...updates };
-      return blck.id === selected.value ? patch : blck;
-    });
-  };
+      blocks.value = blocks.value.map((blck) => {
+        const patch = updates?.props
+          ? { ...blck, props: { ...blck.props, ...updates.props } }
+          : { ...blck, ...updates };
+        return blck.id === selected.value ? patch : blck;
+      });
+    };
 
-  const unselect = () => {
-    selected.value = null;
-  };
+    const unselect = () => {
+      selected.value = null;
+    };
 
-  return {
-    blocks,
-    connections,
-    selected,
-    unselect,
-    appendBlock,
-    updateBlock,
-    removeSelectedBlock,
-  };
-});
-
-// TODO: subscribe to localstorage
-// useBlockStore().$subscribe(() => {})
+    return {
+      blocks,
+      connections,
+      selected,
+      unselect,
+      appendBlock,
+      updateBlock,
+      removeSelectedBlock,
+    };
+  },
+  {
+    storage: {
+      adapter: "indexedDB",
+      options: {
+        dbName: "syntaxlab",
+        storeName: "blocks",
+      },
+    },
+  }
+);
