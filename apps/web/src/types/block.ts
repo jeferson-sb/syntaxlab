@@ -52,15 +52,18 @@ export type BlockPropsByType = {
   sticky: StickyBlock["props"];
 };
 
-type CreateBlockDTO<T extends keyof BlockPropsByType = keyof BlockPropsByType> =
-  {
-    id: string;
-    type: T;
-    x: number;
-    y: number;
-    props: BlockPropsByType[T];
-  };
+type MergedBlockProps = Partial<
+  CodeBlock["props"] &
+    NoteBlock["props"] &
+    BookmarkBlock["props"] &
+    ImageBlock["props"] &
+    StickyBlock["props"]
+>;
 
 export type AnyBlock = {
-  [K in keyof BlockPropsByType]: CreateBlockDTO<K>;
-}[keyof BlockPropsByType];
+  id: string;
+  type: keyof BlockPropsByType;
+  x: number;
+  y: number;
+  props: MergedBlockProps;
+};
