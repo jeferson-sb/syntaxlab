@@ -1,12 +1,22 @@
 import Elysia from "elysia";
 import { makeMongoBlockRepository } from "@/modules/block/infra/database/mongoBlockRepository";
-import { makeCreateBlock } from '@/modules/block/application/createBlock'
+import { makeCreateBlock } from "@/modules/block/application/createBlock";
 import { makeGetBlocks } from "@/modules/block/application/getBlocks";
 import { makeDeleteBlock } from "@/modules/block/application/deleteBlock";
+import type { BlockRepository } from "@/modules/block/domain/Block";
 
-export const registerBlockContainer = () =>
+type BlockContainerDependencies = {
+  blockRepository?: BlockRepository;
+};
+
+export const registerBlockContainer = (
+  dependencies: BlockContainerDependencies = {},
+) =>
   new Elysia({ name: "module/block" })
-    .decorate("blockRepository", makeMongoBlockRepository())
+    .decorate(
+      "blockRepository",
+      dependencies.blockRepository ?? makeMongoBlockRepository(),
+    )
     .resolve({ as: "scoped" }, ({ blockRepository }) => ({
       createBlockUseCase: makeCreateBlock({ blockRepository }),
       getBlocksUseCase: makeGetBlocks({ blockRepository }),

@@ -5,10 +5,20 @@ import { makeGetBoards } from "@/modules/board/application/getBoards";
 import { makeGetBoard } from "@/modules/board/application/getBoard";
 import { makeDeleteBoard } from "@/modules/board/application/deleteBoard";
 import { makeUpdateBoard } from "@/modules/board/application/updateBoard";
+import type { BoardRepository } from "@/modules/board/domain/Board";
 
-export const registerBoardContainer = () =>
+type BoardContainerDependencies = {
+  boardRepository?: BoardRepository;
+};
+
+export const registerBoardContainer = (
+  dependencies: BoardContainerDependencies = {},
+) =>
   new Elysia({ name: "module/board" })
-    .decorate("boardRepository", makeMongoBoardRepository())
+    .decorate(
+      "boardRepository",
+      dependencies.boardRepository ?? makeMongoBoardRepository(),
+    )
     .resolve({ as: "scoped" }, ({ boardRepository }) => ({
       createBoardUseCase: makeCreateBoard({ boardRepository }),
       getBoardsUseCase: makeGetBoards({ boardRepository }),
