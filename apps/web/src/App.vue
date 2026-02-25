@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useTemplateRef } from 'vue'
 import { treaty, edenFetch } from '@elysiajs/eden'
 import type { App } from 'syntaxlab-backend'
 
@@ -7,6 +8,14 @@ const fetch = edenFetch<App>('http://localhost:3000')
 
 // TODO: add gemini integration for note/sticky blocks
 const aiExpand = () => { }
+
+type CanvasExposed = {
+  getCanvasElement: () => HTMLDivElement | null
+}
+
+const canvasRef = useTemplateRef<CanvasExposed>('canvasRef')
+
+const getCanvasElement = () => canvasRef.value?.getCanvasElement() ?? null
 </script>
 
 <template>
@@ -14,10 +23,10 @@ const aiExpand = () => { }
     <Sidebar />
 
     <div class="shell">
-      <Header />
+      <Header :get-canvas-element="getCanvasElement" />
 
       <main>
-        <Canvas />
+        <Canvas ref="canvasRef" />
         <Toolbar />
       </main>
     </div>

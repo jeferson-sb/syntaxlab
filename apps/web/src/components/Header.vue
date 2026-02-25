@@ -1,14 +1,17 @@
 <script lang="ts" setup>
 import { FileDown, Edit3, Menu } from 'lucide-vue-next';
 import { ref } from 'vue';
-import { toJpeg, toPng } from 'html-to-image';
+import { toJpeg } from 'html-to-image';
 
+const props = defineProps<{
+  getCanvasElement: () => HTMLDivElement | null;
+}>()
 
 const isSidebarOpen = ref();
 const boardName = ref('Ideation Canvas');
 
 const exportCommand = () => {
-  const target = document.querySelector('.canvas-viewport') as HTMLDivElement // replace with ref
+  const target = props.getCanvasElement()
 
   if (!target) return;
 

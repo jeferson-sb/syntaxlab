@@ -1,10 +1,16 @@
 <script lang="ts" setup>
-import { computed, ref, onMounted, onUnmounted, reactive } from 'vue';
+import { computed, ref, onMounted, onUnmounted, reactive, useTemplateRef } from 'vue';
 import { storeToRefs } from 'pinia'
 import { useCanvasStore } from '@/store/canvas'
 import { useBlockStore } from '@/store/block'
 import { useConnectionStore } from '@/store/connection'
 import type { Block } from '@/types/block';
+
+const canvas = useTemplateRef('canvas')
+
+defineExpose({
+  getCanvasElement: () => canvas.value,
+})
 
 const canvasState = useCanvasStore()
 const blockState = useBlockStore()
@@ -94,7 +100,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="canvas-viewport" @wheel="onWheel" @mousedown="onMouseDown">
+  <div ref="canvas" class="canvas-viewport" @wheel="onWheel" @mousedown="onMouseDown">
     <div class="canvas-stage" :style="{ transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})` }">
       <div class="canvas-grid dot-grid" />
 

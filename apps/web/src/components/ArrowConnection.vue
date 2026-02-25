@@ -32,13 +32,6 @@ const coords = computed(() => {
 <template>
   <path
     :d="`M ${coords.x1} ${coords.y1} C ${coords.x1} ${coords.my}, ${coords.x2} ${coords.my}, ${coords.x2} ${coords.y2}`"
-    stroke-width="2.5" fill="none" stroke-dasharray="6,4" />
+    stroke-width="2.5" fill="none" stroke-dasharray="6,4" stroke="var(--blue-5)" opacity="0.7" />
 
 </template>
-
-<style scoped>
-path {
-  stroke: var(--blue-5);
-  opacity: 0.7;
-}
-</style>
