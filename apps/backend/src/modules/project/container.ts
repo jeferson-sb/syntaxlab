@@ -6,10 +6,20 @@ import { makeGetProject } from "@/modules/project/application/getProject";
 import { makeDeleteProject } from "@/modules/project/application/deleteProject";
 import { makeUpdateProject } from "@/modules/project/application/updateProject";
 import { makeAddBoardToProject } from "@/modules/project/application/addBoardToProject";
+import type { ProjectRepository } from "@/modules/project/domain/Project";
 
-export const registerProjectContainer = () =>
+type ProjectContainerDependencies = {
+  projectRepository?: ProjectRepository;
+};
+
+export const registerProjectContainer = (
+  dependencies: ProjectContainerDependencies = {},
+) =>
   new Elysia({ name: "module/project" })
-    .decorate("projectRepository", makeMongoProjectRepository())
+    .decorate(
+      "projectRepository",
+      dependencies.projectRepository ?? makeMongoProjectRepository(),
+    )
     .resolve({ as: "scoped" }, ({ projectRepository }) => ({
       createProjectUseCase: makeCreateProject({ projectRepository }),
       getProjectsUseCase: makeGetProjects({ projectRepository }),
