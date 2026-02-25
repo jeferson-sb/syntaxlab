@@ -1,9 +1,28 @@
 <script lang="ts" setup>
 import { FileDown, Edit3, Menu } from 'lucide-vue-next';
 import { ref } from 'vue';
+import { toJpeg, toPng } from 'html-to-image';
+
 
 const isSidebarOpen = ref();
 const boardName = ref('Ideation Canvas');
+
+const exportCommand = () => {
+  const target = document.querySelector('.canvas-viewport') as HTMLDivElement // replace with ref
+
+  if (!target) return;
+
+  const download = (dataUrl: string, fileName = 'my-canvas.jpeg') => {
+    const link = document.createElement('a')
+    link.download = fileName
+    link.href = dataUrl
+    link.click()
+  }
+
+  toJpeg(target, { quality: 0.8, cacheBust: true })
+    .then((dataUrl) => download(dataUrl))
+    .catch(console.error)
+}
 </script>
 
 <template>
@@ -21,9 +40,9 @@ const boardName = ref('Ideation Canvas');
     </div>
 
     <div class="header__actions">
-      <button class="button__action">
+      <button type="button" class="button__action" @click="exportCommand">
         <FileDown :size="14" />
-        Export
+        Screenshot Canvas
       </button>
     </div>
   </header>
@@ -121,6 +140,11 @@ const boardName = ref('Ideation Canvas');
 
   &:hover {
     background: color-mix(in srgb, var(--blue-5) 90%, black 0%);
+  }
+
+  &[disabled] {
+    cursor: not-allowed;
+    opacity: 0.8;
   }
 }
 </style>
