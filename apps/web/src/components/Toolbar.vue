@@ -11,7 +11,7 @@ import {
   Link2,
 } from 'lucide-vue-next';
 import { onKeyStroke } from '@vueuse/core'
-import { computed, useTemplateRef } from 'vue';
+import { useTemplateRef } from 'vue';
 
 import { useCanvasStore } from '@/store/canvas'
 import { useBlockStore } from '@/store/block';
@@ -24,24 +24,6 @@ const connectionState = useConnectionStore()
 
 const colors = ['#fcfcfc', '#fef9c3', '#dcfce7', '#dbeafe', '#f3e8ff']
 const fileInputRef = useTemplateRef('file')
-
-const linkStatusLabel = computed(() => {
-  if (connectionState.isUnlinkModeActive) {
-    if (!connectionState.linkSourceBlockId) {
-      return 'Unlink mode on: choose source block';
-    }
-
-    return 'Unlink mode on: choose target block';
-  }
-
-  if (!connectionState.isLinkModeActive) return 'Link mode off';
-
-  if (!connectionState.linkSourceBlockId) {
-    return 'Link mode on: choose source block';
-  }
-
-  return 'Link mode on: choose target block';
-})
 
 const isTypingInEditableElement = () => {
   const active = document.activeElement as HTMLElement | null;
@@ -67,13 +49,9 @@ const removeConnectionsFromSelectedBlock = () => {
   connectionState.removeConnectionsForBlock(blockState.selected);
 };
 
-const toggleLinkMode = () => {
-  connectionState.toggleLinkMode(blockState.selected);
-}
+const toggleLinkMode = () => connectionState.toggleLinkMode(blockState.selected);
 
-const toggleUnlinkMode = () => {
-  connectionState.toggleUnlinkMode(blockState.selected);
-}
+const toggleUnlinkMode = () => connectionState.toggleUnlinkMode(blockState.selected);
 
 const addTemplateBlock = (type: 'code' | 'note' | 'bookmark' | 'sticky') => {
   const centerX =
@@ -134,7 +112,6 @@ onKeyStroke('Delete', () => {
 })
 onKeyStroke('Backspace', (event) => {
   if (isTypingInEditableElement()) return;
-  event.preventDefault();
   removeConnectionsFromSelectedBlock();
 })
 onKeyStroke('Escape', () => {
@@ -147,12 +124,10 @@ onKeyStroke(['c', 'C'], () => { if (!blockState.selected) addTemplateBlock('code
 onKeyStroke(['s', 'S'], () => { if (!blockState.selected) addTemplateBlock('sticky') })
 onKeyStroke(['l', 'L'], (event) => {
   if (isTypingInEditableElement()) return;
-  event.preventDefault();
   if (event.shiftKey) {
     toggleUnlinkMode();
     return;
   }
-
   toggleLinkMode();
 })
 </script>
@@ -238,8 +213,8 @@ onKeyStroke(['l', 'L'], (event) => {
       </div>
     </div>
 
-    <p class="toolbar-assistive-status" aria-live="polite" role="status">
-      {{ connectionState.statusMessage || linkStatusLabel }}
+    <p v-if="connectionState.statusMessage" class="toolbar-assistive-status" aria-live="polite" role="status">
+      {{ connectionState.statusMessage }}
     </p>
   </div>
 </template>
@@ -358,13 +333,12 @@ onKeyStroke(['l', 'L'], (event) => {
 }
 
 .toolbar-assistive-status {
-  margin: 0;
   align-self: center;
   padding: var(--size-1) var(--size-2);
   font-size: var(--font-size-0);
   color: var(--gray-7);
   border-radius: var(--radius-2);
   background: var(--gray-0);
-  border: var(--border-size-1) solid var(--gray-2);
+  box-shadow: var(--shadow-2);
 }
 </style>

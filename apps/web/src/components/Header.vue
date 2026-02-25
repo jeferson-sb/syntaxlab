@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Share2, Bell, Edit3, Menu } from 'lucide-vue-next';
+import { FileDown, Edit3, Menu } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 const isSidebarOpen = ref();
@@ -21,13 +21,9 @@ const boardName = ref('Ideation Canvas');
     </div>
 
     <div class="header__actions">
-      <button class="button__share">
-        <Share2 :size="14" />
-        Share
-      </button>
-
-      <button class="button__bell">
-        <Bell :size="18" />
+      <button class="button__action">
+        <FileDown :size="14" />
+        Export
       </button>
     </div>
   </header>
@@ -103,7 +99,7 @@ const boardName = ref('Ideation Canvas');
   gap: var(--size-2);
 }
 
-.button__share {
+.button__action {
   display: inline-flex;
   align-items: center;
   gap: var(--size-2);
@@ -125,18 +121,6 @@ const boardName = ref('Ideation Canvas');
 
   &:hover {
     background: color-mix(in srgb, var(--blue-5) 90%, black 0%);
-  }
-}
-
-.button__bell {
-  padding: var(--size-2);
-  border-radius: var(--radius-3);
-  background: var(--gray-4);
-  color: var(--gray-7);
-  transition: background 150ms ease;
-
-  &:hover {
-    background: var(--gray-5);
   }
 }
 </style>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive, ref, onMounted, onUnmounted } from 'vue';
+import { computed, ref, onMounted, onUnmounted, reactive } from 'vue';
 import { storeToRefs } from 'pinia'
 import { useCanvasStore } from '@/store/canvas'
 import { useBlockStore } from '@/store/block'
@@ -67,7 +67,7 @@ const selectBlock = (id: string | null) => {
     return
   }
 
-  const { selectedBlockId } = connectionState.handleBlockClick(id)
+  const { selectedBlockId } = connectionState.toggleBlockLink(id)
   blockState.selected = selectedBlockId
 }
 
@@ -91,7 +91,6 @@ onUnmounted(() => {
   window.removeEventListener('mousemove', onMouseMove);
   window.removeEventListener('mouseup', onMouseUp);
 })
-
 </script>
 
 <template>
@@ -107,8 +106,8 @@ onUnmounted(() => {
       <div class="canvas-interaction-layer">
         <BlockRenderer v-for="block in blockState.blocks" v-bind:key="block.id" :block="block"
           :selected="block.id === blockState.selected" @select-block="selectBlock(block.id)"
-          :is-link-source="(connectionState.isLinkModeActive || connectionState.isUnlinkModeActive) && connectionState.linkSourceBlockId === block.id"
-          @preview-position="previewPosition" @preview-end="clearPreviewPosition" @change-position="changePosition" />
+          :is-link-source="connectionState.linkSourceBlockId === block.id" @preview-position="previewPosition"
+          @preview-end="clearPreviewPosition" @change-position="changePosition" />
       </div>
     </div>
   </div>
@@ -131,6 +130,7 @@ onUnmounted(() => {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  transform-origin: 0px 0px;
 }
 
 .canvas-grid {

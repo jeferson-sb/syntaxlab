@@ -1,4 +1,4 @@
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import { defineStore } from "pinia";
 
 import { uniqueId } from "@/lib/uniqueId";
@@ -21,10 +21,9 @@ export const useConnectionStore = defineStore(
   () => {
     const connections = ref<Connection[]>(initialState);
     const interactionMode = ref<InteractionMode>(null);
-    const isLinkModeActive = computed(() => interactionMode.value === "link");
-    const isUnlinkModeActive = computed(
-      () => interactionMode.value === "unlink",
-    );
+
+    const isLinkModeActive = interactionMode.value === "link";
+    const isUnlinkModeActive = interactionMode.value === "unlink";
     const linkSourceBlockId = ref<string | null>(null);
     const statusMessage = ref("");
 
@@ -40,7 +39,7 @@ export const useConnectionStore = defineStore(
       return connections.value.some(
         (connection) =>
           connection.fromBlockId === fromBlockId &&
-          connection.toBlockId === toBlockId,
+          connection.toBlockId === toBlockId
       );
     };
 
@@ -75,7 +74,7 @@ export const useConnectionStore = defineStore(
         fromBlockId,
         toBlockId,
       });
-      setStatus("Connection created.");
+      clearStatus();
       return true;
     };
 
@@ -84,11 +83,11 @@ export const useConnectionStore = defineStore(
       linkSourceBlockId.value = sourceBlockId;
 
       if (sourceBlockId) {
-        setStatus("Link mode active. Select a target block.");
+        setStatus("Select a target block.");
         return;
       }
 
-      setStatus("Link mode active. Select the source block.");
+      setStatus("Select the source block.");
     };
 
     const beginUnlinkMode = (sourceBlockId: string | null) => {
@@ -96,17 +95,17 @@ export const useConnectionStore = defineStore(
       linkSourceBlockId.value = sourceBlockId;
 
       if (sourceBlockId) {
-        setStatus("Unlink mode active. Select the connected target block.");
+        setStatus("Unlink the connected target block.");
         return;
       }
 
-      setStatus("Unlink mode active. Select the source block.");
+      setStatus("Unlink the source block.");
     };
 
     const cancelLinkMode = () => {
       interactionMode.value = null;
       linkSourceBlockId.value = null;
-      setStatus("Link mode cancelled.");
+      clearStatus();
     };
 
     const toggleLinkMode = (selectedBlockId: string | null) => {
@@ -129,14 +128,13 @@ export const useConnectionStore = defineStore(
 
     const removeConnectionBetweenBlocks = (
       fromBlockId: string,
-      toBlockId: string,
+      toBlockId: string
     ) => {
       if (fromBlockId === toBlockId) {
         setStatus("Select two different blocks to remove a connection.");
         return false;
       }
 
-      const previousCount = connections.value.length;
       connections.value = connections.value.filter((connection) => {
         const isDirectMatch =
           connection.fromBlockId === fromBlockId &&
@@ -148,21 +146,10 @@ export const useConnectionStore = defineStore(
         return !isDirectMatch && !isReverseMatch;
       });
 
-      const removedCount = previousCount - connections.value.length;
-      if (removedCount === 0) {
-        setStatus("No connection found between selected blocks.");
-        return false;
-      }
-
-      setStatus(
-        removedCount === 1
-          ? "1 connection removed."
-          : `${removedCount} connections removed.`,
-      );
       return true;
     };
 
-    const handleBlockClick = (blockId: string) => {
+    const toggleBlockLink = (blockId: string) => {
       if (!interactionMode.value) {
         clearStatus();
         return { selectedBlockId: blockId, connectionCreated: false };
@@ -171,21 +158,20 @@ export const useConnectionStore = defineStore(
       if (!linkSourceBlockId.value) {
         linkSourceBlockId.value = blockId;
         setStatus(
-          interactionMode.value === "unlink"
+          isUnlinkModeActive
             ? "Source selected. Select target block to remove connection."
-            : "Source selected. Select a target block.",
+            : "Source selected. Select a target block."
         );
         return { selectedBlockId: blockId, connectionCreated: false };
       }
 
       const sourceId = linkSourceBlockId.value;
-      const createdOrRemoved =
-        interactionMode.value === "unlink"
-          ? removeConnectionBetweenBlocks(sourceId, blockId)
-          : createConnection({
-              fromBlockId: sourceId,
-              toBlockId: blockId,
-            });
+      const createdOrRemoved = isUnlinkModeActive
+        ? removeConnectionBetweenBlocks(sourceId, blockId)
+        : createConnection({
+            fromBlockId: sourceId,
+            toBlockId: blockId,
+          });
 
       if (createdOrRemoved) {
         interactionMode.value = null;
@@ -196,26 +182,10 @@ export const useConnectionStore = defineStore(
     };
 
     const removeConnectionsForBlock = (blockId: string) => {
-      const previousCount = connections.value.length;
-
       connections.value = connections.value.filter(
         (connection) =>
-          connection.fromBlockId !== blockId &&
-          connection.toBlockId !== blockId,
+          connection.fromBlockId !== blockId && connection.toBlockId !== blockId
       );
-
-      const removedCount = previousCount - connections.value.length;
-      if (removedCount > 0) {
-        setStatus(
-          removedCount === 1
-            ? "1 connection removed."
-            : `${removedCount} connections removed.`,
-        );
-      } else {
-        setStatus("No connections found for selected block.");
-      }
-
-      return removedCount;
     };
 
     return {
@@ -233,7 +203,7 @@ export const useConnectionStore = defineStore(
       canCreateConnection,
       createConnection,
       removeConnectionBetweenBlocks,
-      handleBlockClick,
+      toggleBlockLink,
       removeConnectionsForBlock,
     };
   },
@@ -242,8 +212,8 @@ export const useConnectionStore = defineStore(
       adapter: "indexedDB",
       options: {
         dbName: "syntaxlab",
-        storeName: "connections",
+        storeName: "blocks",
       },
     },
-  },
+  }
 );

@@ -59,11 +59,13 @@ const { style } = useDraggable(blockRef, {
 
   & .selected {
     box-shadow: 0 0 0 6px var(--blue-2);
-    transition: 200ms ease-in-out;
+    transition: box-shadow 200ms ease-in-out;
   }
 
-  &.is-link-source {
-    opacity: 0.65;
+  &.is-link-source>div {
+    outline: 2px solid var(--purple-4);
+    outline-style: dashed;
+    outline-offset: 10px;
   }
 
   @starting-style {
