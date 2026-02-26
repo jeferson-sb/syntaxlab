@@ -67,7 +67,7 @@ const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
 <style lang="css" scoped>
 .sidebar {
   width: 16rem;
-  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   position: sticky;

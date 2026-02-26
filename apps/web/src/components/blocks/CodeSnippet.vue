@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue'
 import DOMPurify from 'dompurify';
-import { Copy } from 'lucide-vue-next'
+import { useClipboard } from '@vueuse/core'
+import { Copy, Check } from 'lucide-vue-next'
 import { codeToHtml } from 'shiki/bundle/web'
 
 import type { CodeBlock } from '@/types/block';
@@ -9,6 +10,7 @@ import type { CodeBlock } from '@/types/block';
 const props = defineProps<{ block: CodeBlock, isEditing: boolean }>()
 const code = ref('')
 const draftCode = ref('')
+const { copy, copied } = useClipboard({ source: draftCode })
 
 const highlightCode = async () => {
   const clean = DOMPurify.sanitize(props.block.props.inlineCode ?? '')
@@ -54,9 +56,10 @@ watch(
           {{ block.props.title }}
         </span>
       </div>
-      <div class="copy">
-        <Copy :size="16" />
-      </div>
+      <button type="button" aria-label="copy" class="copy" @click="copy(draftCode)">
+        <Copy v-if="!copied" :size="16" />
+        <Check v-else :size="16" />
+      </button>
     </div>
     <div class="code-snippet__body">
       <textarea v-if="isEditing" autofocus="true" v-model="draftCode" @blur="onBlur" @focus="onFocus" />
@@ -85,11 +88,22 @@ watch(
   padding-block: var(--size-3);
   background-color: var(--bg-color);
   border-block-end: var(--gray-8) var(--border-size-1) solid;
+}
 
-  & .copy svg {
-    color: var(--gray-5);
-    opacity: 0.8;
-    cursor: pointer;
+.copy {
+  border: 0;
+  background: none;
+  color: var(--gray-5);
+  opacity: 0.8;
+  cursor: pointer;
+
+  & .lucide-check {
+    scale: 1;
+
+    @starting-style {
+      filter: blur(4px);
+      scale: 0.5;
+    }
   }
 }
 

@@ -19,7 +19,6 @@ const isEditing = ref(false)
 const blockRef = useTemplateRef('block')
 const { style } = useDraggable(blockRef, {
   initialValue: { x: block.x, y: block.y },
-  containerElement: () => blockRef.value?.parentElement,
   stopPropagation: true,
   onMove(position) {
     emit('previewPosition', { id: block.id, x: position.x, y: position.y })

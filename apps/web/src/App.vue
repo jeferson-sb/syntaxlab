@@ -36,7 +36,7 @@ const getCanvasElement = () => canvasRef.value?.getCanvasElement() ?? null
 <style scoped>
 .app {
   display: flex;
-  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--gray-2);
   color: var(--gray-9);
   transition: background 200ms ease, color 200ms ease;
