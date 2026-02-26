@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { SwitchRoot, SwitchThumb } from 'reka-ui'
 import { FileDown, Edit3, Menu } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { toJpeg } from 'html-to-image';
@@ -9,6 +10,7 @@ const props = defineProps<{
 
 const isSidebarOpen = ref();
 const boardName = ref('Ideation Canvas');
+const serverSync = ref(false)
 
 const exportCommand = () => {
   const target = props.getCanvasElement()
@@ -43,6 +45,16 @@ const exportCommand = () => {
     </div>
 
     <div class="header__actions">
+      <div class="switch">
+        <label>
+          Server Sync
+        </label>
+
+        <SwitchRoot id="server-sync" v-model="serverSync" class="switch__root">
+          <SwitchThumb class="switch__thumb" />
+        </SwitchRoot>
+      </div>
+
       <button type="button" class="button__action" @click="exportCommand">
         <FileDown :size="14" />
         Screenshot Canvas
@@ -119,6 +131,64 @@ const exportCommand = () => {
   display: flex;
   align-items: center;
   gap: var(--size-2);
+}
+
+.switch {
+  display: flex;
+  gap: var(--size-1);
+  align-items: center;
+
+  & label {
+    color: var(--gray-8);
+    font-size: var(--font-size-1);
+    font-weight: var(--font-weight-5);
+    padding-inline-end: var(--size-2);
+    user-select: none;
+  }
+
+  & .switch__root {
+    display: flex;
+    position: relative;
+    align-items: center;
+    width: 32px;
+    height: 20px;
+    transition: background 150ms var(--ease-in-3);
+    border-radius: var(--radius-round);
+    border: var(--border-size-1) solid var(--gray-4);
+    padding: 0;
+
+    &[data-state=unchecked] {
+      background-color: var(--gray-3);
+    }
+
+    &[data-state=checked] {
+      background-color: var(--gray-8);
+      border-color: var(--gray-4);
+    }
+
+    &:focus-within {
+      outline: none;
+      border-color: var(--gray-4);
+    }
+  }
+
+  & .switch__thumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: .875rem;
+    height: .875rem;
+    background: white;
+    font-size: var(--font-size-0);
+    border-radius: var(--radius-round);
+    transition: translate 150ms var(--ease-out-3);
+    translate: 2px 0;
+    will-change: translate;
+
+    &[data-state=checked] {
+      translate: 100%;
+    }
+  }
 }
 
 .button__action {
