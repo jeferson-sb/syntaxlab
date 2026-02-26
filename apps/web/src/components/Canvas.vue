@@ -20,6 +20,7 @@ const { pinchZoom, changeOffset } = canvasState
 const { zoom, offset } = storeToRefs(canvasState)
 
 const isPanning = ref(false)
+const isSpacePressed = ref(false)
 const lastMousePos = ref({ x: 0, y: 0 });
 const dragPreviewPositions = reactive<Record<string, { x: number; y: number }>>({})
 
@@ -37,8 +38,10 @@ const blocksWithDragPreview = computed(() => {
 })
 
 const onMouseDown = (e: MouseEvent) => {
+  if (!isSpacePressed.value) return;
   if ((e.target as Element | null)?.closest('.block')) return;
 
+  e.preventDefault();
   isPanning.value = true;
   lastMousePos.value.x = e.clientX;
   lastMousePos.value.y = e.clientY;
@@ -54,6 +57,36 @@ const onMouseMove = (e: MouseEvent) => {
 }
 
 const onMouseUp = () => {
+  isPanning.value = false
+}
+
+const isTypingTarget = (target: EventTarget | null) => {
+  if (!(target instanceof HTMLElement)) return false
+
+  return (
+    target.isContentEditable ||
+    target.tagName === 'INPUT' ||
+    target.tagName === 'TEXTAREA' ||
+    target.tagName === 'SELECT'
+  )
+}
+
+const onKeyDown = (e: KeyboardEvent) => {
+  if (e.code !== 'Space') return
+  if (isTypingTarget(e.target)) return
+
+  e.preventDefault()
+  isSpacePressed.value = true
+}
+
+const onKeyUp = (e: KeyboardEvent) => {
+  if (e.code !== 'Space') return
+  isSpacePressed.value = false
+  isPanning.value = false
+}
+
+const onWindowBlur = () => {
+  isSpacePressed.value = false
   isPanning.value = false
 }
 
@@ -90,17 +123,24 @@ const clearPreviewPosition = (blockId: string) => {
 }
 
 onMounted(() => {
-  window.addEventListener('mousemove', onMouseMove);
-  window.addEventListener('mouseup', onMouseUp);
+  // window.addEventListener('keydown', onKeyDown);
+  // window.addEventListener('keyup', onKeyUp);
+  // window.addEventListener('blur', onWindowBlur);
+  // window.addEventListener('mousemove', onMouseMove);
+  // window.addEventListener('mouseup', onMouseUp);
 })
 onUnmounted(() => {
-  window.removeEventListener('mousemove', onMouseMove);
-  window.removeEventListener('mouseup', onMouseUp);
+  // window.removeEventListener('keydown', onKeyDown);
+  // window.removeEventListener('keyup', onKeyUp);
+  // window.removeEventListener('blur', onWindowBlur);
+  // window.removeEventListener('mousemove', onMouseMove);
+  // window.removeEventListener('mouseup', onMouseUp);
 })
 </script>
 
 <template>
-  <div ref="canvas" class="canvas-viewport" @wheel="onWheel" @mousedown="onMouseDown">
+  <div ref="canvas" class="canvas-viewport" :class="{ 'is-space-panning': isSpacePressed, 'is-panning': isPanning }"
+    @wheel="onWheel" @mousedown="onMouseDown">
     <div class="canvas-stage" :style="{ transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})` }">
       <div class="canvas-grid dot-grid" />
 
@@ -125,9 +165,13 @@ onUnmounted(() => {
   height: 100%;
   position: relative;
   overflow: hidden;
-  cursor: grab;
+  cursor: default;
 
-  &:active {
+  &.is-space-panning {
+    cursor: grab;
+  }
+
+  &.is-panning {
     cursor: grabbing;
   }
 }
