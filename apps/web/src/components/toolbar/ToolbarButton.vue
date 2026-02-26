@@ -5,7 +5,7 @@ defineProps<{ active?: boolean; shortcut?: string }>()
 </script>
 
 <template>
-  <TooltipProvider :delay-duration="200">
+  <TooltipProvider :delay-duration="100">
     <TooltipRoot>
       <TooltipTrigger as-child>
         <button v-bind="$attrs" type="button" :class="{ 'toolbar-button': true, active }">
@@ -38,6 +38,10 @@ defineProps<{ active?: boolean; shortcut?: string }>()
   font-size: var(--font-size-1);
   font-weight: var(--font-weight-7);
   color: var(--gray-6);
+
+  &:empty {
+    display: none;
+  }
 }
 
 .toolbar-button {
@@ -60,7 +64,8 @@ defineProps<{ active?: boolean; shortcut?: string }>()
   }
 }
 
-.tooltip-content {
+:deep(.tooltip-content) {
+  z-index: var(--layer-4);
   background-color: var(--gray-9);
   user-select: none;
   padding: var(--size-1) var(--size-2);
