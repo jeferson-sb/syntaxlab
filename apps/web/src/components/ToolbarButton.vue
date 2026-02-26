@@ -1,16 +1,32 @@
 <script lang="ts" setup>
-defineProps<{ active?: boolean }>()
+import { TooltipArrow, TooltipContent, TooltipPortal, TooltipProvider, TooltipRoot, TooltipTrigger } from 'reka-ui'
+
+defineProps<{ active?: boolean; shortcut?: string }>()
 </script>
 
 <template>
-  <button type="button" :class="{ 'toolbar-button': true, active }">
-    <div class="toolbar-icon">
-      <slot name="icon" />
-    </div>
-    <span class="toolbar-label">
-      <slot name="label" />
-    </span>
-  </button>
+  <TooltipProvider :delay-duration="200">
+    <TooltipRoot>
+      <TooltipTrigger :as-child="true">
+        <button type="button" :class="{ 'toolbar-button': true, active }">
+          <div class="toolbar-icon">
+            <slot name="icon" />
+          </div>
+          <span class="toolbar-label">
+            <slot name="label" />
+          </span>
+        </button>
+      </TooltipTrigger>
+
+      <TooltipPortal v-if="shortcut">
+        <TooltipContent class="tooltip-content" :side-offset="5">
+          {{ shortcut }}
+          <TooltipArrow :width="12" :height="6" />
+        </TooltipContent>
+      </TooltipPortal>
+
+    </TooltipRoot>
+  </TooltipProvider>
 </template>
 
 <style lang="css" scoped>
@@ -42,5 +58,12 @@ defineProps<{ active?: boolean }>()
       color: var(--blue-5);
     }
   }
+}
+
+.tooltip-content {
+  background-color: var(--gray-9);
+  user-select: none;
+  padding: var(--size-1) var(--size-2);
+  border-radius: var(--radius-2);
 }
 </style>

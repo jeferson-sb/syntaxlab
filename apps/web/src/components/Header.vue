@@ -40,7 +40,6 @@ const exportCommand = () => {
       <div class="header__title">
         <Edit3 class="text-primary" :size="18" />
         <h2 class="title">{{ boardName }}</h2>
-        <span class="badge-live">LIVE</span>
       </div>
     </div>
 
@@ -114,23 +113,10 @@ const exportCommand = () => {
   color: var(--gray-7);
 }
 
-.badge-live {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.625rem;
-  padding: 0.125rem 0.5rem;
-  border-radius: 9999px;
-  background: rgba(16, 185, 129, 0.12);
-  color: rgba(16, 185, 129, 0.95);
-  margin-left: 0.5rem;
-}
-
 .header__actions {
   display: flex;
   align-items: center;
-  gap: var(--size-2);
+  gap: var(--size-4);
 }
 
 .switch {

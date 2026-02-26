@@ -122,7 +122,7 @@ onKeyStroke('Delete', () => {
   if (isTypingInEditableElement()) return;
   if (blockState.selected) removeSelectedBlock()
 })
-onKeyStroke('Backspace', (event) => {
+onKeyStroke('Backspace', () => {
   if (isTypingInEditableElement()) return;
   removeConnectionsFromSelectedBlock();
 })
@@ -161,30 +161,30 @@ onKeyStroke(['l', 'L'], (event) => {
         <template #icon>
           <Link2 :size="18" />
         </template>
-        <template #label>Link (L)</template>
+        <template #label>Link</template>
       </ToolbarButton>
 
       <div class="toolbar-divider" role="separator" aria-orientation="vertical"></div>
 
-      <ToolbarButton @click="addTemplateBlock('note')">
+      <ToolbarButton @click="addTemplateBlock('note')" shortcut="Text — T">
         <template #icon>
           <Type :size="18" />
         </template>
       </ToolbarButton>
 
-      <ToolbarButton @click="addTemplateBlock('sticky')">
+      <ToolbarButton @click="addTemplateBlock('sticky')" shortcut="Sticky Note — S">
         <template #icon>
           <StickyNote :size="18" />
         </template>
       </ToolbarButton>
 
-      <ToolbarButton @click="addTemplateBlock('code')">
+      <ToolbarButton @click="addTemplateBlock('code')" shortcut="Code — C">
         <template #icon>
           <Code :size="18" />
         </template>
       </ToolbarButton>
 
-      <ToolbarButton @click="addImageBlock()">
+      <ToolbarButton @click="addImageBlock()" shortcut="Image — U">
         <template #icon>
           <ImageIcon :size="18" />
         </template>
@@ -197,7 +197,7 @@ onKeyStroke(['l', 'L'], (event) => {
       <div class="toolbar-divider" v-if="blockState.selected" role="separator" aria-orientation="vertical"></div>
 
       <div class="toolbar-group" v-if="blockState.selected">
-        <button type="button" class="tool-btn-secondary" title="Change Font Size" @click="changeTextSize">
+        <button type="button" class="tool-btn-secondary" @click="changeTextSize">
           <Type :size="16" />
           <span class="badge-text">{{ currentFontSize.label }}</span>
         </button>
@@ -209,7 +209,7 @@ onKeyStroke(['l', 'L'], (event) => {
 
         <div class="toolbar-divider" role="separator" aria-orientation="vertical"></div>
 
-        <button class="tool-btn-danger" title="Remove block" @click="removeSelectedBlock">
+        <button class="tool-btn-danger" @click="removeSelectedBlock">
           <Trash2 :size="16" />
         </button>
       </div>
@@ -234,8 +234,6 @@ onKeyStroke(['l', 'L'], (event) => {
 </template>
 
 <style lang="css" scoped>
-@import "open-props/style";
-
 .toolbar-wrapper {
   position: absolute;
   top: var(--size-5);
