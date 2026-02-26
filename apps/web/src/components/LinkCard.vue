@@ -7,10 +7,6 @@ const props = defineProps<{ block: BookmarkBlock }>()
 
 <template>
   <div class="bookmark">
-    <figure>
-      <img :src="block.props.imageUrl" :alt="block.props.title" loading="lazy">
-    </figure>
-
     <div class="bookmark-body">
 
       <div>
@@ -21,15 +17,11 @@ const props = defineProps<{ block: BookmarkBlock }>()
         <h3 class="bookmark-body__title">
           {{ block.props.title }}
         </h3>
-        <p class="bookmark-body__content">
-          {{ block.props.content }}
-        </p>
       </div>
 
       <a :href="block.props.href" target="_blank" rel="noopener noreferrer">
         Open
       </a>
-
     </div>
   </div>
 </template>
@@ -45,25 +37,10 @@ const props = defineProps<{ block: BookmarkBlock }>()
   border: var(--gray-2) var(--border-size-1) solid;
   padding: var(--size-4);
 
-  & figure {
-    flex: 1;
-    height: var(--size-11);
-    border-radius: var(--radius-2);
-    overflow: clip;
-
-    & img {
-      user-select: none;
-      pointer-events: none;
-      object-fit: cover;
-      width: 100%;
-      height: 100%;
-    }
-  }
-
   & .bookmark-body {
     display: flex;
     flex: 2;
-    flex-direction: column;
+    justify-content: space-between;
     gap: var(--size-2);
 
     & .bookmark-body__meta {
@@ -86,17 +63,6 @@ const props = defineProps<{ block: BookmarkBlock }>()
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-    }
-
-    & .bookmark-body__content {
-      font-size: var(--font-size-1);
-      font-weight: var(--font-weight-5);
-      color: var(--gray-6);
-      line-height: var(--font-lineheight-2);
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
     }
 
     a {

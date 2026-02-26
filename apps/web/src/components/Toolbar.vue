@@ -9,7 +9,6 @@ import {
   StickyNote,
   Code,
   Link2,
-  BookmarkPlus,
 } from 'lucide-vue-next';
 import { onKeyStroke } from '@vueuse/core'
 import { ref, useTemplateRef } from 'vue';
@@ -82,8 +81,6 @@ const addImageBlock = () => {
   fileInputRef.value?.focus();
   fileInputRef.value?.click();
 }
-
-const addBookmarkBlock = () => { }
 
 const onImageUpload = (e: Event) => {
   const target = e.target as HTMLInputElement;
@@ -193,11 +190,7 @@ onKeyStroke(['l', 'L'], (event) => {
         </template>
       </ToolbarButton>
 
-      <ToolbarButton @click="addBookmarkBlock()">
-        <template #icon>
-          <BookmarkPlus :size="18" />
-        </template>
-      </ToolbarButton>
+      <BookmarkTool />
 
       <input type="file" ref="file" accept="image/*" @change="onImageUpload" hidden />
 
