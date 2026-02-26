@@ -1,17 +1,16 @@
 <script lang="ts" setup>
 import type { NoteBlock } from '@/types/block';
 
-const props = defineProps<{ block: NoteBlock, isEditing: false }>()
+defineProps<{ block: NoteBlock; isEditing: boolean }>()
 const onFocus = (event: FocusEvent) => {
-  const target = event.target as HTMLInputElement;
+  const target = event.target as HTMLTextAreaElement;
   target?.select()
 }
 </script>
 
 <template>
   <div class="text-card" :style="{ '--color': block.props.color, '--font-size': block.props.textSize }">
-    <textarea v-if="isEditing" autofocus="true" :defaultValue="block.props.content" v-model="block.props.content"
-      @focus="onFocus" />
+    <textarea v-if="isEditing" autofocus v-model="block.props.content" @focus="onFocus" />
     <p v-else>{{ block.props.content }}</p>
   </div>
 </template>

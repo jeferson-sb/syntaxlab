@@ -2,9 +2,9 @@
 import type { StickyBlock } from '@/types/block';
 import { Lightbulb } from 'lucide-vue-next'
 
-const props = defineProps<{ block: StickyBlock, isEditing: false }>()
+const props = defineProps<{ block: StickyBlock; isEditing: boolean }>()
 const onFocus = (event: FocusEvent) => {
-  const target = event.target as HTMLInputElement;
+  const target = event.target as HTMLInputElement | HTMLTextAreaElement;
   target?.select()
 }
 </script>
@@ -14,15 +14,13 @@ const onFocus = (event: FocusEvent) => {
     <div class="sticky-note__header">
       <Lightbulb :size="36" class="icon" />
 
-      <input v-if="isEditing" autofocus="true" :defaultValue="block.props.title" v-model="block.props.title"
-        @focus="onFocus" class="title-input" />
+      <input v-if="isEditing" autofocus v-model="block.props.title" @focus="onFocus" class="title-input" />
       <h3 v-else class="title">
         {{ block.props.title || 'Untitled' }}
       </h3>
     </div>
 
-    <textarea v-if="isEditing" autofocus="true" :defaultValue="block.props.content" v-model="block.props.content"
-      @focus="onFocus" />
+    <textarea v-if="isEditing" autofocus v-model="block.props.content" @focus="onFocus" />
     <p v-else>{{ block.props.content }}</p>
 
   </div>

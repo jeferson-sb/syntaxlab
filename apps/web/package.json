@@ -8,6 +8,8 @@
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest",
+    "test:browser": "vitest --config vitest.browser.config.ts --run",
+    "test:browser:watch": "vitest --config vitest.browser.config.ts",
     "typecheck": "vue-tsc -p tsconfig.app.json --noEmit"
   },
   "dependencies": {
@@ -25,9 +27,12 @@
   "devDependencies": {
     "@types/node": "^24.10.1",
     "@vitejs/plugin-vue": "^6.0.1",
+    "@vitest/browser-playwright": "^4.0.18",
     "@vue/test-utils": "^2.4.6",
     "@vue/tsconfig": "^0.8.1",
     "elysia": "^1.4.25",
+    "happy-dom": "^20.7.0",
+    "playwright": "^1.58.2",
     "shiki": "^3.22.0",
     "typescript": "~5.9.3",
     "unplugin-vue-components": "^31.0.0",
