@@ -16,6 +16,7 @@ export type NoteBlock = Block & {
   props: {
     content?: string;
     color?: string;
+    textSize?: string;
   };
 };
 

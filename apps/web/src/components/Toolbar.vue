@@ -9,9 +9,10 @@ import {
   StickyNote,
   Code,
   Link2,
+  BookmarkPlus,
 } from 'lucide-vue-next';
 import { onKeyStroke } from '@vueuse/core'
-import { useTemplateRef } from 'vue';
+import { ref, useTemplateRef } from 'vue';
 
 import { useCanvasStore } from '@/store/canvas'
 import { useBlockStore } from '@/store/block';
@@ -23,6 +24,7 @@ const blockState = useBlockStore()
 const connectionState = useConnectionStore()
 
 const colors = ['#fcfcfc', '#fef9c3', '#dcfce7', '#dbeafe', '#f3e8ff']
+const currentFontSize = ref({ label: 'base', css: '0.75rem' });
 const fileInputRef = useTemplateRef('file')
 
 const isTypingInEditableElement = () => {
@@ -81,6 +83,8 @@ const addImageBlock = () => {
   fileInputRef.value?.click();
 }
 
+const addBookmarkBlock = () => { }
+
 const onImageUpload = (e: Event) => {
   const target = e.target as HTMLInputElement;
   const file = target?.files?.[0];
@@ -105,6 +109,17 @@ const onImageUpload = (e: Event) => {
   };
   reader.readAsDataURL(file);
 };
+
+const changeTextSize = () => {
+  const labels = ['base', 'md', 'lg']
+  const sizes = ['0.75rem', '1.1rem', '1.5rem'];
+  const currentIndex = sizes.indexOf(currentFontSize.value.css || '0.75rem');
+  const nextIndex = (currentIndex + 1) % sizes.length;
+
+  blockState.updateBlock({ props: { textSize: sizes[nextIndex] } })
+  currentFontSize.value.css = sizes[nextIndex] || '0.75rem'
+  currentFontSize.value.label = labels[nextIndex] || 'base'
+}
 
 onKeyStroke('Delete', () => {
   if (isTypingInEditableElement()) return;
@@ -178,14 +193,20 @@ onKeyStroke(['l', 'L'], (event) => {
         </template>
       </ToolbarButton>
 
+      <ToolbarButton @click="addBookmarkBlock()">
+        <template #icon>
+          <BookmarkPlus :size="18" />
+        </template>
+      </ToolbarButton>
+
       <input type="file" ref="file" accept="image/*" @change="onImageUpload" hidden />
 
-      <div class="toolbar-divider" role="separator" aria-orientation="vertical"></div>
+      <div class="toolbar-divider" v-if="blockState.selected" role="separator" aria-orientation="vertical"></div>
 
-      <div class="toolbar-group">
-        <button class="tool-btn-secondary" title="Change Font Size">
+      <div class="toolbar-group" v-if="blockState.selected">
+        <button type="button" class="tool-btn-secondary" title="Change Font Size" @click="changeTextSize">
           <Type :size="16" />
-          <span class="badge-text">base</span>
+          <span class="badge-text">{{ currentFontSize.label }}</span>
         </button>
 
         <div class="color-picker">
@@ -328,8 +349,12 @@ onKeyStroke(['l', 'L'], (event) => {
   width: var(--size-4);
   height: var(--size-4);
   border-radius: var(--radius-round);
-  border: var(--border-size-1) solid var(--slate-2);
+  border: var(--border-size-1) solid var(--gray-2);
   cursor: pointer;
+
+  &:hover {
+    border-color: var(--gray-7);
+  }
 }
 
 .toolbar-assistive-status {

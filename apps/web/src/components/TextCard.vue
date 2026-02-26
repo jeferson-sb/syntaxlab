@@ -9,7 +9,7 @@ const onFocus = (event: FocusEvent) => {
 </script>
 
 <template>
-  <div class="text-card" :style="{ '--color': block.props.color }">
+  <div class="text-card" :style="{ '--color': block.props.color, '--font-size': block.props.textSize }">
     <textarea v-if="isEditing" autofocus="true" :defaultValue="block.props.content" v-model="block.props.content"
       @focus="onFocus" />
     <p v-else>{{ block.props.content }}</p>
@@ -19,7 +19,6 @@ const onFocus = (event: FocusEvent) => {
 <style lang="css" scoped>
 .text-card {
   padding: var(--size-7);
-  width: var(--size-13);
   box-shadow: var(--shadow-2);
   border-radius: var(--radius-4);
   border: var(--gray-2) var(--border-size-1) solid;
@@ -27,7 +26,7 @@ const onFocus = (event: FocusEvent) => {
   color: var(--gray-7);
   line-height: var(--font-lineheight-4);
   font-weight: var(--font-weight-6);
-  font-size: var(--font-size-0);
+  font-size: var(--font-size, var(--font-size-0));
 
   textarea {
     background: transparent;

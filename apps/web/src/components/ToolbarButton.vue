@@ -27,6 +27,7 @@ defineProps<{ active?: boolean }>()
 .toolbar-button {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
   gap: var(--size-3);
   padding-inline: var(--size-2);
   padding-block: var(--size-1);
