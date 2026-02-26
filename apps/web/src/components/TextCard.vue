@@ -23,6 +23,7 @@ const onFocus = (event: FocusEvent) => {
   border-radius: var(--radius-4);
   border: var(--gray-2) var(--border-size-1) solid;
   background: var(--color, oklch(99.107% 0.00011 271));
+  min-width: 11rem;
   color: var(--gray-7);
   line-height: var(--font-lineheight-4);
   font-weight: var(--font-weight-6);

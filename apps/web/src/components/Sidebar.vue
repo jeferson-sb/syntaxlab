@@ -34,7 +34,7 @@ const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
         </div>
 
         <nav class="main-nav">
-          <NavItem label="My Boards" :active="true">
+          <NavItem label="My Boards" active>
             <LayoutDashboard :size="18" />
           </NavItem>
           <NavItem label="Shared with Me">

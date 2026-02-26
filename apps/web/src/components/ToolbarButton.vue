@@ -7,8 +7,8 @@ defineProps<{ active?: boolean; shortcut?: string }>()
 <template>
   <TooltipProvider :delay-duration="200">
     <TooltipRoot>
-      <TooltipTrigger :as-child="true">
-        <button type="button" :class="{ 'toolbar-button': true, active }">
+      <TooltipTrigger as-child>
+        <button v-bind="$attrs" type="button" :class="{ 'toolbar-button': true, active }">
           <div class="toolbar-icon">
             <slot name="icon" />
           </div>

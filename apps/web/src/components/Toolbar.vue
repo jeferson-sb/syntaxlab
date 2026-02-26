@@ -148,7 +148,7 @@ onKeyStroke(['l', 'L'], (event) => {
   <div class="toolbar-wrapper">
     <div class="toolbar-container">
 
-      <ToolbarButton :active="true" @click="blockState.unselect">
+      <ToolbarButton active @click="blockState.unselect">
         <template #icon>
           <MousePointer2 :size="18" />
         </template>

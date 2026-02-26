@@ -40,7 +40,7 @@ const addBookmark = () => {
 
 <template>
   <DialogRoot>
-    <DialogTrigger :as-child="true">
+    <DialogTrigger as-child>
       <ToolbarButton>
         <template #icon>
           <BookmarkPlus :size="18" />
@@ -117,13 +117,13 @@ const addBookmark = () => {
 
 
   &[data-state=open] {
-    animation: scale-up 300ms var(--ease-3) both;
+    animation: scale-up 200ms var(--ease-out-3) both;
   }
 }
 
 @keyframes scale-up {
   from {
-    transform: translate(-50%, -50%) scale(0.3);
+    transform: translate(-50%, -50%) scale(0.4);
   }
 
   to {
