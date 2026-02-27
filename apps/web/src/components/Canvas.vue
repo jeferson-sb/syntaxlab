@@ -1,10 +1,13 @@
 <script lang="ts" setup>
-import { computed, ref, onMounted, onUnmounted, reactive, useTemplateRef } from 'vue';
+import { computed, ref, reactive, useTemplateRef } from 'vue';
 import { storeToRefs } from 'pinia'
+import { onKeyStroke, useEventListener } from '@vueuse/core'
+
 import { useCanvasStore } from '@/store/canvas'
 import { useBlockStore } from '@/store/block'
 import { useConnectionStore } from '@/store/connection'
 import type { Block } from '@/types/block';
+import { isTypingTargetEvent } from '@/lib/event';
 
 const canvas = useTemplateRef('canvas')
 
@@ -16,7 +19,7 @@ const canvasState = useCanvasStore()
 const blockState = useBlockStore()
 const connectionState = useConnectionStore()
 
-const { pinchZoom, changeOffset } = canvasState
+const { changeOffset, zoomAtPoint } = canvasState
 const { zoom, offset } = storeToRefs(canvasState)
 
 const isPanning = ref(false)
@@ -41,7 +44,7 @@ const onMouseDown = (e: MouseEvent) => {
   if (!isSpacePressed.value) return;
   if ((e.target as Element | null)?.closest('.block')) return;
 
-  e.preventDefault();
+  // e.preventDefault();
   isPanning.value = true;
   lastMousePos.value.x = e.clientX;
   lastMousePos.value.y = e.clientY;
@@ -60,29 +63,13 @@ const onMouseUp = () => {
   isPanning.value = false
 }
 
-const isTypingTarget = (target: EventTarget | null) => {
-  if (!(target instanceof HTMLElement)) return false
+const onSpaceBarPress = (e: KeyboardEvent) => {
+  if (isTypingTargetEvent(e.target)) return
 
-  return (
-    target.isContentEditable ||
-    target.tagName === 'INPUT' ||
-    target.tagName === 'TEXTAREA' ||
-    target.tagName === 'SELECT'
-  )
-}
-
-const onKeyDown = (e: KeyboardEvent) => {
-  if (e.code !== 'Space') return
-  if (isTypingTarget(e.target)) return
-
-  e.preventDefault()
-  isSpacePressed.value = true
-}
-
-const onKeyUp = (e: KeyboardEvent) => {
-  if (e.code !== 'Space') return
-  isSpacePressed.value = false
-  isPanning.value = false
+  isSpacePressed.value = !isSpacePressed.value
+  if (!isSpacePressed.value) {
+    isPanning.value = false
+  }
 }
 
 const onWindowBlur = () => {
@@ -93,8 +80,15 @@ const onWindowBlur = () => {
 const onWheel = (e: WheelEvent) => {
   if (e.ctrlKey || e.metaKey) {
     e.preventDefault();
+
+    const rect = canvas.value!.getBoundingClientRect();
+    const focalPoint = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    };
     const delta = e.deltaY > 0 ? -0.05 : 0.05;
-    pinchZoom(delta)
+
+    zoomAtPoint(focalPoint, delta);
   } else if (!isPanning.value) {
     changeOffset({ x: offset.value.x - e.deltaX, y: offset.value.y - e.deltaY })
   }
@@ -122,27 +116,16 @@ const clearPreviewPosition = (blockId: string) => {
   delete dragPreviewPositions[blockId]
 }
 
-onMounted(() => {
-  // window.addEventListener('keydown', onKeyDown);
-  // window.addEventListener('keyup', onKeyUp);
-  // window.addEventListener('blur', onWindowBlur);
-  // window.addEventListener('mousemove', onMouseMove);
-  // window.addEventListener('mouseup', onMouseUp);
-})
-onUnmounted(() => {
-  // window.removeEventListener('keydown', onKeyDown);
-  // window.removeEventListener('keyup', onKeyUp);
-  // window.removeEventListener('blur', onWindowBlur);
-  // window.removeEventListener('mousemove', onMouseMove);
-  // window.removeEventListener('mouseup', onMouseUp);
-})
+useEventListener('blur', onWindowBlur)
+onKeyStroke(e => e.code === 'Space', onSpaceBarPress, { target: canvas.value?.firstChild, dedupe: true })
 </script>
 
 <template>
-  <div ref="canvas" class="canvas-viewport" :class="{ 'is-space-panning': isSpacePressed, 'is-panning': isPanning }"
-    @wheel="onWheel" @mousedown="onMouseDown">
+  <div ref="canvas" class="canvas-viewport"
+    :class="{ 'canvas--panning': isSpacePressed, 'canvas--grabbing': isPanning }" @wheel="onWheel"
+    @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp">
     <div class="canvas-stage" :style="{ transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})` }">
-      <div class="canvas-grid dot-grid" />
+      <div class="canvas-grid" role="presentation" />
 
       <svg class="canvas-vector-layer">
         <ArrowConnection v-for="conn in connectionState.connections" :key="conn.id" :conn="conn"
@@ -150,7 +133,7 @@ onUnmounted(() => {
       </svg>
 
       <div class="canvas-interaction-layer">
-        <BlockRenderer v-for="block in blockState.blocks" v-bind:key="block.id" :block="block"
+        <BlockRenderer v-for="block in blockState.blocks" :key="block.id" :block="block"
           :selected="block.id === blockState.selected" @select-block="selectBlock(block.id)"
           :is-link-source="connectionState.linkSourceBlockId === block.id" @preview-position="previewPosition"
           @preview-end="clearPreviewPosition" @change-position="changePosition" />
@@ -167,11 +150,11 @@ onUnmounted(() => {
   overflow: hidden;
   cursor: default;
 
-  &.is-space-panning {
+  &.canvas--panning {
     cursor: grab;
   }
 
-  &.is-panning {
+  &.canvas--grabbing {
     cursor: grabbing;
   }
 }
@@ -180,7 +163,7 @@ onUnmounted(() => {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  transform-origin: 0px 0px;
+  transform-origin: 0 0;
 }
 
 .canvas-grid {

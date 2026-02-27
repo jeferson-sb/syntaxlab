@@ -1,6 +1,8 @@
 <script lang="ts" setup>
-import { ref, useTemplateRef } from 'vue';
+import { ref, useTemplateRef, watch } from 'vue';
 import { useDraggable } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
+import { useCanvasStore } from '@/store/canvas'
 import type { Block } from '@/types/block';
 
 const { block, selected, isLinkSource } = defineProps<{
@@ -15,19 +17,50 @@ const emit = defineEmits<{
   (e: 'changePosition', update: Partial<Block>): void
 }>()
 
+const canvasStore = useCanvasStore()
+const { zoom } = storeToRefs(canvasStore)
+
 const isEditing = ref(false)
+const dragStartMouse = ref({ x: 0, y: 0 })
 const blockRef = useTemplateRef('block')
-const { style } = useDraggable(blockRef, {
+
+const { style, position } = useDraggable(blockRef, {
   initialValue: { x: block.x, y: block.y },
   stopPropagation: true,
-  onMove(position) {
-    emit('previewPosition', { id: block.id, x: position.x, y: position.y })
+  onStart(_pos, event) {
+    dragStartMouse.value = { x: event.clientX, y: event.clientY }
   },
-  onEnd(position) {
+  onMove(_pos, event) {
+    // Calculate delta in screen space and convert to world space
+    const deltaX = (event.clientX - dragStartMouse.value.x) / zoom.value
+    const deltaY = (event.clientY - dragStartMouse.value.y) / zoom.value
+
+    const x = block.x + deltaX
+    const y = block.y + deltaY
+
+    // Update useDraggable's internal position for correct styling
+    position.value = { x, y }
+    emit('previewPosition', { id: block.id, x, y })
+  },
+  onEnd(_pos, event) {
+    const deltaX = (event.clientX - dragStartMouse.value.x) / zoom.value
+    const deltaY = (event.clientY - dragStartMouse.value.y) / zoom.value
+
+    const x = block.x + deltaX
+    const y = block.y + deltaY
+
     emit('previewEnd', block.id)
-    emit('changePosition', { id: block.id, x: position.x, y: position.y })
+    emit('changePosition', { id: block.id, x, y })
   }
 })
+
+// Sync position when block is updated externally
+watch(
+  () => [block.x, block.y] as const,
+  ([x, y]) => {
+    position.value = { x, y }
+  },
+)
 </script>
 
 <template>
