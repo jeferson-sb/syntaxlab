@@ -1,15 +1,28 @@
 <script lang="ts" setup>
+import { ref, useId } from 'vue';
 import { Link2 } from 'lucide-vue-next'
-import { useId } from 'vue';
-
+import { useBlockStore } from '@/store/block'
 import type { BookmarkBlock } from '@/types/block';
 
 const props = defineProps<{ block: BookmarkBlock }>()
 const id = useId()
+
+const blockStore = useBlockStore()
+const isEditOpen = ref(false)
+
+const handleSave = (payload: { title: string; url: string }) => {
+  blockStore.updateBlock({
+    id: props.block.id,
+    props: {
+      title: payload.title,
+      href: payload.url,
+    },
+  })
+}
 </script>
 
 <template>
-  <div class="bookmark">
+  <div class="bookmark" @dblclick="isEditOpen = true">
     <div class="bookmark-body">
 
       <div>
@@ -26,6 +39,9 @@ const id = useId()
         Open
       </a>
     </div>
+
+    <BookmarkDialog v-model:open="isEditOpen" mode="edit" :initial-title="block.props.title"
+      :initial-url="block.props.href" @save="handleSave" />
   </div>
 </template>
 
@@ -42,7 +58,8 @@ const id = useId()
 
   & .bookmark-body {
     display: flex;
-    flex: 2;
+    flex: 1;
+    flex-wrap: wrap;
     justify-content: space-between;
     gap: var(--size-2);
 
@@ -63,9 +80,7 @@ const id = useId()
       color: var(--gray-8);
       line-height: var(--font-lineheight-1);
       margin-block-end: var(--size-1);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      text-wrap: pretty;
     }
 
     a {
