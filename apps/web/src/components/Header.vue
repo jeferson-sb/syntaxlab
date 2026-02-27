@@ -4,6 +4,8 @@ import { FileDown, Edit3, Menu } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { toJpeg } from 'html-to-image';
 
+import { slugify } from '@/lib/slugify';
+
 const props = defineProps<{
   getCanvasElement: () => HTMLDivElement | null;
 }>()
@@ -25,7 +27,7 @@ const exportCommand = () => {
   }
 
   toJpeg(target, { quality: 0.8, cacheBust: true })
-    .then((dataUrl) => download(dataUrl))
+    .then((dataUrl) => download(dataUrl, slugify(boardName.value)))
     .catch(console.error)
 }
 </script>
@@ -38,7 +40,7 @@ const exportCommand = () => {
       </button>
 
       <div class="header__title">
-        <Edit3 class="text-primary" :size="18" />
+        <Edit3 class="text-primary" :size="18" role="presentation" aria-label="Pencil" />
         <h2 class="title">{{ boardName }}</h2>
       </div>
     </div>
@@ -49,7 +51,7 @@ const exportCommand = () => {
           Server Sync
         </label>
 
-        <SwitchRoot id="server-sync" v-model="serverSync" class="switch__root">
+        <SwitchRoot id="server-sync" v-model="serverSync" aria-label="Enable server sync" class="switch__root">
           <SwitchThumb class="switch__thumb" />
         </SwitchRoot>
       </div>
@@ -68,10 +70,9 @@ const exportCommand = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-inline: 1.5rem;
-  border-block-end: 1px solid var(--gray-3);
+  padding-inline: var(--size-5);
+  border-block-end: var(--border-size-1) solid var(--gray-3);
   background: var(--gray-1);
-  backdrop-filter: blur(12px);
   z-index: var(--layer-3);
 }
 
@@ -86,10 +87,10 @@ const exportCommand = () => {
   border-radius: var(--radius-3, 0.5rem);
   background: transparent;
   transition: background 150ms ease;
-}
 
-.header__toggle:hover {
-  background: var(--surface-2, #f1f5f9);
+  &:hover {
+    background: var(--gray-2);
+  }
 }
 
 .header__title {
@@ -100,10 +101,6 @@ const exportCommand = () => {
   & svg {
     color: var(--blue-5);
   }
-}
-
-.icon-primary {
-  color: var(--primary, #7c3aed);
 }
 
 .title {
@@ -156,6 +153,10 @@ const exportCommand = () => {
       outline: none;
       border-color: var(--gray-4);
     }
+
+    &:focus-visible {
+      outline: 2px dashed var(--purple-4);
+    }
   }
 
   & .switch__thumb {
@@ -199,6 +200,10 @@ const exportCommand = () => {
 
   &:hover {
     background: color-mix(in srgb, var(--blue-5) 90%, black 0%);
+  }
+
+  &:focus-visible {
+    outline: 2px dashed var(--purple-4);
   }
 
   &[disabled] {

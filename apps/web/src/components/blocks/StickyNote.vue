@@ -29,7 +29,7 @@ const onFocus = (event: FocusEvent) => {
 <style lang="css" scoped>
 .sticky-note {
   position: relative;
-  padding: 1.5rem;
+  padding: var(--size-5);
   width: 20rem;
   box-shadow: var(--shadow-2);
   border-radius: var(--radius-3);
@@ -37,9 +37,9 @@ const onFocus = (event: FocusEvent) => {
 
   & textarea {
     background: transparent;
-    border: none;
     padding: 0;
     resize: none;
+    display: block;
     font-size: var(--font-size-1);
     font-weight: var(--font-weight-5);
     color: var(--gray-6);

@@ -49,12 +49,11 @@ defineProps<{ active?: boolean; shortcut?: string }>()
   align-items: center;
   flex-shrink: 0;
   gap: var(--size-3);
-  padding-inline: var(--size-2);
-  padding-block: var(--size-1);
-  border-radius: var(--size-2);
+  padding: var(--size-1) var(--size-2);
   background: none;
 
   &.active {
+    border-radius: var(--radius-2);
     background: color-mix(in srgb, var(--blue-5) 10%, #fff 90%);
 
     & .toolbar-icon,

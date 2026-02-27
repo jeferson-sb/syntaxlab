@@ -32,6 +32,8 @@ const onFocus = (event: FocusEvent) => {
     background: transparent;
     padding: 0;
     resize: none;
+    display: block;
+    min-inline-size: unset;
 
     &:focus {
       outline: 0;

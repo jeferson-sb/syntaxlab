@@ -27,5 +27,6 @@ declare module 'vue' {
     TextCard: typeof import('./src/components/blocks/TextCard.vue')['default']
     Toolbar: typeof import('./src/components/toolbar/Toolbar.vue')['default']
     ToolbarButton: typeof import('./src/components/toolbar/ToolbarButton.vue')['default']
+    ToolbarImageUpload: typeof import('./src/components/toolbar/ToolbarImageUpload.vue')['default']
   }
 }

@@ -65,9 +65,9 @@ const addBookmark = () => {
           <input id="username" placeholder="https://github.com/facebook/react" v-model="url">
         </fieldset>
 
-        <div class="actions">
+        <div class="dialog-actions">
           <DialogClose as-child>
-            <button type="button" class="save" @click="addBookmark">
+            <button type="button" class="save" @click="addBookmark" :disabled="!title || !url">
               Create
             </button>
           </DialogClose>
@@ -156,9 +156,6 @@ const addBookmark = () => {
   & input {
     all: unset;
     flex: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     border-radius: var(--radius-2);
     padding-inline: var(--size-3);
     height: var(--size-8);
@@ -173,7 +170,7 @@ const addBookmark = () => {
   }
 }
 
-.actions {
+.dialog-actions {
   display: flex;
   justify-content: flex-end;
   margin-top: var(--size-6);
@@ -202,6 +199,11 @@ const addBookmark = () => {
 
   &:active {
     transform: scale(0.95);
+  }
+
+  &[disabled] {
+    cursor: not-allowed;
+    opacity: 0.7;
   }
 }
 

@@ -20,9 +20,8 @@ const props = defineProps<{ block: ImageBlock }>()
   position: relative;
   box-shadow: var(--shadow-3);
   overflow: hidden;
-  background: white;
   border-radius: var(--radius-3);
-  width: var(--size-14);
+  max-width: 40rem;
 
   & .image-card__metadata {
     position: absolute;
@@ -31,20 +30,17 @@ const props = defineProps<{ block: ImageBlock }>()
     z-index: var(--layer-3);
 
     & span {
-      font-size: 0.75rem;
+      font-size: var(--font-size-0);
       font-weight: var(--font-weight-7);
       letter-spacing: var(--font-letterspacing-3);
       text-transform: uppercase;
       color: white;
-      background: rgb(0 0 0 / 0.4);
-      backdrop-filter: blur(12px);
+      background: oklab(0% 0 0 / 0.4);
       padding-inline: var(--size-2);
       padding-block: var(--size-1);
       border-radius: var(--radius-3);
       opacity: 0;
-      transition-property: opacity;
-      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-      transition-duration: 250ms;
+      transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 

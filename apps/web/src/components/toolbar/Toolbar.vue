@@ -22,7 +22,7 @@ const canvasState = useCanvasStore()
 const blockState = useBlockStore()
 const connectionState = useConnectionStore()
 
-const colors = ['#fcfcfc', '#fef9c3', '#dcfce7', '#dbeafe', '#f3e8ff']
+const colors = [{ css: '#fcfcfc', label: 'offwhite' }, { css: '#fef9c3', label: 'yellow' }, { css: '#dcfce7', label: 'green' }, { css: '#dbeafe', label: 'blue' }, { css: '#f3e8ff', label: 'purple' }]
 const currentFontSize = ref({ label: 'base', css: '0.75rem' });
 const fileInputRef = useTemplateRef('file')
 
@@ -68,7 +68,7 @@ const addTemplateBlock = (type: 'code' | 'note' | 'bookmark' | 'sticky') => {
     props: {
       content: "Double click to edit content",
       title: type === "code" ? "new_file.js" : "New Idea",
-      color: colors[0],
+      color: colors[0]?.css,
       inlineCode: type === 'code' ? `const myfunction = () => {}` : '',
       lang: type === 'code' ? 'javascript' : '',
       href: '',
@@ -77,35 +77,7 @@ const addTemplateBlock = (type: 'code' | 'note' | 'bookmark' | 'sticky') => {
   });
 };
 
-const addImageBlock = () => {
-  fileInputRef.value?.focus();
-  fileInputRef.value?.click();
-}
-
-const onImageUpload = (e: Event) => {
-  const target = e.target as HTMLInputElement;
-  const file = target?.files?.[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    const imageUrl = event.target?.result as string;
-    const centerX = (-canvasState.offset.x + window.innerWidth / 2) / canvasState.zoom;
-    const centerY = (-canvasState.offset.y + window.innerHeight / 2) / canvasState.zoom;
-
-    blockState.appendBlock({
-      id: uniqueId(),
-      type: 'image',
-      x: centerX - 150,
-      y: centerY - 150,
-      props: {
-        title: file.name,
-        href: imageUrl
-      }
-    })
-  };
-  reader.readAsDataURL(file);
-};
+const addImageBlock = () => fileInputRef.value.fileInputClick()
 
 const changeTextSize = () => {
   const labels = ['base', 'md', 'lg']
@@ -192,7 +164,7 @@ onKeyStroke(['l', 'L'], (event) => {
 
       <BookmarkTool />
 
-      <input type="file" ref="file" accept="image/*" @change="onImageUpload" hidden />
+      <ToolbarImageUpload ref="file" />
 
       <div class="toolbar-divider" v-if="blockState.selected" role="separator" aria-orientation="vertical"></div>
 
@@ -203,13 +175,14 @@ onKeyStroke(['l', 'L'], (event) => {
         </button>
 
         <div class="color-picker">
-          <button v-for="color in colors" :key="color" @click="blockState.updateBlock({ props: { color } })"
-            class="color-swatch" :style="{ backgroundColor: color }" />
+          <button type="button" v-for="color in colors" :key="color.css" :aria-label="color.label"
+            @click="blockState.updateBlock({ props: { color: color.css } })" class="color-swatch"
+            :style="{ backgroundColor: color.css }" />
         </div>
 
         <div class="toolbar-divider" role="separator" aria-orientation="vertical"></div>
 
-        <button class="tool-btn-danger" @click="removeSelectedBlock">
+        <button class="tool-btn-danger" aria-label="Delete" @click="removeSelectedBlock">
           <Trash2 :size="16" />
         </button>
       </div>
@@ -240,9 +213,6 @@ onKeyStroke(['l', 'L'], (event) => {
   left: 50%;
   transform: translateX(-50%);
   z-index: var(--layer-4);
-  display: flex;
-  flex-direction: column;
-  gap: var(--size-2);
 }
 
 .toolbar-container {
@@ -252,7 +222,8 @@ onKeyStroke(['l', 'L'], (event) => {
   padding-inline: var(--size-3);
   padding-block: var(--size-2);
 
-  background: var(--gray-0);
+  background: oklch(0.9816 0.0017 247.84 / 0.8);
+  backdrop-filter: blur(10px);
   border: var(--border-size-1) solid var(--gray-1);
   border-radius: var(--radius-3);
   box-shadow: var(--shadow-1), var(--shadow-2);
@@ -274,8 +245,7 @@ onKeyStroke(['l', 'L'], (event) => {
   gap: var(--size-1);
 }
 
-.tool-btn-secondary,
-.tool-btn-icon-only {
+.tool-btn-secondary {
   display: flex;
   align-items: center;
   gap: var(--size-1);
@@ -286,11 +256,10 @@ onKeyStroke(['l', 'L'], (event) => {
   color: var(--gray-7);
   cursor: pointer;
   transition: background 300ms;
-}
 
-.tool-btn-secondary:hover,
-.tool-btn-icon-only:hover {
-  background: var(--slate-1);
+  &:hover {
+    background: var(--gray-1);
+  }
 }
 
 .tool-btn-danger {
@@ -301,11 +270,11 @@ onKeyStroke(['l', 'L'], (event) => {
   color: var(--red-5);
   cursor: pointer;
   transition: background 300ms;
-}
 
-.tool-btn-danger:hover {
-  background: var(--red-0);
-  color: var(--red-7);
+  &:hover {
+    background: var(--red-0);
+    color: var(--red-7);
+  }
 }
 
 .badge-text {
@@ -328,6 +297,10 @@ onKeyStroke(['l', 'L'], (event) => {
   border-radius: var(--size-2);
   color: var(--gray-6);
   background: var(--gray-0);
+
+  &:hover {
+    color: var(--gray-8);
+  }
 }
 
 .color-picker {

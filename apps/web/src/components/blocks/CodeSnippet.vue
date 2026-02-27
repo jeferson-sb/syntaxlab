@@ -47,7 +47,7 @@ watch(
   <div class="code-snippet">
     <div class="code-snippet__header">
       <div class="code-snippet__toolbar">
-        <div class="menu-bar">
+        <div class="menu-bar" aria-hidden="true">
           <div :style="{ '--menu-actions-bg': '#ff5f56' }"></div>
           <div :style="{ '--menu-actions-bg': '#ffbd2e' }"></div>
           <div :style="{ '--menu-actions-bg': '#27c93f' }"></div>
@@ -84,8 +84,7 @@ watch(
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-inline: var(--size-4);
-  padding-block: var(--size-3);
+  padding: var(--size-3) var(--size-4);
   background-color: var(--bg-color);
   border-block-end: var(--gray-8) var(--border-size-1) solid;
 }
@@ -143,6 +142,7 @@ watch(
   background-color: var(--bg-color);
   font-size: var(--font-size-1);
   line-height: var(--font-lineheight-3);
+  scrollbar-width: thin;
 
   & pre {
     cursor: text;
@@ -150,8 +150,10 @@ watch(
   }
 
   & textarea {
+    display: block;
     resize: none;
     background: transparent;
+    min-inline-size: unset;
     border: none;
     outline: none;
     padding: 0;

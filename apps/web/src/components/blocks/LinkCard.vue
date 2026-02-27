@@ -1,8 +1,11 @@
 <script lang="ts" setup>
-import type { BookmarkBlock } from '@/types/block';
 import { Link2 } from 'lucide-vue-next'
+import { useId } from 'vue';
+
+import type { BookmarkBlock } from '@/types/block';
 
 const props = defineProps<{ block: BookmarkBlock }>()
+const id = useId()
 </script>
 
 <template>
@@ -14,12 +17,12 @@ const props = defineProps<{ block: BookmarkBlock }>()
           <Link2 :size="20" />
           link preview
         </div>
-        <h3 class="bookmark-body__title">
+        <h3 :id="id" class="bookmark-body__title">
           {{ block.props.title }}
         </h3>
       </div>
 
-      <a :href="block.props.href" target="_blank" rel="noopener noreferrer">
+      <a :href="block.props.href" :aria-describedby="id" target="_blank" rel="noopener noreferrer">
         Open
       </a>
     </div>
@@ -82,6 +85,14 @@ const props = defineProps<{ block: BookmarkBlock }>()
 
       &:hover {
         background-color: var(--blue-2);
+      }
+
+      &:focus {
+        outline: none;
+      }
+
+      &:focus-visible {
+        outline: 2px dashed var(--purple-4);
       }
     }
   }

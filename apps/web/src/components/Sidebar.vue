@@ -33,7 +33,7 @@ const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
           </button>
         </div>
 
-        <nav class="main-nav">
+        <ul class="main-nav">
           <NavItem label="My Boards" active>
             <LayoutDashboard :size="18" />
           </NavItem>
@@ -46,7 +46,7 @@ const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
           <NavItem label="Archive">
             <Archive :size="18" />
           </NavItem>
-        </nav>
+        </ul>
 
         <div class="recent-section">
           <p class="section-label">Recent</p>
@@ -136,6 +136,8 @@ const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
   display: flex;
   flex-direction: column;
   gap: var(--size-1);
+  margin: 0;
+  padding: 0;
 }
 
 .recent-section {

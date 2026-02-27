@@ -62,14 +62,17 @@ const { style } = useDraggable(blockRef, {
   }
 
   &.is-link-source>div {
-    outline: 2px solid var(--purple-4);
-    outline-style: dashed;
+    outline: 2px dashed var(--purple-4);
     outline-offset: 10px;
   }
 
   @starting-style {
     opacity: 0;
     translate: 0 20px;
+  }
+
+  &:focus-visible {
+    outline: 2px dashed var(--purple-4);
   }
 }
 </style>
