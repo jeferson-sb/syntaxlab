@@ -1,12 +1,48 @@
 <script lang="ts" setup>
-import type { StickyBlock } from '@/types/block';
 import { Lightbulb } from 'lucide-vue-next'
+import { watchDebounced } from '@vueuse/core';
+
+import type { StickyBlock } from '@/types/block';
+import { expandIdea } from '@/services/geminiService'
+import { useSettingsStore } from '@/store/settings';
 
 const props = defineProps<{ block: StickyBlock; isEditing: boolean }>()
 const onFocus = (event: FocusEvent) => {
   const target = event.target as HTMLInputElement | HTMLTextAreaElement;
   target?.select()
 }
+
+const settingsState = useSettingsStore()
+
+let controller: AbortController | null = null;
+
+const onKeyTab = (event: KeyboardEvent) => {
+  if (props.block.props.aiPreview) {
+    event.preventDefault();
+    props.block.props.content += props.block.props.aiPreview;
+    props.block.props.aiPreview = '';
+  }
+}
+
+watchDebounced(
+  () => props.block.props.content,
+  async (text) => {
+    if (!text) return
+    if (!settingsState.preferAiFeatures) return
+    if (controller) controller.abort();
+    controller = new AbortController();
+
+    props.block.props.aiPreview = "";
+
+    const stream = expandIdea(text);
+
+    for await (const chunk of stream) {
+      if (controller.signal.aborted) break;
+      props.block.props.aiPreview += chunk;
+    }
+  },
+  { debounce: 1000 },
+)
 </script>
 
 <template>
@@ -20,7 +56,13 @@ const onFocus = (event: FocusEvent) => {
       </h3>
     </div>
 
-    <textarea v-if="isEditing" autofocus v-model="block.props.content" @focus="onFocus" />
+    <div class="editor" v-if="isEditing">
+      <div class="editor-backdrop" aria-hidden="true">
+        <span class="editor-content">{{ block.props.content }}</span>
+        <span class="editor-ai-text">{{ block.props.aiPreview }}</span>
+      </div>
+      <textarea autofocus v-model="block.props.content" @focus="onFocus" @keydown.tab="onKeyTab" />
+    </div>
     <p v-else>{{ block.props.content }}</p>
 
   </div>
@@ -34,17 +76,6 @@ const onFocus = (event: FocusEvent) => {
   box-shadow: var(--shadow-2);
   border-radius: var(--radius-3);
   background: var(--sticky-color, oklch(99.107% 0.00011 271));
-
-  & textarea {
-    background: transparent;
-    padding: 0;
-    resize: none;
-    display: block;
-    font-size: var(--font-size-1);
-    font-weight: var(--font-weight-5);
-    color: var(--gray-6);
-    line-height: var(--font-lineheight-4);
-  }
 
   & textarea:focus,
   & input:focus {
@@ -92,6 +123,43 @@ const onFocus = (event: FocusEvent) => {
     color: var(--gray-8);
     border: 0;
     padding: 0;
+  }
+}
+
+.editor {
+  position: relative;
+  display: grid;
+
+  .editor-backdrop,
+  textarea {
+    grid-area: 1 / 1;
+    font: inherit;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .editor-backdrop {
+    pointer-events: none;
+    user-select: none;
+
+    .editor-content {
+      visibility: hidden;
+    }
+
+    .editor-ai-text {
+      color: var(--gray-5);
+    }
+  }
+
+  textarea {
+    background: transparent;
+    padding: 0;
+    resize: none;
+    display: block;
+    min-inline-size: unset;
+    color: inherit;
+    caret-color: var(--gray-7);
   }
 }
 </style>

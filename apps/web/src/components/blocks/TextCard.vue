@@ -14,6 +14,14 @@ const settingsState = useSettingsStore()
 
 let controller: AbortController | null = null;
 
+const onKeyTab = (event: KeyboardEvent) => {
+  if (props.block.props.aiPreview) {
+    event.preventDefault();
+    props.block.props.content += props.block.props.aiPreview;
+    props.block.props.aiPreview = '';
+  }
+}
+
 watchDebounced(
   () => props.block.props.content,
   async (text) => {
@@ -39,8 +47,11 @@ watchDebounced(
 <template>
   <div class="text-card" :style="{ '--color': block.props.color, '--font-size': block.props.textSize }">
     <div class="editor" v-if="isEditing">
-      <textarea autofocus v-model="block.props.content" @focus="onFocus" />
-      <span class="editor-ai-text">{{ block.props.aiPreview }}</span>
+      <div class="editor-backdrop" aria-hidden="true">
+        <span class="editor-content">{{ block.props.content }}</span>
+        <span class="editor-ai-text">{{ block.props.aiPreview }}</span>
+      </div>
+      <textarea autofocus v-model="block.props.content" @focus="onFocus" @keydown.tab="onKeyTab" />
     </div>
     <p v-else>{{ block.props.content }}</p>
   </div>
@@ -68,6 +79,29 @@ watchDebounced(
 
 .editor {
   position: relative;
+  display: grid;
+
+  .editor-backdrop,
+  textarea {
+    grid-area: 1 / 1;
+    font: inherit;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .editor-backdrop {
+    pointer-events: none;
+    user-select: none;
+
+    .editor-content {
+      visibility: hidden;
+    }
+
+    .editor-ai-text {
+      color: var(--gray-5);
+    }
+  }
 
   textarea {
     background: transparent;
@@ -75,20 +109,12 @@ watchDebounced(
     resize: none;
     display: block;
     min-inline-size: unset;
+    color: inherit;
+    caret-color: var(--gray-7);
 
     &:focus {
       outline: 0;
     }
-  }
-
-  & .editor-ai-text {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    pointer-events: none;
-    user-select: none;
-    font: inherit;
   }
 }
 </style>

@@ -24,6 +24,7 @@ export type NoteBlock = Block & {
 export type StickyBlock = Block & {
   props: {
     title?: string;
+    aiPreview?: string;
     content?: string;
     color?: string;
   };
