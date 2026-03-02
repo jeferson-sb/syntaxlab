@@ -5,14 +5,16 @@ import { ref } from 'vue';
 import { toJpeg } from 'html-to-image';
 
 import { slugify } from '@/lib/slugify';
+import { useSettingsStore } from '@/store/settings';
 
 const props = defineProps<{
   getCanvasElement: () => HTMLDivElement | null;
 }>()
 
+const settingsState = useSettingsStore()
+
 const isSidebarOpen = ref();
 const boardName = ref('Ideation Canvas');
-const serverSync = ref(false)
 
 const exportCommand = () => {
   const target = props.getCanvasElement()
@@ -48,10 +50,22 @@ const exportCommand = () => {
     <div class="header__actions">
       <div class="switch">
         <label>
+          AI suggestions
+        </label>
+
+        <SwitchRoot id="server-sync" v-model="settingsState.preferAiFeatures" aria-label="Enable AI Features"
+          class="switch__root">
+          <SwitchThumb class="switch__thumb" />
+        </SwitchRoot>
+      </div>
+
+      <div class="switch">
+        <label>
           Server Sync
         </label>
 
-        <SwitchRoot id="server-sync" v-model="serverSync" aria-label="Enable server sync" class="switch__root">
+        <SwitchRoot id="server-sync" v-model="settingsState.preferRemoteSync" aria-label="Enable server sync"
+          class="switch__root">
           <SwitchThumb class="switch__thumb" />
         </SwitchRoot>
       </div>

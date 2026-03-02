@@ -15,6 +15,7 @@ export type CodeBlock = Block & {
 export type NoteBlock = Block & {
   props: {
     content?: string;
+    aiPreview?: string;
     color?: string;
     textSize?: string;
   };

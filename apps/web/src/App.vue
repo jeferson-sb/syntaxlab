@@ -3,11 +3,10 @@ import { useTemplateRef } from 'vue'
 import { treaty, edenFetch } from '@elysiajs/eden'
 import type { App } from 'syntaxlab-backend'
 
-const api = treaty<App>('http://localhost:3000')
-const fetch = edenFetch<App>('http://localhost:3000')
+import { config } from "@/lib/config";
 
-// TODO: add gemini integration for note/sticky blocks
-const aiExpand = () => { }
+const api = treaty<App>(config.backendUrl)
+const fetch = edenFetch<App>(config.backendUrl)
 
 type CanvasExposed = {
   getCanvasElement: () => HTMLDivElement | null
