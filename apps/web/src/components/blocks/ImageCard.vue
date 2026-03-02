@@ -18,7 +18,7 @@ const props = defineProps<{ block: ImageBlock }>()
 <style lang="css" scoped>
 .image-card {
   position: relative;
-  box-shadow: var(--shadow-3);
+  box-shadow: var(--block-shadow);
   overflow: hidden;
   border-radius: var(--radius-3);
   max-width: 40rem;

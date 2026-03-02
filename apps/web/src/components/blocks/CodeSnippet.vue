@@ -75,7 +75,7 @@ watch(
   width: var(--size-px-15);
   background-color: var(--bg-color);
   border-radius: var(--radius-3);
-  box-shadow: var(--shadow-2);
+  box-shadow: var(--block-shadow);
   overflow: clip;
   font-family: var(--font-monospace-code);
 }

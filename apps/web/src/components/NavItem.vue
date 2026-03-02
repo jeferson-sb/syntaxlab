@@ -17,15 +17,16 @@ defineProps<{ label: string; active?: boolean }>()
   padding: var(--size-2) var(--size-3);
   border-radius: var(--radius-2);
   cursor: pointer;
-  color: var(--gray-7);
+  color: var(--text-2);
 
   &.active {
     color: var(--blue-5);
-    background-color: color-mix(in srgb, var(--blue-4) 20%, #fff 80%);
+    background-color: light-dark(color-mix(in srgb, var(--blue-4) 20%, #fff 80%),
+        color-mix(in srgb, var(--blue-4) 30%, var(--gray-9) 70%));
   }
 
   &:hover:not(.active) {
-    background-color: var(--gray-2);
+    background-color: var(--surface-3);
   }
 }
 

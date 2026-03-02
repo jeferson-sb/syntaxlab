@@ -73,8 +73,8 @@ const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
   position: sticky;
   top: 0;
   z-index: var(--layer-1);
-  background: var(--gray-1);
-  border-inline-end: var(--border-size-1) solid var(--gray-3);
+  background: var(--surface-2);
+  border-inline-end: var(--border-size-1) solid var(--border-color);
 
   animation: var(--animation-slide-in-left);
 }
@@ -121,10 +121,11 @@ const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
   font-size: var(--font-size-1);
   font-weight: var(--font-weight-7);
   line-height: var(--font-lineheight-1);
+  color: var(--text-1);
 }
 
 .brand-subtitle {
-  color: var(--gray-7);
+  color: var(--text-2);
   font-size: var(--font-size-0);
   font-weight: var(--font-weight-5);
   text-transform: uppercase;
@@ -153,7 +154,7 @@ const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
   font-weight: var(--font-weight-7);
   text-transform: uppercase;
   letter-spacing: var(--font-letterspacing-3);
-  color: var(--gray-6);
+  color: var(--text-3);
 }
 
 .recent-list {
@@ -166,7 +167,7 @@ const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
 .recent-item {
   font-size: var(--font-size-1);
   line-height: var(--font-lineheight-1);
-  color: var(--gray-7);
+  color: var(--text-2);
   cursor: pointer;
   padding-block: var(--size-1);
   transition: color 150ms;
@@ -216,10 +217,11 @@ const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
     display: block;
     padding: var(--size-1);
     border-radius: var(--radius-1);
+    color: var(--text-1);
   }
 
   .mobile-close-btn:hover {
-    background: var(--slate-1);
+    background: var(--surface-3);
   }
 }
 </style>

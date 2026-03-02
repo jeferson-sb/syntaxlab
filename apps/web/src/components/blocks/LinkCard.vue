@@ -50,10 +50,10 @@ const handleSave = (payload: { title: string; url: string }) => {
   display: flex;
   gap: var(--size-4);
   width: var(--size-px-15);
-  background: oklch(99.107% 0.00011 271);
+  background: var(--block-bg);
   border-radius: var(--radius-3);
-  box-shadow: var(--shadow-2);
-  border: var(--gray-2) var(--border-size-1) solid;
+  box-shadow: var(--block-shadow);
+  border: var(--border-color) var(--border-size-1) solid;
   padding: var(--size-4);
 
   & .bookmark-body {
@@ -67,7 +67,7 @@ const handleSave = (payload: { title: string; url: string }) => {
       display: flex;
       align-items: center;
       gap: var(--size-2);
-      color: var(--gray-6);
+      color: var(--text-3);
       font-size: var(--font-size-0);
       font-weight: var(--font-weight-7);
       text-transform: uppercase;
@@ -77,7 +77,7 @@ const handleSave = (payload: { title: string; url: string }) => {
     & .bookmark-body__title {
       font-weight: var(--font-weight-7);
       font-size: var(--font-size-3);
-      color: var(--gray-8);
+      color: var(--text-1);
       line-height: var(--font-lineheight-1);
       margin-block-end: var(--size-1);
       text-wrap: pretty;

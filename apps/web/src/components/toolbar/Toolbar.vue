@@ -222,11 +222,11 @@ onKeyStroke(['l', 'L'], (event) => {
   padding-inline: var(--size-3);
   padding-block: var(--size-2);
 
-  background: oklch(0.9816 0.0017 247.84 / 0.8);
+  background: light-dark(oklch(0.9816 0.0017 247.84 / 0.8), oklch(0.25 0.015 260 / 0.85));
   backdrop-filter: blur(10px);
-  border: var(--border-size-1) solid var(--gray-1);
+  border: var(--border-size-1) solid var(--border-color);
   border-radius: var(--radius-3);
-  box-shadow: var(--shadow-1), var(--shadow-2);
+  box-shadow: var(--block-shadow);
   animation: var(--animation-slide-in-down) forwards;
   animation-duration: 300ms;
 }
@@ -234,7 +234,7 @@ onKeyStroke(['l', 'L'], (event) => {
 .toolbar-divider {
   height: var(--size-5);
   width: var(--border-size-1);
-  background: var(--gray-2);
+  background: var(--border-color);
   margin-inline: var(--size-1);
 }
 
@@ -252,13 +252,13 @@ onKeyStroke(['l', 'L'], (event) => {
   padding: var(--size-2);
   border-radius: var(--radius-2);
   border: none;
-  background: var(--gray-0);
-  color: var(--gray-7);
+  background: var(--surface-1);
+  color: var(--text-2);
   cursor: pointer;
   transition: background 300ms;
 
   &:hover {
-    background: var(--gray-1);
+    background: var(--surface-2);
   }
 }
 
@@ -286,7 +286,7 @@ onKeyStroke(['l', 'L'], (event) => {
 .zoom-label {
   font-size: var(--font-size-0);
   font-weight: var(--font-weight-7);
-  color: var(--gray-6);
+  color: var(--text-3);
   width: var(--size-9);
   text-align: center;
 }
@@ -295,11 +295,11 @@ onKeyStroke(['l', 'L'], (event) => {
 .zoom-control-plus {
   padding: var(--size-2);
   border-radius: var(--size-2);
-  color: var(--gray-6);
-  background: var(--gray-0);
+  color: var(--text-3);
+  background: var(--surface-1);
 
   &:hover {
-    color: var(--gray-8);
+    color: var(--text-1);
   }
 }
 
@@ -313,11 +313,11 @@ onKeyStroke(['l', 'L'], (event) => {
   width: var(--size-4);
   height: var(--size-4);
   border-radius: var(--radius-round);
-  border: var(--border-size-1) solid var(--gray-2);
+  border: var(--border-size-1) solid var(--border-color);
   cursor: pointer;
 
   &:hover {
-    border-color: var(--gray-7);
+    border-color: var(--text-2);
   }
 }
 
@@ -325,9 +325,9 @@ onKeyStroke(['l', 'L'], (event) => {
   align-self: center;
   padding: var(--size-1) var(--size-2);
   font-size: var(--font-size-0);
-  color: var(--gray-7);
+  color: var(--text-2);
   border-radius: var(--radius-2);
-  background: var(--gray-0);
-  box-shadow: var(--shadow-2);
+  background: var(--surface-1);
+  box-shadow: var(--block-shadow);
 }
 </style>

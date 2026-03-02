@@ -80,7 +80,7 @@ const isValid = computed(() => title.value.trim() !== '' && url.value.trim() !==
   position: fixed;
   inset: 0;
   z-index: var(--layer-4);
-  background: var(--gray-7);
+  background: light-dark(var(--gray-7), var(--gray-9));
   opacity: 0;
 
   &[data-state=open] {
@@ -104,9 +104,9 @@ const isValid = computed(() => title.value.trim() !== '' && url.value.trim() !==
   width: min(100%, 480px);
   padding: var(--size-6);
 
-  background: var(--stone-0);
+  background: var(--surface-1);
   border-radius: var(--radius-3);
-  box-shadow: var(--shadow-5);
+  box-shadow: var(--block-shadow);
   transform-origin: center;
 
   &[data-state=open] {
@@ -127,7 +127,7 @@ const isValid = computed(() => title.value.trim() !== '' && url.value.trim() !==
 .dialog-title {
   font-size: var(--font-size-3);
   font-weight: var(--font-weight-6);
-  color: var(--stone-12);
+  color: var(--text-1);
   margin-block-end: var(--size-4);
 }
 
@@ -143,7 +143,7 @@ const isValid = computed(() => title.value.trim() !== '' && url.value.trim() !==
     flex-basis: 100%;
     font-size: var(--font-size-1);
     font-weight: var(--font-weight-5);
-    color: var(--gray-7);
+    color: var(--text-2);
   }
 
   & input {
@@ -153,9 +153,9 @@ const isValid = computed(() => title.value.trim() !== '' && url.value.trim() !==
     padding-inline: var(--size-3);
     height: var(--size-8);
     font-size: var(--font-size-1);
-    background: var(--stone-1);
-    box-shadow: 0 0 0 1px var(--stone-3);
-    color: var(--gray-8);
+    background: var(--surface-2);
+    box-shadow: 0 0 0 1px var(--border-color);
+    color: var(--text-1);
 
     &:focus {
       box-shadow: 0 0 0 2px var(--blue-5);

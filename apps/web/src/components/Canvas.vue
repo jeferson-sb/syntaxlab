@@ -174,8 +174,8 @@ onKeyStroke(e => e.code === 'Space', onSpaceBarPress, { target: canvas.value?.fi
   left: -10000px;
   top: -10000px;
 
-  background: var(--gray-2);
-  background-image: radial-gradient(var(--gray-5) 1px, transparent 1px);
+  background: var(--canvas-bg);
+  background-image: radial-gradient(var(--canvas-dot) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 

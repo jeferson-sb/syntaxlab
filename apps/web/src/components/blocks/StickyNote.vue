@@ -73,9 +73,9 @@ watchDebounced(
   position: relative;
   padding: var(--size-5);
   width: 20rem;
-  box-shadow: var(--shadow-2);
+  box-shadow: var(--block-shadow);
   border-radius: var(--radius-3);
-  background: var(--sticky-color, oklch(99.107% 0.00011 271));
+  background: var(--sticky-color, var(--block-bg));
 
   & textarea:focus,
   & input:focus {
@@ -83,7 +83,7 @@ watchDebounced(
   }
 
   & p {
-    color: var(--gray-6);
+    color: var(--text-2);
     font-size: var(--font-size-1);
     line-height: var(--font-lineheight-4);
     font-weight: var(--font-weight-5);
@@ -112,7 +112,7 @@ watchDebounced(
   & .title {
     font-size: var(--font-size-2);
     font-weight: var(--font-weight-7);
-    color: var(--gray-8);
+    color: var(--text-1);
     cursor: text;
   }
 
@@ -120,7 +120,7 @@ watchDebounced(
     background: transparent;
     font-size: var(--font-size-2);
     font-weight: var(--font-weight-7);
-    color: var(--gray-8);
+    color: var(--text-1);
     border: 0;
     padding: 0;
   }
@@ -148,7 +148,7 @@ watchDebounced(
     }
 
     .editor-ai-text {
-      color: var(--gray-5);
+      color: var(--text-3);
     }
   }
 
@@ -159,7 +159,7 @@ watchDebounced(
     display: block;
     min-inline-size: unset;
     color: inherit;
-    caret-color: var(--gray-7);
+    caret-color: var(--text-1);
   }
 }
 </style>

@@ -6,6 +6,7 @@ import { toJpeg } from 'html-to-image';
 
 import { slugify } from '@/lib/slugify';
 import { useSettingsStore } from '@/store/settings';
+import ThemeSwitch from './ThemeSwitch.vue';
 
 const props = defineProps<{
   getCanvasElement: () => HTMLDivElement | null;
@@ -74,6 +75,8 @@ const exportCommand = () => {
         <FileDown :size="14" />
         Screenshot Canvas
       </button>
+
+      <ThemeSwitch />
     </div>
   </header>
 </template>
@@ -85,8 +88,8 @@ const exportCommand = () => {
   align-items: center;
   justify-content: space-between;
   padding-inline: var(--size-5);
-  border-block-end: var(--border-size-1) solid var(--gray-3);
-  background: var(--gray-1);
+  border-block-end: var(--border-size-1) solid var(--border-color);
+  background: var(--surface-2);
   z-index: var(--layer-3);
 }
 
@@ -100,10 +103,11 @@ const exportCommand = () => {
   padding: 0.5rem;
   border-radius: var(--radius-3, 0.5rem);
   background: transparent;
+  color: var(--text-1);
   transition: background 150ms ease;
 
   &:hover {
-    background: var(--gray-2);
+    background: var(--surface-3);
   }
 }
 
@@ -121,7 +125,7 @@ const exportCommand = () => {
   font-size: var(--font-size-1);
   line-height: var(--font-lineheight-2);
   font-weight: var(--font-weight-7);
-  color: var(--gray-7);
+  color: var(--text-1);
 }
 
 .header__actions {
@@ -136,7 +140,7 @@ const exportCommand = () => {
   align-items: center;
 
   & label {
-    color: var(--gray-8);
+    color: var(--text-1);
     font-size: var(--font-size-1);
     font-weight: var(--font-weight-5);
     padding-inline-end: var(--size-2);
@@ -151,21 +155,21 @@ const exportCommand = () => {
     height: 20px;
     transition: background 150ms var(--ease-in-3);
     border-radius: var(--radius-round);
-    border: var(--border-size-1) solid var(--gray-4);
+    border: var(--border-size-1) solid var(--border-color);
     padding: 0;
 
     &[data-state=unchecked] {
-      background-color: var(--gray-3);
+      background-color: var(--surface-3);
     }
 
     &[data-state=checked] {
-      background-color: var(--gray-8);
-      border-color: var(--gray-4);
+      background-color: var(--blue-5);
+      border-color: var(--blue-5);
     }
 
     &:focus-within {
       outline: none;
-      border-color: var(--gray-4);
+      border-color: var(--border-color);
     }
 
     &:focus-visible {
@@ -179,7 +183,7 @@ const exportCommand = () => {
     justify-content: center;
     width: .875rem;
     height: .875rem;
-    background: white;
+    background: var(--surface-1);
     font-size: var(--font-size-0);
     border-radius: var(--radius-round);
     transition: translate 150ms var(--ease-out-3);

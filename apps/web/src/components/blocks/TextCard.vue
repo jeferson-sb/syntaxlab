@@ -60,12 +60,12 @@ watchDebounced(
 <style lang="css" scoped>
 .text-card {
   padding: var(--size-7);
-  box-shadow: var(--shadow-2);
+  box-shadow: var(--block-shadow);
   border-radius: var(--radius-4);
-  border: var(--gray-2) var(--border-size-1) solid;
-  background: var(--color, oklch(99.107% 0.00011 271));
+  border: var(--border-color) var(--border-size-1) solid;
+  background: var(--color, var(--block-bg));
   min-width: 11rem;
-  color: var(--gray-7);
+  color: var(--text-1);
   line-height: var(--font-lineheight-4);
   font-weight: var(--font-weight-6);
   font-size: var(--font-size, var(--font-size-0));
@@ -99,7 +99,7 @@ watchDebounced(
     }
 
     .editor-ai-text {
-      color: var(--gray-5);
+      color: var(--text-3);
     }
   }
 
@@ -110,7 +110,7 @@ watchDebounced(
     display: block;
     min-inline-size: unset;
     color: inherit;
-    caret-color: var(--gray-7);
+    caret-color: var(--text-1);
 
     &:focus {
       outline: 0;
