@@ -18,6 +18,7 @@ declare module 'vue' {
     Button: typeof import('./src/components/Button.vue')['default']
     Canvas: typeof import('./src/components/Canvas.vue')['default']
     CodeSnippet: typeof import('./src/components/blocks/CodeSnippet.vue')['default']
+    CreateBoardDialog: typeof import('./src/components/CreateBoardDialog.vue')['default']
     Header: typeof import('./src/components/Header.vue')['default']
     ImageCard: typeof import('./src/components/blocks/ImageCard.vue')['default']
     LinkCard: typeof import('./src/components/blocks/LinkCard.vue')['default']

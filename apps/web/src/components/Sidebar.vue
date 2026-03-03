@@ -9,8 +9,18 @@ import {
   Sparkles
 } from 'lucide-vue-next';
 import { ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useBoardStore } from '@/store/board';
+import type { Board } from '@/types/canvasBoard';
+
+const boardStore = useBoardStore();
+const { isCreateDialogOpen } = storeToRefs(boardStore);
 
 const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
+
+const handleCreateBoard = (board: Board) => {
+  boardStore.createBoard(board);
+}
 </script>
 
 <template>
@@ -56,10 +66,12 @@ const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
         </div>
       </div>
 
-      <button class="button-new-board">
+      <button class="button-new-board" @click="boardStore.openCreateDialog">
         <Plus :size="18" />
-        <span>New Board</span>
+        <span>New Canvas</span>
       </button>
+
+      <CreateBoardDialog v-model:open="isCreateDialogOpen" @create="handleCreateBoard" />
     </div>
   </aside>
 </template>
