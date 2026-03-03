@@ -11,10 +11,16 @@ const code = ref('')
 const draftCode = ref('')
 const { copy, copied } = useClipboard({ source: draftCode })
 
+const getFileExt = (fileNameLike: string) => {
+  const parts = fileNameLike.split('.')
+  if (parts.length === 1) return ''
+  return parts[parts.length - 1]
+}
+
 const highlightCode = async () => {
   const raw = props.block.props.inlineCode ?? ''
   const highlighted = await codeToHtml(raw, {
-    lang: props.block.props.lang || 'plaintext',
+    lang: props.block.props.lang || getFileExt(props.block.props.title ?? '') || 'plaintext',
     theme: 'tokyo-night',
     cssVariablePrefix: 'code'
   })
@@ -112,12 +118,16 @@ watch(
   align-items: center;
   gap: var(--size-2);
 
-  & input:focus {
-    outline: none;
+  & input {
     background: transparent;
     font: inherit;
     border: 0;
     padding: 0;
+    color: var(--gray-5);
+  }
+
+  & input:focus {
+    outline: none;
   }
 
   & .title {
