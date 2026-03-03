@@ -80,7 +80,7 @@ const isValid = computed(() => title.value.trim() !== '' && url.value.trim() !==
   position: fixed;
   inset: 0;
   z-index: var(--layer-4);
-  background: light-dark(var(--gray-7), var(--gray-9));
+  background: light-dark(var(--gray-7), var(--gray-10));
   opacity: 0;
 
   &[data-state=open] {

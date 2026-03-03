@@ -76,7 +76,7 @@ const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
   background: var(--surface-2);
   border-inline-end: var(--border-size-1) solid var(--border-color);
 
-  animation: var(--animation-slide-in-left);
+  /* animation: var(--animation-slide-in-left); */
 }
 
 .sidebar-container {
@@ -106,7 +106,8 @@ const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
 }
 
 .brand-icon {
-  --shadow-color: var(--blue-3);
+  --shadow-color: light-dark(var(--blue-3), var(--blue-8));
+
   background: var(--blue-4);
   color: white;
   padding: var(--size-2);
@@ -179,6 +180,9 @@ const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
 }
 
 .button-new-board {
+  --shadow-color: light-dark(var(--blue-3), var(--blue-8));
+  --highlight-color: light-dark(var(--blue-4), var(--blue-6));
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -194,13 +198,13 @@ const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
   border: none;
   box-shadow: 0 0 #0000,
     0 0 #0000,
-    0 10px 15px -3px var(--blue-3),
-    0 4px 6px -4px var(--blue-3);
+    0 10px 15px -3px var(--shadow-color),
+    0 4px 6px -4px var(--shadow-color);
   cursor: pointer;
-  transition: transform 120ms ease;
+  transition: transform 120ms ease, background-color 250ms ease;
 
   &:hover {
-    background-color: color-mix(in srgb, var(--blue-4) 90%, #fff 10%);
+    background-color: color-mix(in srgb, var(--highlight-color) 90%, #fff 10%);
   }
 
   &:active {

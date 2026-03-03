@@ -197,6 +197,9 @@ const exportCommand = () => {
 }
 
 .button__action {
+  --shadow-color: light-dark(var(--blue-3), var(--blue-8));
+  --highlight-color: light-dark(var(--blue-5), var(--blue-6));
+
   display: inline-flex;
   align-items: center;
   gap: var(--size-2);
@@ -208,8 +211,8 @@ const exportCommand = () => {
   border-radius: var(--radius-3);
   box-shadow: 0 0 #0000,
     0 0 #0000,
-    0 6px 15px -3px var(--blue-3),
-    0 4px 6px -4px var(--blue-3);
+    0 6px 15px -3px var(--shadow-color),
+    0 4px 6px -4px var(--shadow-color);
   transition: transform 120ms ease, background 120ms ease;
 
   &:active {
@@ -217,7 +220,7 @@ const exportCommand = () => {
   }
 
   &:hover {
-    background: color-mix(in srgb, var(--blue-5) 90%, black 0%);
+    background: color-mix(in srgb, var(--highlight-color) 90%, black 0%);
   }
 
   &:focus-visible {

@@ -29,7 +29,7 @@ const addBookmark = (payload: { title: string; url: string }) => {
 </script>
 
 <template>
-  <ToolbarButton @click="isOpen = true">
+  <ToolbarButton @click="isOpen = true" shortcut="Bookmark">
     <template #icon>
       <BookmarkPlus :size="18" />
     </template>

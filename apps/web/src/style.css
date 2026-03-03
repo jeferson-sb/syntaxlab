@@ -41,10 +41,9 @@
     --canvas-bg: light-dark(var(--gray-2), var(--gray-9));
     --canvas-dot: light-dark(var(--gray-5), var(--gray-7));
 
-    --shadow-strength: light-dark(0.1, 0.4);
     --block-shadow:
-      0 1px 2px -1px hsl(220 3% 15% / var(--shadow-strength)),
-      0 2px 4px hsl(220 3% 15% / var(--shadow-strength));
+      0 3px 5px -2px hsl(var(--shadow-color) / 0.1),
+      0 7px 14px -5px hsl(var(--shadow-color) / 0.1);
 
     --block-bg: light-dark(oklch(99.107% 0.00011 271), var(--gray-8));
   }

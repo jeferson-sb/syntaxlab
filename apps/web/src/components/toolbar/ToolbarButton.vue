@@ -21,7 +21,7 @@ defineProps<{ active?: boolean; shortcut?: string }>()
       <TooltipPortal v-if="shortcut">
         <TooltipContent class="tooltip-content" :side-offset="5">
           {{ shortcut }}
-          <TooltipArrow :width="12" :height="6" />
+          <TooltipArrow class="tooltip-arrow" :width="12" :height="6" />
         </TooltipContent>
       </TooltipPortal>
 
@@ -45,6 +45,10 @@ defineProps<{ active?: boolean; shortcut?: string }>()
 }
 
 .toolbar-button {
+  --toolbar-button-light: color-mix(in srgb, var(--blue-5) 10%, #fff 90%);
+  --toolbar-button-dark: color-mix(in srgb, var(--blue-5) 40%, #000 60%);
+  --toolbar-button-bg: light-dark(var(--toolbar-button-light), var(--toolbar-button-dark));
+
   display: flex;
   align-items: center;
   flex-shrink: 0;
@@ -54,7 +58,7 @@ defineProps<{ active?: boolean; shortcut?: string }>()
 
   &.active {
     border-radius: var(--radius-2);
-    background: color-mix(in srgb, var(--blue-5) 10%, #fff 90%);
+    background: var(--toolbar-button-bg);
 
     & .toolbar-icon,
     .toolbar-label {
@@ -65,9 +69,14 @@ defineProps<{ active?: boolean; shortcut?: string }>()
 
 :deep(.tooltip-content) {
   z-index: var(--layer-4);
-  background-color: var(--gray-9);
+  background-color: light-dark(var(--gray-9), var(--gray-1));
+  color: light-dark(var(--gray-1), var(--gray-9));
   user-select: none;
   padding: var(--size-1) var(--size-2);
   border-radius: var(--radius-2);
+}
+
+:deep(.tooltip-arrow) {
+  fill: light-dark(var(--gray-9), var(--gray-1));
 }
 </style>

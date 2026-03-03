@@ -65,7 +65,7 @@ watchDebounced(
   border: var(--border-color) var(--border-size-1) solid;
   background: var(--color, var(--block-bg));
   min-width: 11rem;
-  color: var(--text-1);
+  color: var(--text-2);
   line-height: var(--font-lineheight-4);
   font-weight: var(--font-weight-6);
   font-size: var(--font-size, var(--font-size-0));
@@ -75,6 +75,10 @@ watchDebounced(
     white-space: pre-wrap;
     font: inherit;
   }
+}
+
+[data-theme=dark] .text-card {
+  background: color-mix(in srgb, var(--color) 25%, #000 75%);
 }
 
 .editor {

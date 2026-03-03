@@ -83,13 +83,17 @@ watchDebounced(
   }
 
   & p {
-    color: var(--text-2);
+    color: var(--text-3);
     font-size: var(--font-size-1);
     line-height: var(--font-lineheight-4);
     font-weight: var(--font-weight-5);
     cursor: text;
     white-space: pre-wrap;
   }
+}
+
+[data-theme=dark] .sticky-note {
+  background: color-mix(in srgb, var(--sticky-color) 25%, #000 75%);
 }
 
 .sticky-note__header {
@@ -112,7 +116,7 @@ watchDebounced(
   & .title {
     font-size: var(--font-size-2);
     font-weight: var(--font-weight-7);
-    color: var(--text-1);
+    color: var(--text-2);
     cursor: text;
   }
 

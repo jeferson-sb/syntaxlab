@@ -124,7 +124,7 @@ onKeyStroke(['l', 'L'], (event) => {
         <template #icon>
           <MousePointer2 :size="18" />
         </template>
-        <template #label>{{ blockState.selected ? 'Unselect' : 'Select' }}</template>
+        <template #label>{{ blockState.selected ? 'Unselect (ESC)' : 'Select' }}</template>
       </ToolbarButton>
 
       <ToolbarButton :active="connectionState.isLinkModeActive" @click="toggleLinkMode"
@@ -216,6 +216,8 @@ onKeyStroke(['l', 'L'], (event) => {
 }
 
 .toolbar-container {
+  --inner-shadow: inset 0px 0px 8px 0px var(--gray-4);
+
   display: flex;
   align-items: center;
   gap: var(--size-2);
@@ -226,9 +228,13 @@ onKeyStroke(['l', 'L'], (event) => {
   backdrop-filter: blur(10px);
   border: var(--border-size-1) solid var(--border-color);
   border-radius: var(--radius-3);
-  box-shadow: var(--block-shadow);
+  box-shadow: var(--inner-shadow);
   animation: var(--animation-slide-in-down) forwards;
   animation-duration: 300ms;
+}
+
+[data-theme=light] .toolbar-container {
+  box-shadow: var(--shadow-1), var(--shadow-2);
 }
 
 .toolbar-divider {
@@ -272,8 +278,8 @@ onKeyStroke(['l', 'L'], (event) => {
   transition: background 300ms;
 
   &:hover {
-    background: var(--red-0);
-    color: var(--red-7);
+    background: light-dark(var(--red-0), oklch(62.945% 0.22479 26.596 / 0.226));
+    color: light-dark(var(--red-7), var(--red-0));
   }
 }
 
