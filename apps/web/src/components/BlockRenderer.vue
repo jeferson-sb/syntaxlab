@@ -88,6 +88,7 @@ watch(
   transition: opacity 500ms ease-out, translate 500ms ease-out;
   transform-origin: center;
   will-change: left, top;
+  width: max-content;
 
   & .selected {
     box-shadow: 0 0 0 6px var(--blue-2);

@@ -11,7 +11,8 @@ const props = defineProps<{ block: ImageBlock }>()
         {{ block.props.title || 'Image' }}
       </span>
     </div>
-    <img :src="block.props.href" :alt="block.props.title" loading="lazy">
+    <img :src="block.props.href" :alt="block.props.title" loading="lazy" :width="block.props.width"
+      :height="block.props.height">
   </div>
 </template>
 

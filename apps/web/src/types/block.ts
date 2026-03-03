@@ -42,8 +42,8 @@ export type ImageBlock = Block & {
   props: {
     title?: string;
     href?: string;
-    width?: string;
-    height?: string;
+    width?: number;
+    height?: number;
   };
 };
 
