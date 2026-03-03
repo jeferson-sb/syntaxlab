@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue'
-import DOMPurify from 'dompurify';
 import { useClipboard } from '@vueuse/core'
 import { Copy, Check } from 'lucide-vue-next'
 import { codeToHtml } from 'shiki/bundle/web'
@@ -13,12 +12,13 @@ const draftCode = ref('')
 const { copy, copied } = useClipboard({ source: draftCode })
 
 const highlightCode = async () => {
-  const clean = DOMPurify.sanitize(props.block.props.inlineCode ?? '')
-  code.value = await codeToHtml(clean, {
+  const raw = props.block.props.inlineCode ?? ''
+  const highlighted = await codeToHtml(raw, {
     lang: props.block.props.lang || 'plaintext',
     theme: 'tokyo-night',
     cssVariablePrefix: 'code'
   })
+  code.value = highlighted
 }
 
 const onBlur = async () => {
@@ -52,7 +52,8 @@ watch(
           <div :style="{ '--menu-actions-bg': '#ffbd2e' }"></div>
           <div :style="{ '--menu-actions-bg': '#27c93f' }"></div>
         </div>
-        <span class="title">
+        <input type="text" v-if="isEditing" autofocus v-model="block.props.title" />
+        <span v-else class="title">
           {{ block.props.title }}
         </span>
       </div>
@@ -110,6 +111,14 @@ watch(
   display: flex;
   align-items: center;
   gap: var(--size-2);
+
+  & input:focus {
+    outline: none;
+    background: transparent;
+    font: inherit;
+    border: 0;
+    padding: 0;
+  }
 
   & .title {
     cursor: text;
