@@ -1,24 +1,30 @@
-import { GoogleGenAI } from "@google/genai";
 import { config } from "@/lib/config";
-
-const ai = new GoogleGenAI({ apiKey: config.geminiAPIKey });
 
 export async function* expandIdea(content: string) {
   try {
-    const response = await ai.models.generateContentStream({
-      model: "gemini-2.5-flash",
-      contents: `Continue this text with a natural completion (max 15 words). Return ONLY the continuation, do NOT repeat any of the original text.
-
-Text: "${content} "
-
-Continuation:`,
+    const response = await fetch(`${config.backendUrl}/api/ai/expand`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content }),
     });
 
-    for await (const chunk of response) {
-      yield chunk.text;
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+
+    const reader = response.body?.getReader();
+    if (!reader) {
+      throw new Error("No response body");
+    }
+
+    const decoder = new TextDecoder();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      yield decoder.decode(value, { stream: true });
     }
   } catch (error) {
-    console.error("Gemini Expansion Error:", error);
-    return ["Could not expand idea at this time."];
+    console.error("AI Expansion Error:", error);
+    yield "Could not expand idea at this time.";
   }
 }
