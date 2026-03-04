@@ -18,9 +18,7 @@ const { isCreateDialogOpen } = storeToRefs(boardStore);
 
 const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
 
-const handleCreateBoard = (board: Board) => {
-  boardStore.createBoard(board);
-}
+const createBoard = (board: Board) => boardStore.createBoard(board);
 </script>
 
 <template>
@@ -71,7 +69,7 @@ const handleCreateBoard = (board: Board) => {
         <span>New Canvas</span>
       </button>
 
-      <CreateBoardDialog v-model:open="isCreateDialogOpen" @create="handleCreateBoard" />
+      <CreateBoardDialog v-model:open="isCreateDialogOpen" @create="createBoard" />
     </div>
   </aside>
 </template>

@@ -61,7 +61,7 @@ watch(() => props.open, (isOpen) => {
         </fieldset>
 
         <fieldset class="input-group">
-          <label>Visibility</label>
+          <p>Visibility</p>
           <RadioGroupRoot v-model="visibility" class="visibility-group">
             <label class="visibility-option" :data-selected="visibility === 'private'">
               <RadioGroupItem value="private" class="radio-indicator">
@@ -128,7 +128,7 @@ watch(() => props.open, (isOpen) => {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  translate: -50% -50%;
   z-index: var(--layer-important);
 
   width: min(100%, 480px);
@@ -136,7 +136,7 @@ watch(() => props.open, (isOpen) => {
 
   background: var(--surface-1);
   border-radius: var(--radius-3);
-  box-shadow: var(--block-shadow);
+  box-shadow: var(--shadow-3);
   transform-origin: center;
 
   &[data-state=open] {
@@ -146,11 +146,13 @@ watch(() => props.open, (isOpen) => {
 
 @keyframes scale-up {
   from {
-    transform: translate(-50%, -50%) scale(0.4);
+    translate: -50% -50%;
+    scale: 0.4;
   }
 
   to {
-    transform: translate(-50%, -50%) scale(1);
+    translate: -50% -50%;
+    scale: 1;
   }
 }
 
@@ -169,6 +171,7 @@ watch(() => props.open, (isOpen) => {
   border: none;
   padding: 0;
 
+  & p,
   & label {
     flex-basis: 100%;
     font-size: var(--font-size-1);
@@ -194,10 +197,7 @@ watch(() => props.open, (isOpen) => {
 }
 
 .visibility-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--size-2);
-  width: 100%;
+  flex: 1;
 }
 
 .visibility-option {
@@ -210,6 +210,7 @@ watch(() => props.open, (isOpen) => {
   box-shadow: 0 0 0 1px var(--border-color);
   cursor: pointer;
   transition: box-shadow 150ms ease, background 150ms ease;
+  margin-block-end: var(--size-2);
 
   &:hover {
     background: var(--surface-3);
@@ -217,7 +218,7 @@ watch(() => props.open, (isOpen) => {
 
   &[data-selected="true"] {
     box-shadow: 0 0 0 2px var(--blue-5);
-    background: var(--blue-1);
+    background: light-dark(var(--blue-1), var(--blue-7));
   }
 
   & svg {
