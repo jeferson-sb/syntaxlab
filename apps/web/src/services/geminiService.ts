@@ -12,16 +12,14 @@ export async function* expandIdea(content: string) {
       throw new Error(`HTTP error: ${response.status}`);
     }
 
-    const reader = response.body?.getReader();
-    if (!reader) {
+    if (!response.body) {
       throw new Error("No response body");
     }
 
-    const decoder = new TextDecoder();
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      yield decoder.decode(value, { stream: true });
+    const stream = response.body?.pipeThrough(new TextDecoderStream());
+
+    for await (const chunk of stream) {
+      yield chunk;
     }
   } catch (error) {
     console.error("AI Expansion Error:", error);
