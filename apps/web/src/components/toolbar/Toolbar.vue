@@ -90,6 +90,8 @@ const changeTextSize = () => {
   currentFontSize.value.label = labels[nextIndex] || 'base'
 }
 
+const shouldIgnoreKeypress = () => isTypingInEditableElement() || blockState.selected;
+
 onKeyStroke('Delete', () => {
   if (isTypingInEditableElement()) return;
   if (blockState.selected) removeSelectedBlock()
@@ -102,10 +104,10 @@ onKeyStroke('Escape', () => {
   connectionState.cancelLinkMode()
   blockState.unselect()
 })
-onKeyStroke(['t', 'T'], () => { if (!blockState.selected) addTemplateBlock('note') })
-onKeyStroke(['u', 'U'], () => { if (!blockState.selected) addImageBlock() })
-onKeyStroke(['c', 'C'], () => { if (!blockState.selected) addTemplateBlock('code') })
-onKeyStroke(['s', 'S'], () => { if (!blockState.selected) addTemplateBlock('sticky') })
+onKeyStroke(['t', 'T'], () => { if (shouldIgnoreKeypress()) return; addTemplateBlock('note') })
+onKeyStroke(['u', 'U'], () => { if (shouldIgnoreKeypress()) return; addImageBlock() })
+onKeyStroke(['c', 'C'], () => { if (shouldIgnoreKeypress()) return; addTemplateBlock('code') })
+onKeyStroke(['s', 'S'], () => { if (shouldIgnoreKeypress()) return; addTemplateBlock('sticky') })
 onKeyStroke(['l', 'L'], (event) => {
   if (isTypingInEditableElement()) return;
   if (event.shiftKey) {
