@@ -1,24 +1,39 @@
 <script lang="ts" setup>
 import {
-  LayoutDashboard,
-  Users,
-  FileText,
-  Archive,
   Plus,
   ChevronLeft,
-  Sparkles
+  Sparkles,
+  LayoutGrid,
+  FolderOpen
 } from 'lucide-vue-next';
-import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useBoardStore } from '@/store/board';
+import { useProjectStore } from '@/store/project';
 import type { Board } from '@/types/canvasBoard';
 
+type BoardInput = Omit<Board, 'projectId'>;
+
 const boardStore = useBoardStore();
-const { isCreateDialogOpen } = storeToRefs(boardStore);
+const projectStore = useProjectStore();
+const { isCreateDialogOpen, currentBoardId } = storeToRefs(boardStore);
+const { currentProject, projectBoards, projects, isProjectDialogOpen, currentProjectId } = storeToRefs(projectStore);
 
-const recent = ref(['Project Phoenix', 'Auth Flow 2.0', 'Landing Page V3'])
+const createBoard = (board: BoardInput) => boardStore.createBoard({
+  ...board,
+  projectId: projectStore.currentProjectId,
+});
 
-const createBoard = (board: Board) => boardStore.createBoard(board);
+const selectBoard = (boardId: string) => {
+  boardStore.currentBoardId = boardId;
+};
+
+const handleCreateProject = (name: string) => {
+  projectStore.createProject(name);
+};
+
+const handleSelectProject = (projectId: string) => {
+  projectStore.setCurrentProject(projectId);
+};
 </script>
 
 <template>
@@ -32,7 +47,7 @@ const createBoard = (board: Board) => boardStore.createBoard(board);
               <Sparkles :size="20" fill="currentColor" />
             </div>
             <div class="brand-text">
-              <h1 class="brand-title">Ideation Space</h1>
+              <h1 class="brand-title">SyntaxLab</h1>
               <p class="brand-subtitle">Pro Workspace</p>
             </div>
           </div>
@@ -41,25 +56,19 @@ const createBoard = (board: Board) => boardStore.createBoard(board);
           </button>
         </div>
 
-        <ul class="main-nav">
-          <NavItem label="My Boards" active>
-            <LayoutDashboard :size="18" />
-          </NavItem>
-          <NavItem label="Shared with Me">
-            <Users :size="18" />
-          </NavItem>
-          <NavItem label="Templates">
-            <FileText :size="18" />
-          </NavItem>
-          <NavItem label="Archive">
-            <Archive :size="18" />
-          </NavItem>
-        </ul>
-
-        <div class="recent-section">
-          <p class="section-label">Recent</p>
-          <div class="recent-list">
-            <div class="recent-item" v-for="recentItem in recent">{{ recentItem }}</div>
+        <div class="boards-section">
+          <div class="section-header">
+            <p class="section-label">{{ currentProject?.name ?? 'Project' }}</p>
+            <button class="project-switch-btn" @click="projectStore.openProjectDialog" title="Switch project">
+              <FolderOpen :size="14" />
+            </button>
+          </div>
+          <div class="boards-list">
+            <button v-for="board in projectBoards" :key="board.id" class="board-item"
+              :class="{ active: currentBoardId === board.id }" @click="selectBoard(board.id)">
+              <LayoutGrid :size="14" />
+              <span>{{ board.name }}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -70,6 +79,8 @@ const createBoard = (board: Board) => boardStore.createBoard(board);
       </button>
 
       <CreateBoardDialog v-model:open="isCreateDialogOpen" @create="createBoard" />
+      <ProjectDialog v-model:open="isProjectDialogOpen" :projects="projects" :current-project-id="currentProjectId"
+        @create="handleCreateProject" @select="handleSelectProject" />
     </div>
   </aside>
 </template>
@@ -152,11 +163,17 @@ const createBoard = (board: Board) => boardStore.createBoard(board);
   padding: 0;
 }
 
-.recent-section {
+.boards-section {
   display: flex;
   flex-direction: column;
   gap: var(--size-3);
   margin-block-start: var(--size-3);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .section-label {
@@ -168,24 +185,55 @@ const createBoard = (board: Board) => boardStore.createBoard(board);
   color: var(--text-3);
 }
 
-.recent-list {
+.project-switch-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--size-1);
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  border-radius: var(--radius-2);
+  cursor: pointer;
+  transition: color 150ms, background-color 150ms;
+
+  &:hover {
+    color: var(--blue-4);
+    background: var(--surface-3);
+  }
+}
+
+.boards-list {
   display: flex;
   flex-direction: column;
   gap: var(--size-1);
-  padding-inline: var(--size-2);
 }
 
-.recent-item {
+.board-item {
+  display: flex;
+  align-items: center;
+  gap: var(--size-2);
   font-size: var(--font-size-1);
   line-height: var(--font-lineheight-1);
   color: var(--text-2);
   cursor: pointer;
-  padding-block: var(--size-1);
-  transition: color 150ms;
+  padding: var(--size-2);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-2);
+  text-align: left;
+  transition: color 150ms, background-color 150ms;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
     color: var(--blue-4);
+    background: var(--surface-3);
+  }
+
+  &.active {
+    color: var(--blue-4);
+    background: var(--surface-3);
+    font-weight: var(--font-weight-6);
   }
 }
 

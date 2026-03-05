@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { SwitchRoot, SwitchThumb } from 'reka-ui'
 import { FileDown, Edit3, Menu } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { toJpeg } from 'html-to-image';
 
 import { slugify } from '@/lib/slugify';
 import { useSettingsStore } from '@/store/settings';
+import { useBoardStore } from '@/store/board';
 import ThemeSwitch from './ThemeSwitch.vue';
 
 const props = defineProps<{
@@ -13,9 +14,10 @@ const props = defineProps<{
 }>()
 
 const settingsState = useSettingsStore()
+const boardStore = useBoardStore()
 
 const isSidebarOpen = ref();
-const boardName = ref('Ideation Canvas');
+const boardName = computed(() => boardStore.currentBoard()?.name ?? 'Untitled Canvas');
 
 const exportCommand = () => {
   const target = props.getCanvasElement()

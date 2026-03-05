@@ -13,13 +13,15 @@ import {
 } from 'reka-ui'
 import type { Board } from '@/types/canvasBoard';
 
+type BoardInput = Omit<Board, 'projectId'>;
+
 const props = defineProps<{
   open: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
-  (e: 'create', payload: Board): void
+  (e: 'create', payload: BoardInput): void
 }>()
 
 const name = ref('')

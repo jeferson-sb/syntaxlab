@@ -10,7 +10,12 @@ export const useBoardStore = defineStore(
   "board",
   () => {
     const boards = ref<BoardWithId[]>([
-      { id: "default", name: "My First Board", visibility: "private" },
+      {
+        id: "default",
+        name: "My First Board",
+        visibility: "private",
+        projectId: "default-project",
+      },
     ]);
     const currentBoardId = ref<string>("default");
     const isCreateDialogOpen = ref(false);
