@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { X, Lock, Globe } from 'lucide-vue-next'
+import { X, Lock, Globe, WandSparkles } from 'lucide-vue-next'
 import {
   DialogClose,
   DialogContent,
@@ -8,6 +8,7 @@ import {
   DialogPortal,
   DialogRoot,
   DialogTitle,
+  DialogDescription,
   RadioGroupItem,
   RadioGroupRoot,
 } from 'reka-ui'
@@ -29,7 +30,7 @@ const visibility = ref<Board['visibility']>('private')
 
 const isValid = computed(() => name.value.trim().length > 0)
 
-const handleCreate = () => {
+const create = () => {
   if (!isValid.value) return
 
   emit('create', {
@@ -53,50 +54,62 @@ watch(() => props.open, (isOpen) => {
     <DialogPortal>
       <DialogOverlay class="dialog-overlay" />
       <DialogContent class="dialog-content">
-        <DialogTitle class="dialog-title">
-          Create new canvas
-        </DialogTitle>
+        <div class="top-image">
+          <div class="wand" aria-hidden="true">
+            <WandSparkles :size="36" />
+          </div>
+        </div>
 
-        <fieldset class="input-group">
-          <label for="board-name">Name</label>
-          <input id="board-name" v-model="name" placeholder="My awesome canvas" @keydown.enter="handleCreate">
-        </fieldset>
+        <div class="dialog-container">
+          <DialogTitle class="dialog-title">
+            Create new canvas
+          </DialogTitle>
 
-        <fieldset class="input-group">
-          <p>Visibility</p>
-          <RadioGroupRoot v-model="visibility" class="visibility-group">
-            <label class="visibility-option" :data-selected="visibility === 'private'">
-              <RadioGroupItem value="private" class="radio-indicator">
-                <span class="radio-dot" />
-              </RadioGroupItem>
-              <Lock :size="16" />
-              <div class="visibility-text">
-                <span class="visibility-label">Private</span>
-                <span class="visibility-desc">Only you can access</span>
-              </div>
-            </label>
-            <label class="visibility-option" :data-selected="visibility === 'public'">
-              <RadioGroupItem value="public" class="radio-indicator">
-                <span class="radio-dot" />
-              </RadioGroupItem>
-              <Globe :size="16" />
-              <div class="visibility-text">
-                <span class="visibility-label">Public</span>
-                <span class="visibility-desc">Anyone with the link can view</span>
-              </div>
-            </label>
-          </RadioGroupRoot>
-        </fieldset>
+          <DialogDescription class="dialog-description">
+            Start your next big idea on a fresh playground
+          </DialogDescription>
 
-        <div class="dialog-actions">
-          <DialogClose as-child>
-            <button type="button" class="btn-cancel">
-              Cancel
+          <fieldset class="input-group">
+            <label for="board-name">Name</label>
+            <input id="board-name" v-model="name" placeholder="My awesome canvas" @keydown.enter="create">
+          </fieldset>
+
+          <fieldset class="input-group">
+            <p>Visibility</p>
+            <RadioGroupRoot v-model="visibility" class="visibility-group">
+              <label class="visibility-option" :data-selected="visibility === 'private'">
+                <RadioGroupItem value="private" class="radio-indicator">
+                  <span class="radio-dot" />
+                </RadioGroupItem>
+                <Lock :size="16" />
+                <div class="visibility-text">
+                  <span class="visibility-label">Private</span>
+                  <span class="visibility-desc">Only you can access</span>
+                </div>
+              </label>
+              <label class="visibility-option" :data-selected="visibility === 'public'">
+                <RadioGroupItem value="public" class="radio-indicator">
+                  <span class="radio-dot" />
+                </RadioGroupItem>
+                <Globe :size="16" />
+                <div class="visibility-text">
+                  <span class="visibility-label">Public</span>
+                  <span class="visibility-desc">Anyone with the link can view</span>
+                </div>
+              </label>
+            </RadioGroupRoot>
+          </fieldset>
+
+          <div class="dialog-actions">
+            <DialogClose as-child>
+              <button type="button" class="btn-cancel">
+                Cancel
+              </button>
+            </DialogClose>
+            <button type="button" class="btn-create" :disabled="!isValid" @click="create">
+              Create
             </button>
-          </DialogClose>
-          <button type="button" class="btn-create" :disabled="!isValid" @click="handleCreate">
-            Create
-          </button>
+          </div>
         </div>
 
         <DialogClose class="close" aria-label="Close">
@@ -108,6 +121,40 @@ watch(() => props.open, (isOpen) => {
 </template>
 
 <style scoped>
+.top-image {
+  --hdr-gradient: linear-gradient(120deg in oklab,
+      oklch(60% 0.50 228) 0%,
+      oklch(80% 0.5 264) 66%);
+  --sdr-gradient: linear-gradient(120deg, #007dff 0%, #005eff 66%);
+
+  background: var(--hdr-gradient);
+  height: var(--size-px-12);
+  position: relative;
+  align-content: center;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(var(--blue-4) 1px, transparent 1px);
+    background-size: 24px 24px;
+    height: 100%;
+    width: 100%;
+  }
+
+  & .wand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-inline: auto;
+    background-color: oklch(60% 0.50 228 / 0.7);
+    border: var(--border-size-1) solid var(--blue-5);
+    border-radius: var(--radius-round);
+    width: 64px;
+    height: 64px;
+  }
+}
+
 .dialog-overlay {
   position: fixed;
   inset: 0;
@@ -126,15 +173,19 @@ watch(() => props.open, (isOpen) => {
   }
 }
 
+.dialog-container {
+  padding: var(--size-6);
+}
+
 .dialog-content {
   position: fixed;
   top: 50%;
   left: 50%;
   translate: -50% -50%;
   z-index: var(--layer-important);
+  overflow: clip;
 
   width: min(100%, 480px);
-  padding: var(--size-6);
 
   background: var(--surface-1);
   border-radius: var(--radius-3);
@@ -159,9 +210,13 @@ watch(() => props.open, (isOpen) => {
 }
 
 .dialog-title {
-  font-size: var(--font-size-3);
+  font-size: var(--font-size-fluid-1);
   font-weight: var(--font-weight-6);
   color: var(--text-1);
+}
+
+.dialog-description {
+  opacity: 0.7;
   margin-block-end: var(--size-4);
 }
 
@@ -200,32 +255,32 @@ watch(() => props.open, (isOpen) => {
 
 .visibility-group {
   flex: 1;
-}
 
-.visibility-option {
-  display: flex;
-  align-items: center;
-  gap: var(--size-3);
-  padding: var(--size-3);
-  border-radius: var(--radius-2);
-  background: var(--surface-2);
-  box-shadow: 0 0 0 1px var(--border-color);
-  cursor: pointer;
-  transition: box-shadow 150ms ease, background 150ms ease;
-  margin-block-end: var(--size-2);
+  & .visibility-option {
+    display: flex;
+    align-items: center;
+    gap: var(--size-3);
+    padding: var(--size-3);
+    border-radius: var(--radius-2);
+    background: var(--surface-2);
+    box-shadow: 0 0 0 1px var(--border-color);
+    cursor: pointer;
+    transition: box-shadow 150ms ease, background 150ms ease;
+    margin-block-end: var(--size-2);
 
-  &:hover {
-    background: var(--surface-3);
-  }
+    &:hover {
+      background: var(--surface-3);
+    }
 
-  &[data-selected="true"] {
-    box-shadow: 0 0 0 2px var(--blue-5);
-    background: light-dark(var(--blue-1), var(--blue-7));
-  }
+    &[data-selected="true"] {
+      box-shadow: 0 0 0 2px var(--blue-5);
+      background: light-dark(var(--blue-1), var(--blue-9));
+    }
 
-  & svg {
-    color: var(--text-2);
-    flex-shrink: 0;
+    & svg {
+      color: var(--text-2);
+      flex-shrink: 0;
+    }
   }
 }
 
@@ -260,17 +315,17 @@ watch(() => props.open, (isOpen) => {
   display: flex;
   flex-direction: column;
   gap: var(--size-1);
-}
 
-.visibility-label {
-  font-size: var(--font-size-1);
-  font-weight: var(--font-weight-6);
-  color: var(--text-1);
-}
+  & .visibility-label {
+    font-size: var(--font-size-1);
+    font-weight: var(--font-weight-6);
+    color: var(--text-1);
+  }
 
-.visibility-desc {
-  font-size: var(--font-size-0);
-  color: var(--text-2);
+  & .visibility-desc {
+    font-size: var(--font-size-0);
+    color: var(--text-2);
+  }
 }
 
 .dialog-actions {
@@ -344,11 +399,11 @@ watch(() => props.open, (isOpen) => {
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-round);
-  color: var(--blue-9);
+  color: var(--blue-2);
   cursor: pointer;
 
   &:hover {
-    background: var(--blue-2);
+    background: var(--blue-6);
   }
 
   &:focus-visible {
