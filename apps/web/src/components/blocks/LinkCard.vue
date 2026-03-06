@@ -8,9 +8,9 @@ const props = defineProps<{ block: BookmarkBlock }>()
 const id = useId()
 
 const blockStore = useBlockStore()
-const isEditOpen = ref(false)
+const isEditing = ref(false)
 
-const handleSave = (payload: { title: string; url: string }) => {
+const save = (payload: { title: string; url: string }) => {
   blockStore.updateBlock({
     id: props.block.id,
     props: {
@@ -22,7 +22,7 @@ const handleSave = (payload: { title: string; url: string }) => {
 </script>
 
 <template>
-  <div class="bookmark" @dblclick="isEditOpen = true">
+  <div class="bookmark" @dblclick="isEditing = true">
     <div class="bookmark-body">
 
       <div>
@@ -40,8 +40,8 @@ const handleSave = (payload: { title: string; url: string }) => {
       </a>
     </div>
 
-    <BookmarkDialog v-model:open="isEditOpen" mode="edit" :initial-title="block.props.title"
-      :initial-url="block.props.href" @save="handleSave" />
+    <BookmarkDialog v-model:open="isEditing" mode="edit" :initial-title="block.props.title"
+      :initial-url="block.props.href" @save="save" />
   </div>
 </template>
 

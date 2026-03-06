@@ -330,9 +330,10 @@ onKeyStroke(['l', 'L'], (event) => {
 }
 
 .toolbar-assistive-status {
-  align-self: center;
+  margin-inline: auto;
   padding: var(--size-1) var(--size-2);
   font-size: var(--font-size-0);
+  text-align: center;
   color: var(--text-2);
   border-radius: var(--radius-2);
   background: var(--surface-1);

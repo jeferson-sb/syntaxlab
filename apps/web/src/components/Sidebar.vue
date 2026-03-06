@@ -27,11 +27,11 @@ const selectBoard = (boardId: string) => {
   boardStore.currentBoardId = boardId;
 };
 
-const handleCreateProject = (name: string) => {
+const createProject = (name: string) => {
   projectStore.createProject(name);
 };
 
-const handleSelectProject = (projectId: string) => {
+const selectProject = (projectId: string) => {
   projectStore.setCurrentProject(projectId);
 };
 </script>
@@ -59,13 +59,14 @@ const handleSelectProject = (projectId: string) => {
         <div class="boards-section">
           <div class="section-header">
             <p class="section-label">{{ currentProject?.name ?? 'Project' }}</p>
-            <button class="project-switch-btn" @click="projectStore.openProjectDialog" title="Switch project">
+            <button type="button" class="project-switch-btn" @click="projectStore.openProjectDialog"
+              title="Switch project">
               <FolderOpen :size="14" />
             </button>
           </div>
           <div class="boards-list">
-            <button v-for="board in projectBoards" :key="board.id" class="board-item"
-              :class="{ active: currentBoardId === board.id }" @click="selectBoard(board.id)">
+            <button v-for="board in projectBoards" :key="board.id"
+              :class="{ active: currentBoardId === board.id, 'board-item': true }" @click="selectBoard(board.id)">
               <LayoutGrid :size="14" />
               <span>{{ board.name }}</span>
             </button>
@@ -73,14 +74,14 @@ const handleSelectProject = (projectId: string) => {
         </div>
       </div>
 
-      <button class="button-new-board" @click="boardStore.openCreateDialog">
+      <button type="button" class="button-new-board" @click="boardStore.openCreateDialog">
         <Plus :size="18" />
         <span>New Canvas</span>
       </button>
 
       <CreateBoardDialog v-model:open="isCreateDialogOpen" @create="createBoard" />
       <ProjectDialog v-model:open="isProjectDialogOpen" :projects="projects" :current-project-id="currentProjectId"
-        @create="handleCreateProject" @select="handleSelectProject" />
+        @create="createProject" @select="selectProject" />
     </div>
   </aside>
 </template>

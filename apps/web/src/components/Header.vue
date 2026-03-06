@@ -7,7 +7,6 @@ import { toJpeg } from 'html-to-image';
 import { slugify } from '@/lib/slugify';
 import { useSettingsStore } from '@/store/settings';
 import { useBoardStore } from '@/store/board';
-import ThemeSwitch from './ThemeSwitch.vue';
 
 const props = defineProps<{
   getCanvasElement: () => HTMLDivElement | null;

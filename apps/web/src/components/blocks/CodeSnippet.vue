@@ -20,7 +20,7 @@ const getFileExt = (fileNameLike: string) => {
 const highlightCode = async () => {
   const raw = props.block.props.inlineCode ?? ''
   const highlighted = await codeToHtml(raw, {
-    lang: props.block.props.lang || getFileExt(props.block.props.title ?? '') || 'plaintext',
+    lang: getFileExt(props.block.props.title ?? '') || 'plaintext',
     theme: 'tokyo-night',
     cssVariablePrefix: 'code'
   })

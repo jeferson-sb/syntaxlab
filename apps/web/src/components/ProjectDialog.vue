@@ -32,13 +32,13 @@ const newProjectName = ref('');
 
 const isValid = computed(() => newProjectName.value.trim().length > 0);
 
-const handleCreate = () => {
+const create = () => {
   if (!isValid.value) return;
   emit('create', newProjectName.value.trim());
   emit('update:open', false);
 };
 
-const handleSelect = (projectId: string) => {
+const selectProject = (projectId: string) => {
   emit('select', projectId);
   emit('update:open', false);
 };
@@ -75,8 +75,8 @@ watch(
 
           <TabsContent value="switch" class="tabs-content">
             <div class="project-list">
-              <button v-for="project in projects" :key="project.id" class="project-item"
-                :class="{ active: project.id === currentProjectId }" @click="handleSelect(project.id)">
+              <button v-for="project in projects" :key="project.id" type="button" class="project-item"
+                :class="{ active: project.id === currentProjectId }" @click="selectProject(project.id)">
                 <FolderOpen :size="16" />
                 <span>{{ project.name }}</span>
               </button>
@@ -90,14 +90,14 @@ watch(
             <fieldset class="input-group">
               <label for="project-name">Project Name</label>
               <input id="project-name" v-model="newProjectName" placeholder="My awesome project"
-                @keydown.enter="handleCreate" />
+                @keydown.enter="create" />
             </fieldset>
 
             <div class="dialog-actions">
               <DialogClose as-child>
                 <button type="button" class="btn-cancel">Cancel</button>
               </DialogClose>
-              <button type="button" class="btn-create" :disabled="!isValid" @click="handleCreate">
+              <button type="button" class="btn-create" :disabled="!isValid" @click="create">
                 Create Project
               </button>
             </div>
@@ -120,7 +120,7 @@ watch(
   background: light-dark(var(--gray-7), var(--gray-10));
   opacity: 0;
 
-  &[data-state='open'] {
+  &[data-state=open] {
     animation: fade-in-opaque 500ms var(--ease-3) forwards;
   }
 }
@@ -146,8 +146,15 @@ watch(
   box-shadow: var(--shadow-3);
   transform-origin: center;
 
-  &[data-state='open'] {
+  &[data-state=open] {
     animation: scale-up 200ms var(--ease-out-3) both;
+  }
+
+  & .dialog-title {
+    font-size: var(--font-size-fluid-1);
+    font-weight: var(--font-weight-6);
+    color: var(--text-1);
+    margin-block-end: var(--size-4);
   }
 }
 
@@ -163,23 +170,18 @@ watch(
   }
 }
 
-.dialog-title {
-  font-size: var(--font-size-3);
-  font-weight: var(--font-weight-6);
-  color: var(--text-1);
-  margin-block-end: var(--size-4);
-}
-
 .tabs-root {
   display: flex;
   flex-direction: column;
 }
 
 .tabs-list {
-  display: flex;
-  gap: var(--size-1);
   border-bottom: 1px solid var(--border-color);
   margin-block-end: var(--size-4);
+}
+
+.tabs-content {
+  min-height: var(--size-12);
 }
 
 .tabs-trigger {
@@ -200,22 +202,16 @@ watch(
     color: var(--text-1);
   }
 
-  &[data-state='active'] {
+  &[data-state=active] {
     color: var(--blue-5);
     border-bottom-color: var(--blue-5);
   }
-}
-
-.tabs-content {
-  min-height: 200px;
 }
 
 .project-list {
   display: flex;
   flex-direction: column;
   gap: var(--size-1);
-  max-height: 280px;
-  overflow-y: auto;
 }
 
 .project-item {

@@ -1,15 +1,16 @@
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { defineStore } from "pinia";
+
 import type { Board } from "@/types/canvasBoard";
 import { slugify } from "@/lib/slugify";
 import { uniqueId } from "@/lib/uniqueId";
 
-export type BoardWithId = Board & { id: string };
+export type BoardEntity = Board & { id: string };
 
 export const useBoardStore = defineStore(
   "board",
   () => {
-    const boards = ref<BoardWithId[]>([
+    const boards = ref<BoardEntity[]>([
       {
         id: "default",
         name: "My First Board",
@@ -20,11 +21,12 @@ export const useBoardStore = defineStore(
     const currentBoardId = ref<string>("default");
     const isCreateDialogOpen = ref(false);
 
-    const currentBoard = () =>
-      boards.value.find((b) => b.id === currentBoardId.value);
+    const currentBoard = computed(() =>
+      boards.value.find((b) => b.id === currentBoardId.value),
+    );
 
     const createBoard = (board: Board) => {
-      const newBoard: BoardWithId = {
+      const newBoard: BoardEntity = {
         ...board,
         id: `${slugify(board.name)}-${uniqueId().slice(0, 8)}`,
       };
@@ -38,7 +40,7 @@ export const useBoardStore = defineStore(
       if (index !== -1) {
         boards.value.splice(index, 1);
         if (currentBoardId.value === id && boards.value.length > 0) {
-          currentBoardId.value = boards.value[0]!.id;
+          currentBoardId.value = boards.value[0]?.id ?? "";
         }
       }
     };
@@ -72,8 +74,11 @@ export const useBoardStore = defineStore(
   },
   {
     storage: {
-      adapter: "localStorage",
-      namespace: "syntaxlab",
+      adapter: "indexedDB",
+      options: {
+        dbName: "syntaxlab",
+        storeName: "boards",
+      },
     },
   },
 );

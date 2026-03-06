@@ -1,11 +1,10 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
+
 import type { Project } from "@/types/project";
 import { useBoardStore } from "./board";
 import { slugify } from "@/lib/slugify";
 import { uniqueId } from "@/lib/uniqueId";
-
-export type ProjectWithId = Project;
 
 export const useProjectStore = defineStore(
   "project",
@@ -49,7 +48,7 @@ export const useProjectStore = defineStore(
       if (index !== -1) {
         projects.value.splice(index, 1);
         if (currentProjectId.value === id && projects.value.length > 0) {
-          currentProjectId.value = projects.value[0]!.id;
+          currentProjectId.value = projects.value[0]?.id ?? "";
         }
       }
     };
