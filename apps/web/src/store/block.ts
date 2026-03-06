@@ -1,12 +1,14 @@
-import { ref } from "vue";
+import { shallowRef, computed, triggerRef } from "vue";
 import { defineStore } from "pinia";
 
 import type { AnyBlock } from "@/types/block";
+import { useBoardStore } from "@/store/board";
 
 const initialState: AnyBlock[] = [
   {
     id: "1",
     type: "note",
+    boardId: "default",
     x: 100,
     y: 150,
     props: {
@@ -17,6 +19,7 @@ const initialState: AnyBlock[] = [
   {
     id: "2",
     type: "code",
+    boardId: "default",
     x: 900,
     y: 120,
     props: {
@@ -34,6 +37,7 @@ const initialState: AnyBlock[] = [
   {
     id: "3",
     type: "image",
+    boardId: "default",
     x: 400,
     y: 150,
     props: {
@@ -44,6 +48,7 @@ const initialState: AnyBlock[] = [
   {
     id: "4",
     type: "bookmark",
+    boardId: "default",
     x: 120,
     y: 400,
     props: {
@@ -58,6 +63,7 @@ const initialState: AnyBlock[] = [
   {
     id: "5",
     type: "sticky",
+    boardId: "default",
     x: 700,
     y: 400,
     props: {
@@ -70,12 +76,22 @@ const initialState: AnyBlock[] = [
 export const useBlockStore = defineStore(
   "block",
   () => {
-    const blocks = ref(initialState);
-    const selected = ref<string | null>(null);
+    const blocks = shallowRef(initialState);
+    const selected = shallowRef<string | null>(null);
+
+    const currentBoardBlocks = computed(() => {
+      const boardId = useBoardStore().currentBoardId;
+      return blocks.value.filter((block) => block.boardId === boardId);
+    });
 
     const appendBlock = (newBlock: AnyBlock) => {
-      blocks.value.push(newBlock);
-      selected.value = newBlock.id;
+      const boardId = useBoardStore().currentBoardId;
+      const blockWithBoard = {
+        ...newBlock,
+        boardId: newBlock.boardId ?? boardId,
+      };
+      blocks.value = [...blocks.value, blockWithBoard];
+      selected.value = blockWithBoard.id;
     };
 
     const removeSelectedBlock = () => {
@@ -95,12 +111,20 @@ export const useBlockStore = defineStore(
       const targetId = updates.id ?? selected.value;
       if (!targetId) return;
 
-      blocks.value = blocks.value.map((blck) => {
-        const patch = updates?.props
-          ? { ...blck, props: { ...blck.props, ...updates.props } }
-          : { ...blck, ...updates };
-        return blck.id === targetId ? patch : blck;
-      });
+      const block = blocks.value.find((b) => b.id === targetId);
+      if (!block) return;
+
+      // Mutate in place - shallowRef won't trigger reactivity for deep changes
+      if (updates.props) {
+        Object.assign(block.props, updates.props);
+      }
+      if (updates.x !== undefined) block.x = updates.x;
+      if (updates.y !== undefined) block.y = updates.y;
+
+      // Only trigger ref update for position changes (needed for Canvas)
+      if (updates.x !== undefined || updates.y !== undefined) {
+        triggerRef(blocks);
+      }
     };
 
     const unselect = () => {
@@ -109,6 +133,7 @@ export const useBlockStore = defineStore(
 
     return {
       blocks,
+      currentBoardBlocks,
       selected,
       unselect,
       appendBlock,

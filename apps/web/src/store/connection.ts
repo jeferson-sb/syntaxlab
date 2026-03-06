@@ -1,8 +1,9 @@
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 
 import { uniqueId } from "@/lib/uniqueId";
 import type { Connection } from "@/types/connection";
+import { useBlockStore } from "@/store/block";
 
 type CreateConnectionInput = {
   fromBlockId: string;
@@ -27,6 +28,17 @@ export const useConnectionStore = defineStore(
     const linkSourceBlockId = ref<string | null>(null);
     const statusMessage = ref("");
 
+    const currentBoardConnections = computed(() => {
+      const visibleBlockIds = new Set(
+        useBlockStore().currentBoardBlocks.map((b) => b.id),
+      );
+      return connections.value.filter(
+        (c) =>
+          visibleBlockIds.has(c.fromBlockId) &&
+          visibleBlockIds.has(c.toBlockId),
+      );
+    });
+
     const clearStatus = () => {
       statusMessage.value = "";
     };
@@ -39,7 +51,7 @@ export const useConnectionStore = defineStore(
       return connections.value.some(
         (connection) =>
           connection.fromBlockId === fromBlockId &&
-          connection.toBlockId === toBlockId
+          connection.toBlockId === toBlockId,
       );
     };
 
@@ -128,7 +140,7 @@ export const useConnectionStore = defineStore(
 
     const removeConnectionBetweenBlocks = (
       fromBlockId: string,
-      toBlockId: string
+      toBlockId: string,
     ) => {
       if (fromBlockId === toBlockId) {
         setStatus("Select two different blocks to remove a connection.");
@@ -160,7 +172,7 @@ export const useConnectionStore = defineStore(
         setStatus(
           isUnlinkModeActive
             ? "Source selected. Select target block to remove connection."
-            : "Source selected. Select a target block."
+            : "Source selected. Select a target block.",
         );
         return { selectedBlockId: blockId, connectionCreated: false };
       }
@@ -184,12 +196,14 @@ export const useConnectionStore = defineStore(
     const removeConnectionsForBlock = (blockId: string) => {
       connections.value = connections.value.filter(
         (connection) =>
-          connection.fromBlockId !== blockId && connection.toBlockId !== blockId
+          connection.fromBlockId !== blockId &&
+          connection.toBlockId !== blockId,
       );
     };
 
     return {
       connections,
+      currentBoardConnections,
       statusMessage,
       interactionMode,
       isLinkModeActive,
@@ -215,5 +229,5 @@ export const useConnectionStore = defineStore(
         storeName: "blocks",
       },
     },
-  }
+  },
 );

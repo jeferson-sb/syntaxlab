@@ -28,7 +28,7 @@ const lastMousePos = ref({ x: 0, y: 0 });
 const dragPreviewPositions = reactive<Record<string, { x: number; y: number }>>({})
 
 const blocksWithDragPreview = computed(() => {
-  return blockState.blocks.map((block) => {
+  return blockState.currentBoardBlocks.map((block) => {
     const preview = dragPreviewPositions[block.id]
     if (!preview) return block
 
@@ -128,12 +128,12 @@ onKeyStroke(e => e.code === 'Space', onSpaceBarPress, { target: canvas.value?.fi
       <div class="canvas-grid" role="presentation" />
 
       <svg class="canvas-vector-layer">
-        <ArrowConnection v-for="conn in connectionState.connections" :key="conn.id" :conn="conn"
+        <ArrowConnection v-for="conn in connectionState.currentBoardConnections" :key="conn.id" :conn="conn"
           :blocks="blocksWithDragPreview" />
       </svg>
 
       <div class="canvas-interaction-layer">
-        <BlockRenderer v-for="block in blockState.blocks" :key="block.id" :block="block"
+        <BlockRenderer v-for="block in blockState.currentBoardBlocks" :key="block.id" :block="block"
           :selected="block.id === blockState.selected" @select-block="selectBlock(block.id)"
           :is-link-source="connectionState.linkSourceBlockId === block.id" @preview-position="previewPosition"
           @preview-end="clearPreviewPosition" @change-position="changePosition" />
