@@ -23,11 +23,11 @@ export const useProjectStore = defineStore(
     const currentProjectId = ref<string>("default-project");
 
     const currentProject = computed(() =>
-      projects.value.find((p) => p.id === currentProjectId.value),
+      projects.value.find((p) => p.id === currentProjectId.value)
     );
 
     const projectBoards = computed(() =>
-      boardStore.boards.filter((b) => b.projectId === currentProjectId.value),
+      boardStore.boards.filter((b) => b.projectId === currentProjectId.value)
     );
 
     const createProject = (name: string) => {
@@ -55,7 +55,7 @@ export const useProjectStore = defineStore(
 
     const updateProject = (
       id: string,
-      updates: Partial<Omit<Project, "id">>,
+      updates: Partial<Omit<Project, "id">>
     ) => {
       const project = projects.value.find((p) => p.id === id);
       if (project) {
@@ -93,8 +93,11 @@ export const useProjectStore = defineStore(
   },
   {
     storage: {
-      adapter: "localStorage",
-      namespace: "syntaxlab",
+      adapter: "indexedDB",
+      options: {
+        dbName: "syntaxlab",
+        storeName: "root",
+      },
     },
-  },
+  }
 );

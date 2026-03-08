@@ -108,7 +108,7 @@ onKeyStroke(['t', 'T'], () => { if (shouldIgnoreKeypress()) return; addTemplateB
 onKeyStroke(['u', 'U'], () => { if (shouldIgnoreKeypress()) return; addImageBlock() })
 onKeyStroke(['c', 'C'], () => { if (shouldIgnoreKeypress()) return; addTemplateBlock('code') })
 onKeyStroke(['s', 'S'], () => { if (shouldIgnoreKeypress()) return; addTemplateBlock('sticky') })
-onKeyStroke(['l', 'L'], (event) => {
+onKeyStroke(['l'], (event) => {
   if (isTypingInEditableElement()) return;
   if (event.shiftKey) {
     toggleUnlinkMode();

@@ -8,6 +8,7 @@ export const useSettingsStore = defineStore(
   () => {
     const preferRemoteSync = ref(false);
     const preferAiFeatures = ref(false);
+    const imageQuality = ref(1);
     const theme = ref<Theme>("light");
 
     const toggleTheme = () => {
@@ -19,12 +20,13 @@ export const useSettingsStore = defineStore(
       (newTheme) => {
         document.body.setAttribute("data-theme", newTheme);
       },
-      { immediate: true },
+      { immediate: true }
     );
 
     return {
       preferRemoteSync,
       preferAiFeatures,
+      imageQuality,
       theme,
       toggleTheme,
     };
@@ -34,5 +36,5 @@ export const useSettingsStore = defineStore(
       adapter: "localStorage",
       namespace: "syntaxlab",
     },
-  },
+  }
 );

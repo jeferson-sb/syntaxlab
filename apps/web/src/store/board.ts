@@ -22,7 +22,7 @@ export const useBoardStore = defineStore(
     const isCreateDialogOpen = ref(false);
 
     const currentBoard = computed(() =>
-      boards.value.find((b) => b.id === currentBoardId.value),
+      boards.value.find((b) => b.id === currentBoardId.value)
     );
 
     const createBoard = (board: Board) => {
@@ -77,8 +77,8 @@ export const useBoardStore = defineStore(
       adapter: "indexedDB",
       options: {
         dbName: "syntaxlab",
-        storeName: "boards",
+        storeName: "root",
       },
     },
-  },
+  }
 );

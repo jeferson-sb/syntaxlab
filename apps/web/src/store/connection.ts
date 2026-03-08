@@ -30,12 +30,11 @@ export const useConnectionStore = defineStore(
 
     const currentBoardConnections = computed(() => {
       const visibleBlockIds = new Set(
-        useBlockStore().currentBoardBlocks.map((b) => b.id),
+        useBlockStore().currentBoardBlocks.map((b) => b.id)
       );
       return connections.value.filter(
         (c) =>
-          visibleBlockIds.has(c.fromBlockId) &&
-          visibleBlockIds.has(c.toBlockId),
+          visibleBlockIds.has(c.fromBlockId) && visibleBlockIds.has(c.toBlockId)
       );
     });
 
@@ -51,7 +50,7 @@ export const useConnectionStore = defineStore(
       return connections.value.some(
         (connection) =>
           connection.fromBlockId === fromBlockId &&
-          connection.toBlockId === toBlockId,
+          connection.toBlockId === toBlockId
       );
     };
 
@@ -64,7 +63,10 @@ export const useConnectionStore = defineStore(
       }
 
       if (hasDuplicateConnection(fromBlockId, toBlockId)) {
-        return { ok: false, reason: "This connection already exists." };
+        return {
+          ok: false,
+          reason: "This connection already exists. Press backspace to unlink",
+        };
       }
 
       return { ok: true };
@@ -140,7 +142,7 @@ export const useConnectionStore = defineStore(
 
     const removeConnectionBetweenBlocks = (
       fromBlockId: string,
-      toBlockId: string,
+      toBlockId: string
     ) => {
       if (fromBlockId === toBlockId) {
         setStatus("Select two different blocks to remove a connection.");
@@ -172,7 +174,7 @@ export const useConnectionStore = defineStore(
         setStatus(
           isUnlinkModeActive
             ? "Source selected. Select target block to remove connection."
-            : "Source selected. Select a target block.",
+            : "Source selected. Select a target block."
         );
         return { selectedBlockId: blockId, connectionCreated: false };
       }
@@ -196,8 +198,7 @@ export const useConnectionStore = defineStore(
     const removeConnectionsForBlock = (blockId: string) => {
       connections.value = connections.value.filter(
         (connection) =>
-          connection.fromBlockId !== blockId &&
-          connection.toBlockId !== blockId,
+          connection.fromBlockId !== blockId && connection.toBlockId !== blockId
       );
     };
 
@@ -226,8 +227,8 @@ export const useConnectionStore = defineStore(
       adapter: "indexedDB",
       options: {
         dbName: "syntaxlab",
-        storeName: "blocks",
+        storeName: "root",
       },
     },
-  },
+  }
 );

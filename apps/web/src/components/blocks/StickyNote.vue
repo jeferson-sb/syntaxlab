@@ -46,7 +46,7 @@ watchDebounced(
 </script>
 
 <template>
-  <div class="sticky-note" :style="{ '--sticky-color': block.props.color }">
+  <div class="sticky-note">
     <div class="sticky-note__header">
       <Lightbulb :size="36" class="icon" />
 
@@ -70,6 +70,8 @@ watchDebounced(
 
 <style lang="css" scoped>
 .sticky-note {
+  --sticky-color: v-bind(block.props.color);
+
   position: relative;
   padding: var(--size-5);
   width: 20rem;

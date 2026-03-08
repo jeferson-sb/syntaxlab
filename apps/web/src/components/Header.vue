@@ -16,7 +16,7 @@ const settingsState = useSettingsStore()
 const boardStore = useBoardStore()
 
 const isSidebarOpen = ref();
-const boardName = computed(() => boardStore.currentBoard()?.name ?? 'Untitled Canvas');
+const boardName = computed(() => boardStore.currentBoard?.name ?? 'Untitled Canvas');
 
 const exportCommand = () => {
   const target = props.getCanvasElement()
@@ -30,7 +30,7 @@ const exportCommand = () => {
     link.click()
   }
 
-  toJpeg(target, { quality: 0.8, cacheBust: true })
+  toJpeg(target, { quality: settingsState.imageQuality, cacheBust: true })
     .then((dataUrl) => download(dataUrl, slugify(boardName.value)))
     .catch(console.error)
 }

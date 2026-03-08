@@ -45,7 +45,7 @@ watchDebounced(
 </script>
 
 <template>
-  <div class="text-card" :style="{ '--color': block.props.color, '--font-size': block.props.textSize }">
+  <div class="text-card">
     <div class="editor" v-if="isEditing">
       <div class="editor-backdrop" aria-hidden="true">
         <span class="editor-content">{{ block.props.content }}</span>
@@ -59,6 +59,9 @@ watchDebounced(
 
 <style lang="css" scoped>
 .text-card {
+  --color: v-bind(block.props.color);
+  --font-size: v-bind(block.props.textSize);
+
   padding: var(--size-7);
   box-shadow: var(--block-shadow);
   border-radius: var(--radius-4);

@@ -1,4 +1,4 @@
-import { shallowRef, computed, triggerRef } from "vue";
+import { computed, ref } from "vue";
 import { defineStore } from "pinia";
 
 import type { AnyBlock } from "@/types/block";
@@ -76,8 +76,8 @@ const initialState: AnyBlock[] = [
 export const useBlockStore = defineStore(
   "block",
   () => {
-    const blocks = shallowRef(initialState);
-    const selected = shallowRef<string | null>(null);
+    const blocks = ref(initialState);
+    const selected = ref<string | null>(null);
 
     const currentBoardBlocks = computed(() => {
       const boardId = useBoardStore().currentBoardId;
@@ -100,7 +100,7 @@ export const useBlockStore = defineStore(
       const removedBlockId = selected.value;
 
       blocks.value = blocks.value.filter(
-        (block) => block.id !== selected.value,
+        (block) => block.id !== selected.value
       );
       selected.value = null;
 
@@ -114,17 +114,11 @@ export const useBlockStore = defineStore(
       const block = blocks.value.find((b) => b.id === targetId);
       if (!block) return;
 
-      // Mutate in place - shallowRef won't trigger reactivity for deep changes
       if (updates.props) {
-        Object.assign(block.props, updates.props);
+        block.props = { ...block.props, ...updates.props };
       }
       if (updates.x !== undefined) block.x = updates.x;
       if (updates.y !== undefined) block.y = updates.y;
-
-      // Only trigger ref update for position changes (needed for Canvas)
-      if (updates.x !== undefined || updates.y !== undefined) {
-        triggerRef(blocks);
-      }
     };
 
     const unselect = () => {
@@ -146,8 +140,8 @@ export const useBlockStore = defineStore(
       adapter: "indexedDB",
       options: {
         dbName: "syntaxlab",
-        storeName: "blocks",
+        storeName: "root",
       },
     },
-  },
+  }
 );

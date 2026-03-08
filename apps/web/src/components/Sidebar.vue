@@ -2,9 +2,9 @@
 import {
   Plus,
   ChevronLeft,
-  Sparkles,
   LayoutGrid,
-  FolderOpen
+  FolderOpen,
+  Infinity
 } from 'lucide-vue-next';
 import { storeToRefs } from 'pinia';
 import { useBoardStore } from '@/store/board';
@@ -44,7 +44,7 @@ const selectProject = (projectId: string) => {
         <div class="sidebar-header">
           <div class="brand-group">
             <div class="brand-icon">
-              <Sparkles :size="20" fill="currentColor" />
+              <Infinity :size="20" fill="none" />
             </div>
             <div class="brand-text">
               <h1 class="brand-title">SyntaxLab</h1>
