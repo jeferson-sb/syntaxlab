@@ -1,12 +1,5 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
-import { treaty, edenFetch } from '@elysiajs/eden'
-import type { App } from 'syntaxlab-backend'
-
-import { config } from "@/lib/config";
-
-const api = treaty<App>(config.backendUrl)
-const fetch = edenFetch<App>(config.backendUrl)
 
 type CanvasExposed = {
   getCanvasElement: () => HTMLDivElement | null

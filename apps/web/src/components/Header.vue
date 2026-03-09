@@ -1,12 +1,20 @@
 <script lang="ts" setup>
 import { SwitchRoot, SwitchThumb } from 'reka-ui'
 import { FileDown, Edit3, Menu } from 'lucide-vue-next';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { toJpeg } from 'html-to-image';
+import { useIntervalFn } from '@vueuse/core'
+import { treaty } from '@elysiajs/eden'
+import type { App } from 'syntaxlab-backend'
 
+import { config } from "@/lib/config";
 import { slugify } from '@/lib/slugify';
 import { useSettingsStore } from '@/store/settings';
 import { useBoardStore } from '@/store/board';
+import { useProjectStore } from '@/store/project';
+import { useBlockStore } from '@/store/block';
+
+const { api } = treaty<App>(config.backendUrl)
 
 const props = defineProps<{
   getCanvasElement: () => HTMLDivElement | null;
@@ -14,6 +22,8 @@ const props = defineProps<{
 
 const settingsState = useSettingsStore()
 const boardStore = useBoardStore()
+const projectStore = useProjectStore()
+const blockStore = useBlockStore()
 
 const isSidebarOpen = ref();
 const boardName = computed(() => boardStore.currentBoard?.name ?? 'Untitled Canvas');
@@ -34,6 +44,27 @@ const exportCommand = () => {
     .then((dataUrl) => download(dataUrl, slugify(boardName.value)))
     .catch(console.error)
 }
+
+const TWO_MINUTES = 2 * 60 * 1000
+const { pause, resume, isActive } = useIntervalFn(async () => {
+  console.log('Remote sync is ON, syncing...')
+
+  // TODO: Add data-model mapper
+  // TODO: replace with batch upsert
+  const projReqs = projectStore.projects.map(proj => api.projects.post({ userId: proj.userId, boards: [], name: proj.name }))
+  const boardReqs = boardStore.boards.map(board => api.boards.post({ visibility: board.visibility, name: board.name, blocks: [] }))
+  const blockReqs = blockStore.blocks.map(block => api.blocks.post({ type: block.type, x: block.x, y: block.y, props: block.props }))
+
+  await Promise.all([projReqs, boardReqs, blockReqs]).catch(err => console.error(err))
+}, TWO_MINUTES, { immediate: settingsState.preferRemoteSync })
+
+watch(() => settingsState.preferRemoteSync, (enabled) => {
+  if (!enabled) {
+    pause()
+  } else {
+    resume()
+  }
+})
 </script>
 
 <template>
@@ -46,6 +77,7 @@ const exportCommand = () => {
       <div class="header__title">
         <Edit3 class="text-primary" :size="18" role="presentation" aria-label="Pencil" />
         <h2 class="title">{{ boardName }}</h2>
+        <span v-if="isActive" aria-live="polite">Syncing every two minutes...</span>
       </div>
     </div>
 
@@ -119,6 +151,12 @@ const exportCommand = () => {
 
   & svg {
     color: var(--blue-5);
+  }
+
+  & span {
+    color: var(--text-3);
+    font-style: italic;
+    font-size: var(--font-size-0);
   }
 }
 
