@@ -6,6 +6,7 @@ import { makeGetProject } from "@/modules/project/application/getProject";
 import { makeDeleteProject } from "@/modules/project/application/deleteProject";
 import { makeUpdateProject } from "@/modules/project/application/updateProject";
 import { makeAddBoardToProject } from "@/modules/project/application/addBoardToProject";
+import { makeBatchUpsertProjects } from "@/modules/project/application/batchUpsertProjects";
 import type { ProjectRepository } from "@/modules/project/domain/Project";
 
 type ProjectContainerDependencies = {
@@ -27,6 +28,9 @@ export const registerProjectContainer = (
       deleteProjectUseCase: makeDeleteProject({ projectRepository }),
       updateProjectUseCase: makeUpdateProject({ projectRepository }),
       addBoardToProjectUseCase: makeAddBoardToProject({
+        projectRepository,
+      }),
+      batchUpsertProjectsUseCase: makeBatchUpsertProjects({
         projectRepository,
       }),
     }));

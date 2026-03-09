@@ -12,6 +12,24 @@ export const makeBoardController = (boardRepository?: BoardRepository) =>
         blocks: t.Array(t.Any()),
       }),
     })
+    .post(
+      "/batch",
+      async ({ body, status, batchUpsertBoardsUseCase }) => {
+        const results = await batchUpsertBoardsUseCase(body);
+        return status(200, { results });
+      },
+      {
+        body: t.Array(
+          t.Object({
+            clientRef: t.String(),
+            name: t.String(),
+            visibility: t.Union([t.Literal("private"), t.Literal("public")]),
+            projectId: t.Optional(t.String()),
+            updatedAt: t.String(),
+          }),
+        ),
+      },
+    )
     .patch(
       "/:id",
       async ({ params, body, status, updateBoardUseCase }) => {

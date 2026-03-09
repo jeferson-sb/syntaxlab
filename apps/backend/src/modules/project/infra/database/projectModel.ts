@@ -5,9 +5,10 @@ const projectSchema = new mongoose.Schema(
   {
     name: String,
     userId: String,
+    clientRef: { type: String, unique: true, sparse: true },
     boards: [{ type: mongoose.Schema.Types.ObjectId, ref: "Board" }],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const projectModel = mongoose.model("Project", projectSchema);

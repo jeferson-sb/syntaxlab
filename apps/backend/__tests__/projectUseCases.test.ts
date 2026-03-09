@@ -5,6 +5,7 @@ import { makeGetProject } from "@/modules/project/application/getProject";
 import { makeUpdateProject } from "@/modules/project/application/updateProject";
 import { makeDeleteProject } from "@/modules/project/application/deleteProject";
 import { makeAddBoardToProject } from "@/modules/project/application/addBoardToProject";
+import { makeBatchUpsertProjects } from "@/modules/project/application/batchUpsertProjects";
 import { InMemoryProjectRepository } from "@/modules/project/infra/database/inMemoryProjectRepository";
 import type { ProjectId } from "@/modules/project/domain/Project";
 
@@ -125,5 +126,102 @@ describe("project use cases", () => {
     const project = await getProject(id);
 
     expect(project.boards).toEqual(boardIds);
+  });
+
+  describe("batch upsert", () => {
+    it("creates new projects when clientRef does not exist", async () => {
+      const batchUpsertProjects = makeBatchUpsertProjects({
+        projectRepository,
+      });
+
+      const results = await batchUpsertProjects([
+        {
+          clientRef: "client-proj-1",
+          name: "Project A",
+          userId: "user-1",
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          clientRef: "client-proj-2",
+          name: "Project B",
+          userId: "user-2",
+          updatedAt: new Date().toISOString(),
+        },
+      ]);
+
+      expect(results).toHaveLength(2);
+      expect(results[0]).toMatchObject({
+        clientRef: "client-proj-1",
+        action: "created",
+      });
+      expect(results[1]).toMatchObject({
+        clientRef: "client-proj-2",
+        action: "created",
+      });
+    });
+
+    it("updates existing project when clientRef exists and updatedAt is newer", async () => {
+      const batchUpsertProjects = makeBatchUpsertProjects({
+        projectRepository,
+      });
+      const getProjects = makeGetProjects({ projectRepository });
+
+      // First upsert to create
+      await batchUpsertProjects([
+        {
+          clientRef: "client-proj-1",
+          name: "Original Name",
+          userId: "user-1",
+          updatedAt: new Date("2025-01-01").toISOString(),
+        },
+      ]);
+
+      // Second upsert with newer timestamp should update
+      const results = await batchUpsertProjects([
+        {
+          clientRef: "client-proj-1",
+          name: "Updated Name",
+          userId: "user-1",
+          updatedAt: new Date("2025-01-02").toISOString(),
+        },
+      ]);
+
+      expect(results[0].action).toBe("updated");
+
+      const projects = await getProjects();
+      expect(projects[0].name).toBe("Updated Name");
+    });
+
+    it("skips update when clientRef exists but updatedAt is older", async () => {
+      const batchUpsertProjects = makeBatchUpsertProjects({
+        projectRepository,
+      });
+      const getProjects = makeGetProjects({ projectRepository });
+
+      // First upsert with newer timestamp
+      await batchUpsertProjects([
+        {
+          clientRef: "client-proj-1",
+          name: "Newer Name",
+          userId: "user-1",
+          updatedAt: new Date("2025-01-02").toISOString(),
+        },
+      ]);
+
+      // Second upsert with older timestamp should be skipped
+      const results = await batchUpsertProjects([
+        {
+          clientRef: "client-proj-1",
+          name: "Older Name",
+          userId: "user-1",
+          updatedAt: new Date("2025-01-01").toISOString(),
+        },
+      ]);
+
+      expect(results[0].action).toBe("skipped");
+
+      const projects = await getProjects();
+      expect(projects[0].name).toBe("Newer Name");
+    });
   });
 });

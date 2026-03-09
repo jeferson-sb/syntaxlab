@@ -2,10 +2,13 @@ import type {
   Project,
   ProjectId,
   ProjectRepository,
+  ProjectUpsertInput,
 } from "@/modules/project/domain/Project";
+import type { UpsertResult } from "@/shared/domain/UpsertResult";
 
 export class InMemoryProjectRepository implements ProjectRepository {
-  private projects = new Map<string, Project>();
+  private projects = new Map<string, Project & { clientRef?: string }>();
+  private clientRefIndex = new Map<string, string>();
   private nextId = 1;
 
   async getNextId(): Promise<ProjectId> {
@@ -71,6 +74,68 @@ export class InMemoryProjectRepository implements ProjectRepository {
   async delete(id: ProjectId): Promise<void> {
     if (!this.projects.has(id.value)) throw new Error("Project not found");
 
+    const project = this.projects.get(id.value);
+    if (project?.clientRef) {
+      this.clientRefIndex.delete(project.clientRef);
+    }
     this.projects.delete(id.value);
+  }
+
+  async batchUpsert(entities: ProjectUpsertInput[]): Promise<UpsertResult[]> {
+    const results: UpsertResult[] = [];
+
+    for (const input of entities) {
+      const existingId = this.clientRefIndex.get(input.clientRef);
+      const existing = existingId ? this.projects.get(existingId) : undefined;
+
+      if (existing) {
+        const existingUpdatedAt = existing.updatedAt?.getTime() ?? 0;
+        const inputUpdatedAt = new Date(input.updatedAt).getTime();
+
+        if (inputUpdatedAt <= existingUpdatedAt) {
+          results.push({
+            clientRef: input.clientRef,
+            serverId: existing.id.value,
+            action: "skipped",
+          });
+          continue;
+        }
+
+        this.projects.set(existing.id.value, {
+          ...existing,
+          name: input.name,
+          userId: input.userId,
+          updatedAt: new Date(input.updatedAt),
+        });
+
+        results.push({
+          clientRef: input.clientRef,
+          serverId: existing.id.value,
+          action: "updated",
+        });
+      } else {
+        const id = await this.getNextId();
+        const newProject: Project & { clientRef: string } = {
+          id,
+          name: input.name,
+          userId: input.userId,
+          boards: input.boards,
+          clientRef: input.clientRef,
+          createdAt: new Date(input.updatedAt),
+          updatedAt: new Date(input.updatedAt),
+        };
+
+        this.projects.set(id.value, newProject);
+        this.clientRefIndex.set(input.clientRef, id.value);
+
+        results.push({
+          clientRef: input.clientRef,
+          serverId: id.value,
+          action: "created",
+        });
+      }
+    }
+
+    return results;
   }
 }

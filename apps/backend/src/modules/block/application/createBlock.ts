@@ -3,6 +3,7 @@ import type {
   CodeBlock,
   ImageBlock,
   NoteBlock,
+  StickyBlock,
   BlockRepository,
 } from "@/modules/block/domain/Block";
 import {
@@ -10,6 +11,7 @@ import {
   createCodeBlock,
   createImageBlock,
   createNoteBlock,
+  createStickyBlock,
 } from "@/modules/block/domain/Block";
 
 export type BlockPropsByType = {
@@ -17,10 +19,11 @@ export type BlockPropsByType = {
   note: NoteBlock["props"];
   bookmark: BookmarkBlock["props"];
   image: ImageBlock["props"];
+  sticky: StickyBlock["props"];
 };
 
 type CreateBlockDTO<
-  TType extends keyof BlockPropsByType = keyof BlockPropsByType
+  TType extends keyof BlockPropsByType = keyof BlockPropsByType,
 > = {
   type: TType;
   x: number;
@@ -49,6 +52,10 @@ export const makeCreateBlock =
 
       case "image":
         block = createImageBlock({ id, ...payload });
+        break;
+
+      case "sticky":
+        block = createStickyBlock({ id, ...payload });
         break;
 
       default:

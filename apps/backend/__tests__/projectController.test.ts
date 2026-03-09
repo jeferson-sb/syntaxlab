@@ -179,4 +179,92 @@ describe("projectController", () => {
     expect(response.status).toBe(404);
     expect(await response.text()).toContain("Project not found");
   });
+
+  describe("POST /projects/batch", () => {
+    it("creates multiple projects and returns results", async () => {
+      const app = makeApp();
+      const payload = [
+        {
+          clientRef: "client-proj-1",
+          name: "Project A",
+          userId: "user-1",
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          clientRef: "client-proj-2",
+          name: "Project B",
+          userId: "user-2",
+          updatedAt: new Date().toISOString(),
+        },
+      ];
+
+      const response = await app.handle(
+        new Request("http://localhost/projects/batch", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(payload),
+        }),
+      );
+
+      expect(response.status).toBe(200);
+
+      const json = await response.json();
+      expect(json.results).toHaveLength(2);
+      expect(json.results[0].action).toBe("created");
+      expect(json.results[1].action).toBe("created");
+    });
+
+    it("updates existing projects on second batch call", async () => {
+      const app = makeApp();
+
+      // First batch to create
+      await app.handle(
+        new Request("http://localhost/projects/batch", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify([
+            {
+              clientRef: "client-proj-1",
+              name: "Original",
+              userId: "user-1",
+              updatedAt: new Date("2025-01-01").toISOString(),
+            },
+          ]),
+        }),
+      );
+
+      // Second batch to update
+      const response = await app.handle(
+        new Request("http://localhost/projects/batch", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify([
+            {
+              clientRef: "client-proj-1",
+              name: "Updated",
+              userId: "user-1",
+              updatedAt: new Date("2025-01-02").toISOString(),
+            },
+          ]),
+        }),
+      );
+
+      const json = await response.json();
+      expect(json.results[0].action).toBe("updated");
+    });
+
+    it("returns 422 when payload is invalid", async () => {
+      const app = makeApp();
+
+      const response = await app.handle(
+        new Request("http://localhost/projects/batch", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify([{ name: "Missing fields" }]),
+        }),
+      );
+
+      expect(response.status).toBe(422);
+    });
+  });
 });

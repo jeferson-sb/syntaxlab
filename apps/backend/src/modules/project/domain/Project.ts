@@ -1,6 +1,10 @@
 import type { Board, BoardId } from "@/modules/board/domain/Board";
 import { AggregateId, AggregateRoot } from "@/shared/domain/AggregateRoot";
 import type { Repository } from "@/shared/domain/Repository";
+import type {
+  UpsertResult,
+  BatchUpsertInput,
+} from "@/shared/domain/UpsertResult";
 
 export type UserId = AggregateId<string>;
 export type Project = AggregateRoot<ProjectId> & {
@@ -13,14 +17,19 @@ export type Project = AggregateRoot<ProjectId> & {
 
 export type ProjectId = AggregateId<string>;
 
+export type ProjectUpsertInput = BatchUpsertInput<
+  Omit<Project, "id" | "createdAt" | "updatedAt">
+>;
+
 export type ProjectRepository = Repository<Project> & {
   get(id: ProjectId): Promise<Project>;
   update(entity: Partial<Project>): Promise<void>;
   addBoard(projectId: ProjectId, board: string[]): Promise<void>;
+  batchUpsert(entities: ProjectUpsertInput[]): Promise<UpsertResult[]>;
 };
 
 export const createProject = (
-  props: Omit<Project, "createdAt" | "updatedAt">
+  props: Omit<Project, "createdAt" | "updatedAt">,
 ): Project => ({
   id: props.id,
   name: props.name,

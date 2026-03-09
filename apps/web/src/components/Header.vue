@@ -14,6 +14,8 @@ import { useBoardStore } from '@/store/board';
 import { useProjectStore } from '@/store/project';
 import { useBlockStore } from '@/store/block';
 
+type UpsertResultItem = { clientRef: string; serverId: string; action: string }
+
 const { api } = treaty<App>(config.backendUrl)
 
 const props = defineProps<{
@@ -27,6 +29,7 @@ const blockStore = useBlockStore()
 
 const isSidebarOpen = ref();
 const boardName = computed(() => boardStore.currentBoard?.name ?? 'Untitled Canvas');
+const lastSyncTime = ref<Date | null>(null);
 
 const exportCommand = () => {
   const target = props.getCanvasElement()
@@ -49,13 +52,81 @@ const TWO_MINUTES = 2 * 60 * 1000
 const { pause, resume, isActive } = useIntervalFn(async () => {
   console.log('Remote sync is ON, syncing...')
 
-  // TODO: Add data-model mapper
-  // TODO: replace with batch upsert
-  const projReqs = projectStore.projects.map(proj => api.projects.post({ userId: proj.userId, boards: [], name: proj.name }))
-  const boardReqs = boardStore.boards.map(board => api.boards.post({ visibility: board.visibility, name: board.name, blocks: [] }))
-  const blockReqs = blockStore.blocks.map(block => api.blocks.post({ type: block.type, x: block.x, y: block.y, props: block.props }))
+  const syncStartTime = new Date()
 
-  await Promise.all([projReqs, boardReqs, blockReqs]).catch(err => console.error(err))
+  // Sync projects first
+  const projectPayload = projectStore.projects.map(proj => ({
+    clientRef: proj.id,
+    userId: proj.userId,
+    name: proj.name,
+    updatedAt: proj.updatedAt.toISOString(),
+  }))
+
+  const projectResult = await api.projects.batch.post(projectPayload).catch((err: unknown) => {
+    console.error('Project sync failed:', err)
+    return null
+  })
+
+  projectResult?.data?.results?.forEach((result: UpsertResultItem) => {
+    const project = projectStore.projects.find(p => p.id === result.clientRef)
+    if (project) project._syncId = result.serverId
+  })
+
+  // Sync boards (using project clientRef for linking)
+  const boardPayload = boardStore.boards.map(board => ({
+    clientRef: board.id,
+    name: board.name,
+    visibility: board.visibility,
+    projectId: board.projectId, // clientRef of the project
+    updatedAt: (board.updatedAt ?? new Date()).toISOString(),
+  }))
+
+  const boardResult = await api.boards.batch.post(boardPayload).catch((err: unknown) => {
+    console.error('Board sync failed:', err)
+    return null
+  })
+
+  boardResult?.data?.results?.forEach((result: UpsertResultItem) => {
+    const board = boardStore.boards.find(b => b.id === result.clientRef)
+    if (board) board._syncId = result.serverId
+  })
+
+  // Sync only blocks that changed since last sync
+  const changedBlocks = lastSyncTime.value
+    ? blockStore.blocks.filter(block => {
+      const blockUpdatedAt = block.updatedAt ?? new Date(0)
+      return blockUpdatedAt > lastSyncTime.value!
+    })
+    : blockStore.blocks
+
+  if (changedBlocks.length > 0) {
+    const blockPayload = changedBlocks.map(block => ({
+      clientRef: block.id,
+      type: block.type,
+      x: block.x,
+      y: block.y,
+      boardId: block.boardId, // clientRef of the board
+      props: block.props ?? {},
+      updatedAt: (block.updatedAt ?? new Date()).toISOString(),
+    }))
+
+    const blockResult = await api.blocks.batch.post(blockPayload).catch((err: unknown) => {
+      console.error('Block sync failed:', err)
+      return null
+    })
+
+    blockResult?.data?.results?.forEach((result: UpsertResultItem) => {
+      const block = blockStore.blocks.find(b => b.id === result.clientRef)
+      if (block) block._syncId = result.serverId
+    })
+
+    console.log(`Synced ${changedBlocks.length} changed blocks`)
+  } else {
+    console.log('No blocks changed since last sync')
+  }
+
+  lastSyncTime.value = syncStartTime
+  console.log('Sync completed')
 }, TWO_MINUTES, { immediate: settingsState.preferRemoteSync })
 
 watch(() => settingsState.preferRemoteSync, (enabled) => {

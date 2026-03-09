@@ -24,6 +24,32 @@ export const makeBlockController = (blockRepository?: BlockRepository) =>
         }),
       },
     )
+    .post(
+      "/batch",
+      async ({ body, status, batchUpsertBlocksUseCase }) => {
+        const results = await batchUpsertBlocksUseCase(body);
+        return status(200, { results });
+      },
+      {
+        body: t.Array(
+          t.Object({
+            clientRef: t.String(),
+            type: t.Union([
+              t.Literal("code"),
+              t.Literal("note"),
+              t.Literal("bookmark"),
+              t.Literal("image"),
+              t.Literal("sticky"),
+            ]),
+            x: t.Number(),
+            y: t.Number(),
+            boardId: t.Optional(t.String()),
+            props: t.Record(t.String(), t.Any()),
+            updatedAt: t.String(),
+          }),
+        ),
+      },
+    )
     .get("/", ({ getBlocksUseCase }) => getBlocksUseCase())
     .delete("/:id", async ({ params, status, deleteBlockUseCase }) => {
       try {

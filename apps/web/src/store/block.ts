@@ -89,6 +89,7 @@ export const useBlockStore = defineStore(
       const blockWithBoard = {
         ...newBlock,
         boardId: newBlock.boardId ?? boardId,
+        updatedAt: new Date(),
       };
       blocks.value = [...blocks.value, blockWithBoard];
       selected.value = blockWithBoard.id;
@@ -100,7 +101,7 @@ export const useBlockStore = defineStore(
       const removedBlockId = selected.value;
 
       blocks.value = blocks.value.filter(
-        (block) => block.id !== selected.value
+        (block) => block.id !== selected.value,
       );
       selected.value = null;
 
@@ -119,6 +120,7 @@ export const useBlockStore = defineStore(
       }
       if (updates.x !== undefined) block.x = updates.x;
       if (updates.y !== undefined) block.y = updates.y;
+      block.updatedAt = new Date();
     };
 
     const unselect = () => {
@@ -143,5 +145,5 @@ export const useBlockStore = defineStore(
         storeName: "root",
       },
     },
-  }
+  },
 );

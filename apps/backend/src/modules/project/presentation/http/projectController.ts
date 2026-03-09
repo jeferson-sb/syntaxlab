@@ -17,22 +17,24 @@ export const makeProjectController = (projectRepository?: ProjectRepository) =>
           userId: t.String(),
           boards: t.Array(t.Any()),
         }),
-      }
+      },
     )
     .post(
       "/batch",
-      async () => {
-        // TBD
+      async ({ body, status, batchUpsertProjectsUseCase }) => {
+        const results = await batchUpsertProjectsUseCase(body);
+        return status(200, { results });
       },
       {
         body: t.Array(
           t.Object({
+            clientRef: t.String(),
             name: t.String(),
             userId: t.String(),
-            boards: t.Array(t.Any()),
-          })
+            updatedAt: t.String(),
+          }),
         ),
-      }
+      },
     )
     .get("/", ({ getProjectsUseCase }) => getProjectsUseCase())
     .get("/:id", async ({ params, getProjectUseCase, status }) => {
@@ -61,7 +63,7 @@ export const makeProjectController = (projectRepository?: ProjectRepository) =>
           name: t.String(),
           userId: t.Optional(t.String()),
         }),
-      }
+      },
     )
     .delete("/:id", async ({ params, status, deleteProjectUseCase }) => {
       try {
@@ -81,7 +83,7 @@ export const makeProjectController = (projectRepository?: ProjectRepository) =>
         body: t.Object({
           boards: t.Array(t.String()),
         }),
-      }
+      },
     );
 
 export const projectController = makeProjectController();

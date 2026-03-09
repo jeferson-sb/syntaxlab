@@ -1,10 +1,20 @@
 import { Repository } from "@/shared/domain/Repository";
+import type {
+  UpsertResult,
+  BatchUpsertInput,
+} from "@/shared/domain/UpsertResult";
 
-export type BlockRepository = Repository<Block>;
+export type BlockUpsertInput = BatchUpsertInput<
+  Omit<Block, "id"> & { boardId?: string; props: Record<string, unknown> }
+>;
+
+export type BlockRepository = Repository<Block> & {
+  batchUpsert(entities: BlockUpsertInput[]): Promise<UpsertResult[]>;
+};
 
 export type Block = {
   id: string;
-  type: "code" | "note" | "bookmark" | "image";
+  type: "code" | "note" | "bookmark" | "image" | "sticky";
   x: number;
   y: number;
 };
@@ -97,5 +107,31 @@ export const createImageBlock = ({
     href: props.href,
     width: props.width,
     height: props.height,
+  },
+});
+
+export type StickyBlock = Block & {
+  props: {
+    title?: string;
+    content?: string;
+    color?: string;
+  };
+};
+
+export const createStickyBlock = ({
+  id,
+  type,
+  x,
+  y,
+  props,
+}: StickyBlock): StickyBlock => ({
+  id,
+  type,
+  x,
+  y,
+  props: {
+    title: props.title,
+    content: props.content,
+    color: props.color,
   },
 });

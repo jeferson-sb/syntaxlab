@@ -3,6 +3,7 @@ import { makeMongoBlockRepository } from "@/modules/block/infra/database/mongoBl
 import { makeCreateBlock } from "@/modules/block/application/createBlock";
 import { makeGetBlocks } from "@/modules/block/application/getBlocks";
 import { makeDeleteBlock } from "@/modules/block/application/deleteBlock";
+import { makeBatchUpsertBlocks } from "@/modules/block/application/batchUpsertBlocks";
 import type { BlockRepository } from "@/modules/block/domain/Block";
 
 type BlockContainerDependencies = {
@@ -21,4 +22,5 @@ export const registerBlockContainer = (
       createBlockUseCase: makeCreateBlock({ blockRepository }),
       getBlocksUseCase: makeGetBlocks({ blockRepository }),
       deleteBlockUseCase: makeDeleteBlock({ blockRepository }),
+      batchUpsertBlocksUseCase: makeBatchUpsertBlocks({ blockRepository }),
     }));

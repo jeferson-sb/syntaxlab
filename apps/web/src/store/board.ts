@@ -16,19 +16,21 @@ export const useBoardStore = defineStore(
         name: "My First Board",
         visibility: "private",
         projectId: "default-project",
+        updatedAt: new Date(),
       },
     ]);
     const currentBoardId = ref<string>("default");
     const isCreateDialogOpen = ref(false);
 
     const currentBoard = computed(() =>
-      boards.value.find((b) => b.id === currentBoardId.value)
+      boards.value.find((b) => b.id === currentBoardId.value),
     );
 
     const createBoard = (board: Board) => {
       const newBoard: BoardEntity = {
         ...board,
         id: `${slugify(board.name)}-${uniqueId().slice(0, 8)}`,
+        updatedAt: new Date(),
       };
       boards.value.push(newBoard);
       currentBoardId.value = newBoard.id;
@@ -48,7 +50,7 @@ export const useBoardStore = defineStore(
     const updateBoard = (id: string, updates: Partial<Board>) => {
       const board = boards.value.find((b) => b.id === id);
       if (board) {
-        Object.assign(board, updates);
+        Object.assign(board, updates, { updatedAt: new Date() });
       }
     };
 
@@ -80,5 +82,5 @@ export const useBoardStore = defineStore(
         storeName: "root",
       },
     },
-  }
+  },
 );

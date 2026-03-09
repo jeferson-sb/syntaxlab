@@ -1,9 +1,11 @@
 export type Block = {
   id: string;
+  _syncId?: string;
   type: "code" | "note" | "bookmark" | "image" | "sticky";
   boardId?: string;
   x: number;
   y: number;
+  updatedAt?: Date;
 };
 
 export type CodeBlock = Block & {
@@ -66,9 +68,11 @@ type MergedBlockProps = Partial<
 
 export type AnyBlock = {
   id: string;
+  _syncId?: string;
   type: keyof BlockPropsByType;
   boardId?: string;
   x: number;
   y: number;
   props: MergedBlockProps;
+  updatedAt?: Date;
 };

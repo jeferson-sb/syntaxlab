@@ -5,6 +5,7 @@ import { makeGetBoards } from "@/modules/board/application/getBoards";
 import { makeGetBoard } from "@/modules/board/application/getBoard";
 import { makeDeleteBoard } from "@/modules/board/application/deleteBoard";
 import { makeUpdateBoard } from "@/modules/board/application/updateBoard";
+import { makeBatchUpsertBoards } from "@/modules/board/application/batchUpsertBoards";
 import type { BoardRepository } from "@/modules/board/domain/Board";
 
 type BoardContainerDependencies = {
@@ -25,4 +26,5 @@ export const registerBoardContainer = (
       getBoardUseCase: makeGetBoard({ boardRepository }),
       deleteBoardUseCase: makeDeleteBoard({ boardRepository }),
       updateBoardUseCase: makeUpdateBoard({ boardRepository }),
+      batchUpsertBoardsUseCase: makeBatchUpsertBoards({ boardRepository }),
     }));
