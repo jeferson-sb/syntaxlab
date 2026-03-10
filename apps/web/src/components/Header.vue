@@ -59,7 +59,9 @@ const { pause, resume, isActive } = useIntervalFn(async () => {
     clientRef: proj.id,
     userId: proj.userId,
     name: proj.name,
-    updatedAt: proj.updatedAt.toISOString(),
+    updatedAt: proj.updatedAt instanceof Date
+      ? proj.updatedAt.toISOString()
+      : proj.updatedAt ?? new Date().toISOString(),
   }))
 
   const projectResult = await api.projects.batch.post(projectPayload).catch((err: unknown) => {
@@ -78,7 +80,9 @@ const { pause, resume, isActive } = useIntervalFn(async () => {
     name: board.name,
     visibility: board.visibility,
     projectId: board.projectId, // clientRef of the project
-    updatedAt: (board.updatedAt ?? new Date()).toISOString(),
+    updatedAt: board.updatedAt instanceof Date
+      ? board.updatedAt.toISOString()
+      : board.updatedAt ?? new Date().toISOString(),
   }))
 
   const boardResult = await api.boards.batch.post(boardPayload).catch((err: unknown) => {
@@ -107,7 +111,9 @@ const { pause, resume, isActive } = useIntervalFn(async () => {
       y: block.y,
       boardId: block.boardId, // clientRef of the board
       props: block.props ?? {},
-      updatedAt: (block.updatedAt ?? new Date()).toISOString(),
+      updatedAt: block.updatedAt instanceof Date
+        ? block.updatedAt.toISOString()
+        : block.updatedAt ?? new Date().toISOString(),
     }))
 
     const blockResult = await api.blocks.batch.post(blockPayload).catch((err: unknown) => {
