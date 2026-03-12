@@ -1,18 +1,20 @@
 <script lang="ts" setup>
-import type { ImageBlock } from '@/types/block';
-
-const props = defineProps<{ block: ImageBlock }>()
+defineProps<{
+  title?: string
+  src?: string
+  width?: number
+  height?: number
+}>()
 </script>
 
 <template>
   <div class="image-card">
     <div class="image-card__metadata">
       <span>
-        {{ block.props.title || 'Image' }}
+        {{ title || 'Image' }}
       </span>
     </div>
-    <img :src="block.props.href" :alt="block.props.title" loading="lazy" :width="block.props.width"
-      :height="block.props.height">
+    <img :src="src" :alt="title" loading="lazy" :width="width" :height="height">
   </div>
 </template>
 

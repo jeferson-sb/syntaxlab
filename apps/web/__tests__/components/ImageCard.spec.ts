@@ -2,27 +2,13 @@ import { mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 
 import ImageCard from "../../src/components/blocks/ImageCard.vue";
-import type { ImageBlock } from "../../src/types/block";
-
-const createImageBlock = (
-  overrides?: Partial<ImageBlock["props"]>,
-): ImageBlock => ({
-  id: "image-1",
-  type: "image",
-  x: 0,
-  y: 0,
-  props: {
-    title: "Landscape",
-    href: "https://images.example.com/landscape.jpg",
-    ...overrides,
-  },
-});
 
 describe("<ImageCard />", () => {
   it("renders image metadata title", () => {
     const wrapper = mount(ImageCard, {
       props: {
-        block: createImageBlock({ title: "Mountains" }),
+        title: "Mountains",
+        src: "https://images.example.com/landscape.jpg",
       },
     });
 
@@ -32,7 +18,8 @@ describe("<ImageCard />", () => {
   it("falls back metadata title to Image when missing", () => {
     const wrapper = mount(ImageCard, {
       props: {
-        block: createImageBlock({ title: undefined }),
+        title: undefined,
+        src: "https://images.example.com/landscape.jpg",
       },
     });
 
@@ -42,10 +29,8 @@ describe("<ImageCard />", () => {
   it("renders image attributes from props", () => {
     const wrapper = mount(ImageCard, {
       props: {
-        block: createImageBlock({
-          title: "Cover",
-          href: "https://cdn.example.com/cover.png",
-        }),
+        title: "Cover",
+        src: "https://cdn.example.com/cover.png",
       },
     });
 

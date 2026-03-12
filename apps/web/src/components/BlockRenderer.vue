@@ -3,10 +3,10 @@ import { ref, useTemplateRef, watch } from 'vue';
 import { useDraggable } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { useCanvasStore } from '@/store/canvas'
-import type { Block } from '@/types/block';
+import type { AnyBlock } from '@/types/block';
 
 const { block, selected, isLinkSource } = defineProps<{
-  block: Block;
+  block: AnyBlock;
   selected: boolean;
   isLinkSource?: boolean;
 }>()
@@ -14,7 +14,7 @@ const emit = defineEmits<{
   (e: 'selectBlock'): void
   (e: 'previewPosition', payload: { id: string; x: number; y: number }): void
   (e: 'previewEnd', blockId: string): void
-  (e: 'changePosition', update: Partial<Block>): void
+  (e: 'changePosition', update: Partial<AnyBlock>): void
 }>()
 
 const canvasStore = useCanvasStore()
@@ -66,14 +66,18 @@ watch(
 <template>
   <div ref="block" @click="$emit('selectBlock')" @dblclick="isEditing = true"
     :class="{ 'is-link-source': isLinkSource, block: true }" :style="style">
-    <StickyNote v-if="block.type === 'sticky'" :block="block" :isEditing="isEditing && selected"
+    <StickyNote v-if="block.type === 'sticky'" v-model:title="block.props.title" v-model:content="block.props.content"
+      v-model:aiPreview="block.props.aiPreview" :color="block.props.color" :isEditing="isEditing && selected"
       :class="{ selected: selected }" />
-    <CodeSnippet v-else-if="block.type === 'code'" :block="block" :isEditing="isEditing && selected"
+    <CodeSnippet v-else-if="block.type === 'code'" v-model:title="block.props.title"
+      v-model:inlineCode="block.props.inlineCode" :isEditing="isEditing && selected" :class="{ selected: selected }" />
+    <LinkCard v-else-if="block.type === 'bookmark'" v-model:title="block.props.title" v-model:href="block.props.href"
       :class="{ selected: selected }" />
-    <LinkCard v-else-if="block.type === 'bookmark'" :block="block" :class="{ selected: selected }" />
-    <TextCard v-else-if="block.type === 'note'" :block="block" :isEditing="isEditing && selected"
-      :class="{ selected: selected }" />
-    <ImageCard v-else-if="block.type === 'image'" :block="block" :class="{ selected: selected }" />
+    <TextCard v-else-if="block.type === 'note'" v-model:content="block.props.content"
+      v-model:aiPreview="block.props.aiPreview" :color="block.props.color" :textSize="block.props.textSize"
+      :isEditing="isEditing && selected" :class="{ selected: selected }" />
+    <ImageCard v-else-if="block.type === 'image'" :title="block.props.title" :src="block.props.href"
+      :width="block.props.width" :height="block.props.height" :class="{ selected: selected }" />
   </div>
 </template>
 

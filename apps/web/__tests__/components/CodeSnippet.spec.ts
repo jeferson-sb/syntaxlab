@@ -2,7 +2,6 @@ import { mount } from "@vue/test-utils";
 import { describe, expect, it, vi } from "vitest";
 
 import CodeSnippet from "../../src/components/blocks/CodeSnippet.vue";
-import type { CodeBlock } from "../../src/types/block";
 
 const { sanitizeMock, codeToHtmlMock } = vi.hoisted(() => ({
   sanitizeMock: vi.fn((value: string) => value),
@@ -21,26 +20,12 @@ vi.mock("shiki/bundle/web", () => ({
   codeToHtml: codeToHtmlMock,
 }));
 
-const createCodeBlock = (
-  overrides?: Partial<CodeBlock["props"]>,
-): CodeBlock => ({
-  id: "code-1",
-  type: "code",
-  x: 0,
-  y: 0,
-  props: {
-    title: "Snippet",
-    inlineCode: "const a = 1;",
-    lang: "ts",
-    ...overrides,
-  },
-});
-
 describe("<CodeSnippet />", () => {
   it("renders highlighted code when not editing", async () => {
     const wrapper = mount(CodeSnippet, {
       props: {
-        block: createCodeBlock(),
+        title: "Snippet",
+        inlineCode: "const a = 1;",
         isEditing: false,
       },
     });
@@ -53,13 +38,15 @@ describe("<CodeSnippet />", () => {
     });
   });
 
-  it("renders editing textarea and commits value on blur", async () => {
-    const block = createCodeBlock({ inlineCode: "const oldValue = 1;" });
+  it("renders editing textarea and emits update:inlineCode on blur", async () => {
+    const onUpdateInlineCode = vi.fn();
 
     const wrapper = mount(CodeSnippet, {
       props: {
-        block,
+        title: "Snippet",
+        inlineCode: "const oldValue = 1;",
         isEditing: true,
+        "onUpdate:inlineCode": onUpdateInlineCode,
       },
     });
 
@@ -68,13 +55,6 @@ describe("<CodeSnippet />", () => {
     await textarea.setValue("const nextValue = 2;");
     await textarea.trigger("blur");
 
-    expect(block.props.inlineCode).toBe("const nextValue = 2;");
-
-    await wrapper.setProps({ isEditing: false });
-    await vi.waitFor(() => {
-      expect(wrapper.get(".code-snippet__body > div").html()).toContain(
-        "<pre><code>const nextValue = 2;</code></pre>",
-      );
-    });
+    expect(onUpdateInlineCode).toHaveBeenCalledWith("const nextValue = 2;");
   });
 });

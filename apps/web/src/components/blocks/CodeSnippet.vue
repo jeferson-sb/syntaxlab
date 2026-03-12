@@ -4,9 +4,11 @@ import { useClipboard } from '@vueuse/core'
 import { Copy, Check } from 'lucide-vue-next'
 import { codeToHtml } from 'shiki/bundle/web'
 
-import type { CodeBlock } from '@/types/block';
+const props = defineProps<{ isEditing: boolean }>()
 
-const props = defineProps<{ block: CodeBlock, isEditing: boolean }>()
+const title = defineModel<string>('title')
+const inlineCode = defineModel<string>('inlineCode')
+
 const code = ref('')
 const draftCode = ref('')
 const { copy, copied } = useClipboard({ source: draftCode })
@@ -18,9 +20,9 @@ const getFileExt = (fileNameLike: string) => {
 }
 
 const highlightCode = async () => {
-  const raw = props.block.props.inlineCode ?? ''
+  const raw = inlineCode.value ?? ''
   const highlighted = await codeToHtml(raw, {
-    lang: getFileExt(props.block.props.title ?? '') || 'plaintext',
+    lang: getFileExt(title.value ?? '') || 'plaintext',
     theme: 'tokyo-night',
     cssVariablePrefix: 'code'
   })
@@ -28,19 +30,19 @@ const highlightCode = async () => {
 }
 
 const onBlur = async () => {
-  props.block.props.inlineCode = draftCode.value
+  inlineCode.value = draftCode.value
   await highlightCode()
 }
 
 const onFocus = (event: FocusEvent) => (event.target as HTMLTextAreaElement)?.select()
 
 onMounted(async () => {
-  draftCode.value = props.block.props.inlineCode ?? ''
+  draftCode.value = inlineCode.value ?? ''
   await highlightCode()
 })
 
 watch(
-  () => props.block.props.inlineCode,
+  () => inlineCode.value,
   (next) => {
     if (!props.isEditing) {
       draftCode.value = next ?? ''
@@ -58,9 +60,9 @@ watch(
           <div :style="{ '--menu-actions-bg': '#ffbd2e' }"></div>
           <div :style="{ '--menu-actions-bg': '#27c93f' }"></div>
         </div>
-        <input type="text" v-if="isEditing" autofocus v-model="block.props.title" />
+        <input type="text" v-if="isEditing" autofocus v-model="title" />
         <span v-else class="title">
-          {{ block.props.title }}
+          {{ title }}
         </span>
       </div>
       <button type="button" aria-label="copy" class="copy" @click="copy(draftCode)">

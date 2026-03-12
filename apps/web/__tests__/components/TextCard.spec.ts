@@ -1,28 +1,13 @@
 import { mount } from "@vue/test-utils";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import TextCard from "../../src/components/blocks/TextCard.vue";
-import type { NoteBlock } from "../../src/types/block";
-
-const createNoteBlock = (content = "Initial content"): NoteBlock => ({
-  id: "note-1",
-  type: "note",
-  x: 24,
-  y: 48,
-  props: {
-    content,
-    color: "#fff7cc",
-    textSize: "16px",
-  },
-});
 
 describe("<TextCard />", () => {
   it("renders paragraph content when not editing", () => {
-    const block = createNoteBlock("Hello world");
-
     const wrapper = mount(TextCard, {
       props: {
-        block,
+        content: "Hello world",
         isEditing: false,
       },
     });
@@ -31,10 +16,12 @@ describe("<TextCard />", () => {
     expect(wrapper.get("p").text()).toBe("Hello world");
   });
 
-  it("applies style variables from block props", () => {
+  it("applies style variables from props", () => {
     const wrapper = mount(TextCard, {
       props: {
-        block: createNoteBlock(),
+        content: "Initial content",
+        color: "#fff7cc",
+        textSize: "16px",
         isEditing: false,
       },
     });
@@ -45,13 +32,14 @@ describe("<TextCard />", () => {
     expect(style).toContain("--font-size: 16px");
   });
 
-  it("renders textarea and updates note content with v-model while editing", async () => {
-    const block = createNoteBlock("Draft note");
+  it("renders textarea and emits update:content while editing", async () => {
+    const onUpdateContent = vi.fn();
 
     const wrapper = mount(TextCard, {
       props: {
-        block,
+        content: "Draft note",
         isEditing: true,
+        "onUpdate:content": onUpdateContent,
       },
     });
 
@@ -61,6 +49,6 @@ describe("<TextCard />", () => {
 
     await textarea.setValue("Updated draft note");
 
-    expect(block.props.content).toBe("Updated draft note");
+    expect(onUpdateContent).toHaveBeenCalledWith("Updated draft note");
   });
 });

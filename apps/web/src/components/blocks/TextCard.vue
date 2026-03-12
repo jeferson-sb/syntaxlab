@@ -1,10 +1,13 @@
 <script lang="ts" setup>
-import type { NoteBlock } from '@/types/block';
 import { expandIdea } from '@/services/geminiService'
 import { watchDebounced } from '@vueuse/core';
 import { useSettingsStore } from '@/store/settings';
 
-const props = defineProps<{ block: NoteBlock; isEditing: boolean }>()
+const props = defineProps<{ color?: string; textSize?: string; isEditing: boolean }>()
+
+const content = defineModel<string>('content')
+const aiPreview = defineModel<string>('aiPreview')
+
 const onFocus = (event: FocusEvent) => {
   const target = event.target as HTMLTextAreaElement;
   target?.select()
@@ -15,52 +18,51 @@ const settingsState = useSettingsStore()
 let controller: AbortController | null = null;
 
 const onKeyTab = (event: KeyboardEvent) => {
-  if (props.block.props.aiPreview) {
+  if (aiPreview.value) {
     event.preventDefault();
-    props.block.props.content += props.block.props.aiPreview;
-    props.block.props.aiPreview = '';
+    content.value = (content.value ?? '') + aiPreview.value;
+    aiPreview.value = '';
   }
 }
 
 watchDebounced(
-  () => props.block.props.content,
+  () => content.value,
   async (text) => {
     if (!text) return
     if (!settingsState.preferAiFeatures) return
     if (controller) controller.abort();
     controller = new AbortController();
 
-    props.block.props.aiPreview = "";
+    aiPreview.value = '';
 
     const stream = expandIdea(text);
 
     for await (const chunk of stream) {
       if (controller.signal.aborted) break;
-      props.block.props.aiPreview += chunk;
+      aiPreview.value = (aiPreview.value ?? '') + chunk;
     }
   },
   { debounce: 1000 },
 )
-
 </script>
 
 <template>
   <div class="text-card">
     <div class="editor" v-if="isEditing">
       <div class="editor-backdrop" aria-hidden="true">
-        <span class="editor-content">{{ block.props.content }}</span>
-        <span class="editor-ai-text">{{ block.props.aiPreview }}</span>
+        <span class="editor-content">{{ content }}</span>
+        <span class="editor-ai-text">{{ aiPreview }}</span>
       </div>
-      <textarea autofocus v-model="block.props.content" @focus="onFocus" @keydown.tab="onKeyTab" />
+      <textarea autofocus v-model="content" @focus="onFocus" @keydown.tab="onKeyTab" />
     </div>
-    <p v-else>{{ block.props.content }}</p>
+    <p v-else>{{ content }}</p>
   </div>
 </template>
 
 <style lang="css" scoped>
 .text-card {
-  --color: v-bind(block.props.color);
-  --font-size: v-bind(block.props.textSize);
+  --color: v-bind(color);
+  --font-size: v-bind(textSize);
 
   padding: var(--size-7);
   box-shadow: var(--block-shadow);

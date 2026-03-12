@@ -1,23 +1,16 @@
 <script lang="ts" setup>
 import { ref, useId } from 'vue';
 import { Link2 } from 'lucide-vue-next'
-import { useBlockStore } from '@/store/block'
-import type { BookmarkBlock } from '@/types/block';
 
-const props = defineProps<{ block: BookmarkBlock }>()
+const title = defineModel<string>('title')
+const href = defineModel<string>('href')
+
 const id = useId()
-
-const blockStore = useBlockStore()
 const isEditing = ref(false)
 
 const save = (payload: { title: string; url: string }) => {
-  blockStore.updateBlock({
-    id: props.block.id,
-    props: {
-      title: payload.title,
-      href: payload.url,
-    },
-  })
+  title.value = payload.title
+  href.value = payload.url
 }
 </script>
 
@@ -31,17 +24,16 @@ const save = (payload: { title: string; url: string }) => {
           link preview
         </div>
         <h3 :id="id" class="bookmark-body__title">
-          {{ block.props.title }}
+          {{ title }}
         </h3>
       </div>
 
-      <a :href="block.props.href" :aria-describedby="id" target="_blank" rel="noopener noreferrer">
+      <a :href="href" :aria-describedby="id" target="_blank" rel="noopener noreferrer">
         Open
       </a>
     </div>
 
-    <BookmarkDialog v-model:open="isEditing" mode="edit" :initial-title="block.props.title"
-      :initial-url="block.props.href" @save="save" />
+    <BookmarkDialog v-model:open="isEditing" mode="edit" :initial-title="title" :initial-url="href" @save="save" />
   </div>
 </template>
 
