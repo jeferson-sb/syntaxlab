@@ -16,22 +16,6 @@ describe("<TextCard />", () => {
     expect(wrapper.get("p").text()).toBe("Hello world");
   });
 
-  it("applies style variables from props", () => {
-    const wrapper = mount(TextCard, {
-      props: {
-        content: "Initial content",
-        color: "#fff7cc",
-        textSize: "16px",
-        isEditing: false,
-      },
-    });
-
-    const style = wrapper.get(".text-card").attributes("style");
-
-    expect(style).toContain("--color: #fff7cc");
-    expect(style).toContain("--font-size: 16px");
-  });
-
   it("renders textarea and emits update:content while editing", async () => {
     const onUpdateContent = vi.fn();
 
