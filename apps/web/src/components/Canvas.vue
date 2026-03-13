@@ -129,7 +129,8 @@ onKeyStroke(e => e.code === 'Space', onSpaceBarPress, { target: canvas.value?.fi
 
       <svg class="canvas-vector-layer">
         <ArrowConnection v-for="conn in connectionState.currentBoardConnections" :key="conn.id" :conn="conn"
-          :blocks="blocksWithDragPreview" />
+          :blocks="blocksWithDragPreview"
+          @update-curve-offset="connectionState.updateConnectionCurveOffset($event.id, $event.offset)" />
       </svg>
 
       <div class="canvas-interaction-layer">
@@ -192,6 +193,6 @@ onKeyStroke(e => e.code === 'Space', onSpaceBarPress, { target: canvas.value?.fi
 .canvas-interaction-layer {
   position: absolute;
   inset: 0;
-  pointer-events: auto;
+  pointer-events: none;
 }
 </style>

@@ -4,4 +4,5 @@ export type Connection = {
   toBlockId: string;
   fromAnchorId?: string;
   toAnchorId?: string;
+  curveOffset?: number;
 };

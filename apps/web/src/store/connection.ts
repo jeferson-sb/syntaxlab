@@ -30,11 +30,12 @@ export const useConnectionStore = defineStore(
 
     const currentBoardConnections = computed(() => {
       const visibleBlockIds = new Set(
-        useBlockStore().currentBoardBlocks.map((b) => b.id)
+        useBlockStore().currentBoardBlocks.map((b) => b.id),
       );
       return connections.value.filter(
         (c) =>
-          visibleBlockIds.has(c.fromBlockId) && visibleBlockIds.has(c.toBlockId)
+          visibleBlockIds.has(c.fromBlockId) &&
+          visibleBlockIds.has(c.toBlockId),
       );
     });
 
@@ -50,7 +51,7 @@ export const useConnectionStore = defineStore(
       return connections.value.some(
         (connection) =>
           connection.fromBlockId === fromBlockId &&
-          connection.toBlockId === toBlockId
+          connection.toBlockId === toBlockId,
       );
     };
 
@@ -142,7 +143,7 @@ export const useConnectionStore = defineStore(
 
     const removeConnectionBetweenBlocks = (
       fromBlockId: string,
-      toBlockId: string
+      toBlockId: string,
     ) => {
       if (fromBlockId === toBlockId) {
         setStatus("Select two different blocks to remove a connection.");
@@ -174,7 +175,7 @@ export const useConnectionStore = defineStore(
         setStatus(
           isUnlinkModeActive
             ? "Source selected. Select target block to remove connection."
-            : "Source selected. Select a target block."
+            : "Source selected. Select a target block.",
         );
         return { selectedBlockId: blockId, connectionCreated: false };
       }
@@ -198,8 +199,16 @@ export const useConnectionStore = defineStore(
     const removeConnectionsForBlock = (blockId: string) => {
       connections.value = connections.value.filter(
         (connection) =>
-          connection.fromBlockId !== blockId && connection.toBlockId !== blockId
+          connection.fromBlockId !== blockId &&
+          connection.toBlockId !== blockId,
       );
+    };
+
+    const updateConnectionCurveOffset = (id: string, curveOffset: number) => {
+      const connection = connections.value.find((c) => c.id === id);
+      if (connection) {
+        connection.curveOffset = curveOffset;
+      }
     };
 
     return {
@@ -220,6 +229,7 @@ export const useConnectionStore = defineStore(
       removeConnectionBetweenBlocks,
       toggleBlockLink,
       removeConnectionsForBlock,
+      updateConnectionCurveOffset,
     };
   },
   {
@@ -230,5 +240,5 @@ export const useConnectionStore = defineStore(
         storeName: "root",
       },
     },
-  }
+  },
 );
