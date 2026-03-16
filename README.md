@@ -2,6 +2,10 @@
 
 A visual canvas workspace for developers and product engineers to plan features, organize ideas, and document code. Think of it as a developer's notebook that acts like a powerful visual architect.
 
+<img width="2498" height="1362" alt="syntaxlab" src="https://github.com/user-attachments/assets/8c4d3a9a-6a1f-4638-9815-6dadf30668af" />
+
+<img width="2498" height="1362" alt="syntaxlab_dark" src="https://github.com/user-attachments/assets/49c8de04-63c8-45ac-95ba-83b7781df3a6" />
+
 ## Features
 
 - **Code snippets** — Save and organize code blocks with syntax highlighting
