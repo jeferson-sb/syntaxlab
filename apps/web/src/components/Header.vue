@@ -187,6 +187,8 @@ watch(() => settingsState.preferRemoteSync, (enabled) => {
       </button>
 
       <ThemeSwitch />
+
+      <AuthButton />
     </div>
   </header>
 </template>

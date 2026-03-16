@@ -12,6 +12,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     ArrowConnection: typeof import('./src/components/ArrowConnection.vue')['default']
+    AuthButton: typeof import('./src/components/AuthButton.vue')['default']
     BlockRenderer: typeof import('./src/components/BlockRenderer.vue')['default']
     BookmarkDialog: typeof import('./src/components/BookmarkDialog.vue')['default']
     BookmarkTool: typeof import('./src/components/BookmarkTool.vue')['default']
