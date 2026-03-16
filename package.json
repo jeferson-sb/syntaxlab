@@ -14,8 +14,10 @@
   "author": "Jeferson Brito",
   "license": "MIT",
   "devDependencies": {
+    "@pinia/testing": "^1.0.3",
     "turbo": "^2.8.1",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "web": "^0.0.2"
   },
   "packageManager": "bun@1.3.5"
 }
