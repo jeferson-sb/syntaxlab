@@ -13,7 +13,7 @@ export const useBoardStore = defineStore(
     const boards = ref<BoardEntity[]>([
       {
         id: "default",
-        name: "My First Board",
+        name: "My Auth Flow",
         visibility: "private",
         projectId: "default-project",
         updatedAt: new Date(),

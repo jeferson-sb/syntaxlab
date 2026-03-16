@@ -7,68 +7,73 @@ import { useBoardStore } from "@/store/board";
 const initialState: AnyBlock[] = [
   {
     id: "1",
-    type: "note",
+    type: "sticky",
     boardId: "default",
-    x: 100,
-    y: 150,
+    x: 131.35,
+    y: 33.62,
     props: {
-      content:
-        "A workspace that feels like a developer’s notebook, but acts like a powerful visual architect. Speed over formality.",
+      title: "🎯 Sprint Goal",
+      content: "Build user authentication with JWT tokens and refresh flow",
+      color: "#fef9c3",
     },
   },
   {
     id: "2",
-    type: "code",
+    type: "note",
     boardId: "default",
-    x: 900,
-    y: 120,
+    x: 93.246,
+    y: 410.52,
     props: {
-      title: "auth-provider.js",
-      lang: "javascript",
-      inlineCode: `export const useAuth = () => {
-  const [user, setUser] = useState(null)
-  const login = (credentials) => {
-    return api.post('/auth/login', credentials)
-  }
-}
-      `,
+      content:
+        "## Auth Flow\n1. User submits credentials\n2. Server validates & returns JWT + refresh token\n3. Store tokens in httpOnly cookies\n4. Auto-refresh before expiry",
+      textSize: "md",
     },
   },
   {
     id: "3",
-    type: "image",
+    type: "code",
     boardId: "default",
-    x: 400,
-    y: 150,
+    x: 867.21,
+    y: 0.292,
     props: {
-      title: "mount-fuji.jpeg",
-      href: "https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      title: "auth.ts",
+      lang: "typescript",
+      inlineCode: `export async function login(email: string, password: string) {
+  const res = await fetch('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password }),
+    credentials: 'include',
+  })
+  return res.json()
+}`,
     },
   },
   {
     id: "4",
     type: "bookmark",
     boardId: "default",
-    x: 120,
-    y: 400,
+    x: 1247.17,
+    y: 469.56,
     props: {
-      title: "facebook/react",
+      title: "JWT Best Practices - Auth0",
       content:
-        "A declarative, efficient, and flexible JavaScript library for building user interfaces",
-      href: "https://github.com/facebook/react",
+        "Learn about token storage, rotation, and security considerations",
+      href: "https://auth0.com/docs/secure/tokens/json-web-tokens",
       imageUrl:
-        "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=400&auto=format&fit=crop",
+        "https://cdn.auth0.com/website/assets/pages/homepage/img/hero/developers-e3a7b6aba0.png",
     },
   },
   {
     id: "5",
     type: "sticky",
     boardId: "default",
-    x: 700,
-    y: 400,
+    x: 735.35,
+    y: 436.05,
     props: {
-      title: "User-centric",
-      content: "Focus on user experience and fast feedback",
+      title: "⚠️ Security Notes",
+      content:
+        "Never store JWT in localStorage. Use httpOnly cookies + CSRF protection.",
+      color: "#f3e8ff",
     },
   },
 ];
