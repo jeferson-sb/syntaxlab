@@ -19,7 +19,7 @@ export const makeServer = () => {
         origin: TRUSTED_ORIGINS,
         credentials: true,
         allowedHeaders: ["Content-Type", "Authorization"],
-      }),
+      })
     )
     .use(logger())
     .use(betterAuthPlugin)

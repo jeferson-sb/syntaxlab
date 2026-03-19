@@ -3,7 +3,7 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import mongoose from "mongoose";
 
 export const auth = betterAuth({
-  database: mongodbAdapter(mongoose.connection.getClient().db()),
+  database: mongodbAdapter(mongoose.connection.db!),
   trustedOrigins: [process.env.FRONTEND_URL || "http://localhost:5173"],
   socialProviders: {
     github: {
