@@ -2,15 +2,27 @@ import { makeMongoDBConnection } from "@/bootstrap/db";
 import { config } from "@/shared/infra/config";
 import { makeServer } from "./app";
 
-makeMongoDBConnection();
-
-export const server = makeServer();
 export type { App } from "./app";
 
-server.listen(config.serverPort);
+const bootstrap = async () => {
+  try {
+    await makeMongoDBConnection();
+
+    const server = makeServer();
+    server.listen(config.serverPort);
+
+    console.log(
+      `🦊 Elysia is running at ${server.server?.hostname}:${server.server?.port}`,
+    );
+
+    return server;
+  } catch (error) {
+    console.error("Failed to bootstrap application:", error);
+    process.exit(1);
+  }
+};
+
+// Start the application
+bootstrap();
 
 // TODO: Handle graceful shutdown of system and dependencies
-
-console.log(
-  `🦊 Elysia is running at ${server.server?.hostname}:${server.server?.port}`
-);

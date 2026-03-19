@@ -163,6 +163,7 @@ const isOpen = ref(false)
   display: flex;
   flex-direction: column;
   padding: var(--size-2) var(--size-3);
+  background: var(--surface-2);
 }
 
 .user-name {

@@ -7,7 +7,7 @@ import { projectController } from "@/modules/project/presentation/http/projectCo
 import { boardController } from "@/modules/board/presentation/http/boardController";
 import { blockController } from "@/modules/block/presentation/http/blockController";
 import { aiController } from "@/modules/ai/presentation/http/aiController";
-import { betterAuthPlugin } from "@/modules/auth/presentation/authPlugin";
+import { createBetterAuthPlugin } from "@/modules/auth/presentation/authPlugin";
 
 const TRUSTED_ORIGINS = [process.env.FRONTEND_URL || "http://localhost:5173"];
 
@@ -22,7 +22,7 @@ export const makeServer = () => {
       })
     )
     .use(logger())
-    .use(betterAuthPlugin)
+    .use(createBetterAuthPlugin())
     .use(projectController)
     .use(boardController)
     .use(blockController)
