@@ -26,6 +26,7 @@ defineProps<{
   box-shadow: var(--block-shadow);
   overflow: hidden;
   border-radius: var(--radius-3);
+  width: calc(v-bind(width) * 1px);
   max-width: var(--image-max-size);
 
   & .image-card__metadata {

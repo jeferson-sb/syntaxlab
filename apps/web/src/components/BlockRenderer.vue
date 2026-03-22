@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, useTemplateRef, watch } from 'vue';
-import { useDraggable } from '@vueuse/core'
+import { useDraggable, useKeyModifier } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { useCanvasStore } from '@/store/canvas'
 import type { AnyBlock } from '@/types/block';
@@ -21,30 +21,66 @@ const canvasStore = useCanvasStore()
 const { zoom } = storeToRefs(canvasStore)
 
 const isEditing = ref(false)
+const isResizing = ref(false)
 const dragStartMouse = ref({ x: 0, y: 0 })
+const resizeStartSize = ref({ width: 0, height: 0 })
+const resizePreview = ref<{ width: number; height: number } | null>(null)
+const shiftHeld = useKeyModifier('Shift')
 const blockRef = useTemplateRef('block')
+
+const MIN_IMAGE_SIZE = 80
 
 const { style, position } = useDraggable(blockRef, {
   initialValue: { x: block.x, y: block.y },
   stopPropagation: true,
   onStart(_pos, event) {
     dragStartMouse.value = { x: event.clientX, y: event.clientY }
+
+    if (event.shiftKey && block.type === 'image') {
+      isResizing.value = true
+      resizeStartSize.value = {
+        width: blockRef.value?.offsetWidth ?? block.props.width ?? 300,
+        height: blockRef.value?.offsetHeight ?? block.props.height ?? 200,
+      }
+    }
   },
   onMove(_pos, event) {
-    // Calculate delta in screen space and convert to world space
     const deltaX = (event.clientX - dragStartMouse.value.x) / zoom.value
     const deltaY = (event.clientY - dragStartMouse.value.y) / zoom.value
+
+    if (isResizing.value) {
+      resizePreview.value = {
+        width: Math.max(MIN_IMAGE_SIZE, resizeStartSize.value.width + deltaX),
+        height: Math.max(MIN_IMAGE_SIZE, resizeStartSize.value.height + deltaY),
+      }
+      // Keep the block in place during resize
+      position.value = { x: block.x, y: block.y }
+      return
+    }
 
     const x = block.x + deltaX
     const y = block.y + deltaY
 
-    // Update useDraggable's internal position for correct styling
     position.value = { x, y }
     emit('previewPosition', { id: block.id, x, y })
   },
   onEnd(_pos, event) {
     const deltaX = (event.clientX - dragStartMouse.value.x) / zoom.value
     const deltaY = (event.clientY - dragStartMouse.value.y) / zoom.value
+
+    if (isResizing.value) {
+      emit('changePosition', {
+        id: block.id,
+        props: {
+          ...block.props,
+          width: Math.max(MIN_IMAGE_SIZE, resizeStartSize.value.width + deltaX),
+          height: Math.max(MIN_IMAGE_SIZE, resizeStartSize.value.height + deltaY),
+        },
+      })
+      isResizing.value = false
+      resizePreview.value = null
+      return
+    }
 
     const x = block.x + deltaX
     const y = block.y + deltaY
@@ -65,7 +101,8 @@ watch(
 
 <template>
   <div ref="block" @click="$emit('selectBlock')" @dblclick="isEditing = true"
-    :class="{ 'is-link-source': isLinkSource, block: true }" :style="style">
+    :class="{ 'is-link-source': isLinkSource, block: true, 'is-resizing': isResizing, 'is-resize-ready': shiftHeld && block.type === 'image' }"
+    :style="style">
     <StickyNote v-if="block.type === 'sticky'" v-model:title="block.props.title" v-model:content="block.props.content"
       v-model:aiPreview="block.props.aiPreview" :color="block.props.color" :isEditing="isEditing && selected"
       :class="{ selected: selected }" />
@@ -77,7 +114,8 @@ watch(
       v-model:aiPreview="block.props.aiPreview" :color="block.props.color" :textSize="block.props.textSize"
       :isEditing="isEditing && selected" :class="{ selected: selected }" />
     <ImageCard v-else-if="block.type === 'image'" :title="block.props.title" :src="block.props.href"
-      :width="block.props.width" :height="block.props.height" :class="{ selected: selected }" />
+      :width="resizePreview?.width ?? block.props.width" :height="resizePreview?.height ?? block.props.height"
+      :class="{ selected: selected }" />
   </div>
 </template>
 
@@ -102,6 +140,11 @@ watch(
   &.is-link-source>div {
     outline: 2px dashed var(--purple-4);
     outline-offset: 10px;
+  }
+
+  &.is-resize-ready,
+  &.is-resizing {
+    cursor: nwse-resize;
   }
 
   @starting-style {
