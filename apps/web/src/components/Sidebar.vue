@@ -65,7 +65,7 @@ const selectProject = (projectId: string) => {
             </button>
           </div>
           <div class="boards-list">
-            <button v-for="board in projectBoards" :key="board.id"
+            <button type="button" v-for="board in projectBoards" :key="board.id"
               :class="{ active: currentBoardId === board.id, 'board-item': true }" @click="selectBoard(board.id)">
               <LayoutGrid :size="14" />
               <span>{{ board.name }}</span>
@@ -214,7 +214,8 @@ const selectProject = (projectId: string) => {
   display: flex;
   align-items: center;
   gap: var(--size-2);
-  font-size: var(--font-size-1);
+  font-size: var(--font-size-fluid-0);
+  text-wrap: balance;
   line-height: var(--font-lineheight-1);
   color: var(--text-2);
   cursor: pointer;
@@ -225,6 +226,10 @@ const selectProject = (projectId: string) => {
   text-align: left;
   transition: color 150ms, background-color 150ms;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
+  & svg {
+    flex-shrink: 0;
+  }
 
   &:hover {
     color: var(--blue-4);
