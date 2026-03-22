@@ -1,7 +1,7 @@
-import { Elysia, t } from "elysia";
-import { registerBlockContainer } from "@/modules/block/container";
-import { AnyCreateBlockDTO } from "@/modules/block/application/createBlock";
-import type { BlockRepository } from "@/modules/block/domain/Block";
+import { Elysia, t } from "elysia"
+import { registerBlockContainer } from "@/modules/block/container"
+import { AnyCreateBlockDTO } from "@/modules/block/application/createBlock"
+import type { BlockRepository } from "@/modules/block/domain/Block"
 
 export const makeBlockController = (blockRepository?: BlockRepository) =>
   new Elysia({ prefix: "/blocks" })
@@ -27,8 +27,8 @@ export const makeBlockController = (blockRepository?: BlockRepository) =>
     .post(
       "/batch",
       async ({ body, status, batchUpsertBlocksUseCase }) => {
-        const results = await batchUpsertBlocksUseCase(body);
-        return status(200, { results });
+        const results = await batchUpsertBlocksUseCase(body)
+        return status(200, { results })
       },
       {
         body: t.Array(
@@ -53,11 +53,11 @@ export const makeBlockController = (blockRepository?: BlockRepository) =>
     .get("/", ({ getBlocksUseCase }) => getBlocksUseCase())
     .delete("/:id", async ({ params, status, deleteBlockUseCase }) => {
       try {
-        await deleteBlockUseCase(params.id);
-        return status(204);
+        await deleteBlockUseCase(params.id)
+        return new Response(null, { status: 204 })
       } catch (error) {
-        if (error instanceof Error) return status(404, error.message);
+        if (error instanceof Error) return status(404, error.message)
       }
-    });
+    })
 
-export const blockController = makeBlockController();
+export const blockController = makeBlockController()

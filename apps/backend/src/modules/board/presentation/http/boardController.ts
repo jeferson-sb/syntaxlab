@@ -1,6 +1,6 @@
-import { Elysia, t } from "elysia";
-import { registerBoardContainer } from "@/modules/board/container";
-import type { BoardRepository } from "@/modules/board/domain/Board";
+import { Elysia, t } from "elysia"
+import { registerBoardContainer } from "@/modules/board/container"
+import type { BoardRepository } from "@/modules/board/domain/Board"
 
 export const makeBoardController = (boardRepository?: BoardRepository) =>
   new Elysia({ prefix: "/boards" })
@@ -15,8 +15,8 @@ export const makeBoardController = (boardRepository?: BoardRepository) =>
     .post(
       "/batch",
       async ({ body, status, batchUpsertBoardsUseCase }) => {
-        const results = await batchUpsertBoardsUseCase(body);
-        return status(200, { results });
+        const results = await batchUpsertBoardsUseCase(body)
+        return status(200, { results })
       },
       {
         body: t.Array(
@@ -34,10 +34,10 @@ export const makeBoardController = (boardRepository?: BoardRepository) =>
       "/:id",
       async ({ params, body, status, updateBoardUseCase }) => {
         try {
-          await updateBoardUseCase({ id: { value: params.id }, ...body });
-          return status(204);
+          await updateBoardUseCase({ id: { value: params.id }, ...body })
+          return new Response(null, { status: 204 })
         } catch (error) {
-          if (error instanceof Error) return status(404, error.message);
+          if (error instanceof Error) return status(404, error.message)
         }
       },
       {
@@ -53,18 +53,18 @@ export const makeBoardController = (boardRepository?: BoardRepository) =>
     .get("/", ({ getBoardsUseCase }) => getBoardsUseCase())
     .get("/:id", async ({ params, status, getBoardUseCase }) => {
       try {
-        return await getBoardUseCase({ value: params.id });
+        return await getBoardUseCase({ value: params.id })
       } catch (error) {
-        if (error instanceof Error) return status(404, error.message);
+        if (error instanceof Error) return status(404, error.message)
       }
     })
     .delete("/:id", async ({ params, status, deleteBoardUseCase }) => {
       try {
-        await deleteBoardUseCase({ value: params.id });
-        return status(204);
+        await deleteBoardUseCase({ value: params.id })
+        return new Response(null, { status: 204 })
       } catch (error) {
-        if (error instanceof Error) return status(404, error.message);
+        if (error instanceof Error) return status(404, error.message)
       }
-    });
+    })
 
-export const boardController = makeBoardController();
+export const boardController = makeBoardController()

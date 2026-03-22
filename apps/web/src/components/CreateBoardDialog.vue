@@ -53,7 +53,7 @@ watch(() => props.open, (isOpen) => {
   <DialogRoot :open="open" @update:open="emit('update:open', $event)">
     <DialogPortal>
       <DialogOverlay class="dialog-overlay" />
-      <DialogContent class="dialog-content">
+      <DialogContent class="dialog-content" :aria-describedby="undefined">
         <div class="top-image">
           <div class="wand" aria-hidden="true">
             <WandSparkles :size="36" />
