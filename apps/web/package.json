@@ -10,7 +10,8 @@
     "test": "vitest",
     "test:browser": "vitest --config vitest.browser.config.ts --run",
     "test:browser:watch": "vitest --config vitest.browser.config.ts",
-    "typecheck": "vue-tsc -p tsconfig.app.json --noEmit"
+    "typecheck": "vue-tsc -p tsconfig.app.json --noEmit",
+    "lint": "oxlint src"
   },
   "dependencies": {
     "@elysiajs/eden": "^1.4.6",

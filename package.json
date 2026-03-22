@@ -8,13 +8,29 @@
     "build": "turbo run build",
     "test": "turbo run test",
     "dev": "turbo run dev --parallel",
-    "lint": "turbo run lint"
+    "lint": "turbo run lint",
+    "format": "oxfmt .",
+    "prepare": "simple-git-hooks"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "bunx lint-staged",
+    "pre-push": "bun run test"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,vue,js,mjs}": [
+      "oxlint --fix",
+      "oxfmt --write"
+    ]
   },
   "keywords": [],
   "author": "Jeferson Brito",
   "license": "MIT",
   "devDependencies": {
     "@pinia/testing": "^1.0.3",
+    "lint-staged": "^15.5.2",
+    "oxfmt": "^0.0.2",
+    "oxlint": "^0.16.10",
+    "simple-git-hooks": "^2.13.0",
     "turbo": "^2.8.1",
     "vitest": "^4.0.18",
     "web": "^0.0.2"
