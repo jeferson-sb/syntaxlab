@@ -4,7 +4,9 @@ node_modules
 .gitignore
 *.md
 docs
-apps/web
+apps/web/src
+apps/web/public
+apps/web/node_modules
 .env
 .env.*
 docker-compose.yml
