@@ -24,7 +24,6 @@ declare module 'vue' {
     ImageCard: typeof import('./src/components/blocks/ImageCard.vue')['default']
     LinkCard: typeof import('./src/components/blocks/LinkCard.vue')['default']
     NavItem: typeof import('./src/components/NavItem.vue')['default']
-    NodeRenderer: typeof import('./src/components/NodeRenderer.vue')['default']
     ProjectDialog: typeof import('./src/components/ProjectDialog.vue')['default']
     Sidebar: typeof import('./src/components/Sidebar.vue')['default']
     StickyNote: typeof import('./src/components/blocks/StickyNote.vue')['default']
