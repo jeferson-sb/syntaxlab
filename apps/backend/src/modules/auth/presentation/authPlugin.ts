@@ -17,7 +17,7 @@ export const createBetterAuthPlugin = () => {
   const auth = createAuth()
 
   return new Elysia({ name: "module/auth/better-auth" })
-    .all("/auth/*", ({ request }) => auth.handler(request))
+    .mount(auth.handler)
     .macro({
       auth: {
         async resolve({ status, request: { headers } }) {

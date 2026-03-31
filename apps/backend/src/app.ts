@@ -10,8 +10,6 @@ import { aiController } from "@/modules/ai/presentation/http/aiController"
 import { createBetterAuthPlugin } from "@/modules/auth/presentation/authPlugin"
 
 const TRUSTED_ORIGINS = [process.env.FRONTEND_URL || "http://localhost:5173"]
-console.log("[CORS] FRONTEND_URL:", process.env.FRONTEND_URL)
-console.log("[CORS] TRUSTED_ORIGINS:", TRUSTED_ORIGINS)
 
 export const makeServer = () => {
   return new Elysia({ prefix: "/api" })
