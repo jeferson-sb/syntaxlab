@@ -1,5 +1,5 @@
-import { Elysia } from "elysia";
-import { createAuth, type Session } from "../infra/betterAuth";
+import { Elysia } from "elysia"
+import { createAuth, type Session } from "../infra/betterAuth"
 
 /**
  * Create Better Auth plugin for Elysia.
@@ -14,23 +14,23 @@ import { createAuth, type Session } from "../infra/betterAuth";
  * ```
  */
 export const createBetterAuthPlugin = () => {
-  const auth = createAuth();
+  const auth = createAuth()
 
   return new Elysia({ name: "module/auth/better-auth" })
-    .mount(auth.handler)
+    .all("/auth/*", ({ request }) => auth.handler(request))
     .macro({
       auth: {
         async resolve({ status, request: { headers } }) {
-          const session = await auth.api.getSession({ headers });
-          if (!session) return status(401);
+          const session = await auth.api.getSession({ headers })
+          if (!session) return status(401)
           return {
             user: session.user,
             session: session.session,
-          };
+          }
         },
       },
-    });
-};
+    })
+}
 
-export type AuthUser = Session["user"];
-export type AuthSession = Session["session"];
+export type AuthUser = Session["user"]
+export type AuthSession = Session["session"]
