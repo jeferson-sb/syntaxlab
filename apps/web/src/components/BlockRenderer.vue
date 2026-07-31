@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import { ref, useTemplateRef, watch } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
 import { useDraggable, useKeyModifier } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { useCanvasStore } from '@/store/canvas'
+import { useBlockStore } from '@/store/block'
 import type { AnyBlock } from '@/types/block';
 
 const { block, selected, isLinkSource } = defineProps<{
@@ -19,6 +20,20 @@ const emit = defineEmits<{
 
 const canvasStore = useCanvasStore()
 const { zoom } = storeToRefs(canvasStore)
+const blockStore = useBlockStore()
+
+const propModel = <K extends keyof AnyBlock['props']>(key: K) =>
+  computed({
+    get: () => block.props[key],
+    set: (value: AnyBlock['props'][K]) =>
+      blockStore.updateBlock({ id: block.id, props: { [key]: value } }),
+  })
+
+const title = propModel('title')
+const content = propModel('content')
+const aiPreview = propModel('aiPreview')
+const inlineCode = propModel('inlineCode')
+const href = propModel('href')
 
 const isEditing = ref(false)
 const isResizing = ref(false)
@@ -103,15 +118,15 @@ watch(
   <div ref="block" @click="$emit('selectBlock')" @dblclick="isEditing = true"
     :class="{ 'is-link-source': isLinkSource, block: true, 'is-resizing': isResizing, 'is-resize-ready': shiftHeld && block.type === 'image' }"
     :style="style">
-    <StickyNote v-if="block.type === 'sticky'" v-model:title="block.props.title" v-model:content="block.props.content"
-      v-model:aiPreview="block.props.aiPreview" :color="block.props.color" :isEditing="isEditing && selected"
+    <StickyNote v-if="block.type === 'sticky'" v-model:title="title" v-model:content="content"
+      v-model:aiPreview="aiPreview" :color="block.props.color" :isEditing="isEditing && selected"
       :class="{ selected: selected }" />
-    <CodeSnippet v-else-if="block.type === 'code'" v-model:title="block.props.title"
-      v-model:inlineCode="block.props.inlineCode" :isEditing="isEditing && selected" :class="{ selected: selected }" />
-    <LinkCard v-else-if="block.type === 'bookmark'" v-model:title="block.props.title" v-model:href="block.props.href"
+    <CodeSnippet v-else-if="block.type === 'code'" v-model:title="title"
+      v-model:inlineCode="inlineCode" :isEditing="isEditing && selected" :class="{ selected: selected }" />
+    <LinkCard v-else-if="block.type === 'bookmark'" v-model:title="title" v-model:href="href"
       :class="{ selected: selected }" />
-    <TextCard v-else-if="block.type === 'note'" v-model:content="block.props.content"
-      v-model:aiPreview="block.props.aiPreview" :color="block.props.color" :textSize="block.props.textSize"
+    <TextCard v-else-if="block.type === 'note'" v-model:content="content"
+      v-model:aiPreview="aiPreview" :color="block.props.color" :textSize="block.props.textSize"
       :isEditing="isEditing && selected" :class="{ selected: selected }" />
     <ImageCard v-else-if="block.type === 'image'" :title="block.props.title" :src="block.props.href"
       :width="resizePreview?.width ?? block.props.width" :height="resizePreview?.height ?? block.props.height"

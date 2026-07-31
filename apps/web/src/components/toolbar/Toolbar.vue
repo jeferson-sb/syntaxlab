@@ -16,11 +16,15 @@ import { ref, useTemplateRef } from 'vue';
 import { useCanvasStore } from '@/store/canvas'
 import { useBlockStore } from '@/store/block';
 import { useConnectionStore } from '@/store/connection';
+import { useBoardStore } from '@/store/board';
+import { useHistoryStore } from '@/store/history';
 import { uniqueId } from '@/lib/uniqueId';
 
 const canvasState = useCanvasStore()
 const blockState = useBlockStore()
 const connectionState = useConnectionStore()
+const boardState = useBoardStore()
+const historyState = useHistoryStore()
 
 const colors = [{ css: '#fcfcfc', label: 'offwhite' }, { css: '#fef9c3', label: 'yellow' }, { css: '#dcfce7', label: 'green' }, { css: '#dbeafe', label: 'blue' }, { css: '#f3e8ff', label: 'purple' }]
 const currentFontSize = ref({ label: 'base', css: '0.75rem' });
@@ -115,6 +119,22 @@ onKeyStroke(['l'], (event) => {
     return;
   }
   toggleLinkMode();
+})
+onKeyStroke(['d', 'D'], (event) => {
+  if (isTypingInEditableElement()) return;
+  if (!(event.ctrlKey || event.metaKey)) return;
+  event.preventDefault();
+  blockState.duplicateSelected();
+})
+onKeyStroke(['z', 'Z'], (event) => {
+  if (isTypingInEditableElement()) return;
+  if (!(event.ctrlKey || event.metaKey)) return;
+  event.preventDefault();
+  if (event.shiftKey) {
+    historyState.redo(boardState.currentBoardId);
+    return;
+  }
+  historyState.undo(boardState.currentBoardId);
 })
 </script>
 

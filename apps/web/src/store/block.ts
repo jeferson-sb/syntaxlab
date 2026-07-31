@@ -1,8 +1,13 @@
-import { computed, ref } from "vue";
-import { defineStore } from "pinia";
+import { computed, ref } from "vue"
+import { defineStore } from "pinia"
 
-import type { AnyBlock } from "@/types/block";
-import { useBoardStore } from "@/store/board";
+import type { AnyBlock } from "@/types/block"
+import { useBoardStore } from "@/store/board"
+import { useConnectionStore } from "@/store/connection"
+import { useHistoryStore } from "@/store/history"
+import { uniqueId } from "@/lib/uniqueId"
+
+const DUPLICATE_OFFSET = 20
 
 const initialState: AnyBlock[] = [
   {
@@ -76,61 +81,121 @@ const initialState: AnyBlock[] = [
       color: "#f3e8ff",
     },
   },
-];
+]
 
 export const useBlockStore = defineStore(
   "block",
   () => {
-    const blocks = ref(initialState);
-    const selected = ref<string | null>(null);
+    const blocks = ref(initialState)
+    const selected = ref<string | null>(null)
 
     const currentBoardBlocks = computed(() => {
-      const boardId = useBoardStore().currentBoardId;
-      return blocks.value.filter((block) => block.boardId === boardId);
-    });
+      const boardId = useBoardStore().currentBoardId
+      return blocks.value.filter((block) => block.boardId === boardId)
+    })
 
     const appendBlock = (newBlock: AnyBlock) => {
-      const boardId = useBoardStore().currentBoardId;
+      const boardId = useBoardStore().currentBoardId
       const blockWithBoard = {
         ...newBlock,
         boardId: newBlock.boardId ?? boardId,
         updatedAt: new Date(),
-      };
-      blocks.value = [...blocks.value, blockWithBoard];
-      selected.value = blockWithBoard.id;
-    };
+      }
+      blocks.value = [...blocks.value, blockWithBoard]
+      selected.value = blockWithBoard.id
+
+      useHistoryStore().recordChange(
+        blockWithBoard.boardId,
+        blockWithBoard.id,
+        null,
+        useHistoryStore().snapshot(blockWithBoard),
+      )
+    }
 
     const removeSelectedBlock = () => {
-      if (!selected.value) return null;
+      if (!selected.value) return null
 
-      const removedBlockId = selected.value;
+      const removedBlock = blocks.value.find((b) => b.id === selected.value)
+      if (!removedBlock) return null
 
-      blocks.value = blocks.value.filter(
-        (block) => block.id !== selected.value,
-      );
-      selected.value = null;
+      const historyStore = useHistoryStore()
+      const removedSnapshot = historyStore.snapshot(removedBlock)
+      const relatedConnections = useConnectionStore()
+        .connections.filter(
+          (c) =>
+            c.fromBlockId === removedBlock.id ||
+            c.toBlockId === removedBlock.id,
+        )
+        .map((c) => historyStore.snapshot(c))
 
-      return removedBlockId;
-    };
+      blocks.value = blocks.value.filter((block) => block.id !== selected.value)
+      selected.value = null
+
+      historyStore.recordChange(
+        removedSnapshot.boardId ?? useBoardStore().currentBoardId,
+        removedSnapshot.id,
+        removedSnapshot,
+        null,
+        relatedConnections,
+      )
+
+      return removedSnapshot.id
+    }
 
     const updateBlock = (updates: Partial<AnyBlock>) => {
-      const targetId = updates.id ?? selected.value;
-      if (!targetId) return;
+      const targetId = updates.id ?? selected.value
+      if (!targetId) return
 
-      const block = blocks.value.find((b) => b.id === targetId);
-      if (!block) return;
+      const block = blocks.value.find((b) => b.id === targetId)
+      if (!block) return
+
+      const historyStore = useHistoryStore()
+      const before = historyStore.snapshot(block)
 
       if (updates.props) {
-        block.props = { ...block.props, ...updates.props };
+        block.props = { ...block.props, ...updates.props }
       }
-      if (updates.x !== undefined) block.x = updates.x;
-      if (updates.y !== undefined) block.y = updates.y;
-      block.updatedAt = new Date();
-    };
+      if (updates.x !== undefined) block.x = updates.x
+      if (updates.y !== undefined) block.y = updates.y
+      block.updatedAt = new Date()
+
+      const onlyAiPreviewChanged =
+        updates.props &&
+        updates.x === undefined &&
+        updates.y === undefined &&
+        Object.keys(updates.props).every((key) => key === "aiPreview")
+
+      if (!onlyAiPreviewChanged) {
+        historyStore.recordChange(
+          block.boardId ?? useBoardStore().currentBoardId,
+          block.id,
+          before,
+          historyStore.snapshot(block),
+        )
+      }
+    }
+
+    const duplicateSelected = () => {
+      if (!selected.value) return null
+
+      const source = blocks.value.find((b) => b.id === selected.value)
+      if (!source) return null
+
+      const duplicate: AnyBlock = {
+        ...useHistoryStore().snapshot(source),
+        id: uniqueId(),
+        _syncId: undefined,
+        x: source.x + DUPLICATE_OFFSET,
+        y: source.y + DUPLICATE_OFFSET,
+      }
+
+      appendBlock(duplicate)
+      return duplicate.id
+    }
 
     const unselect = () => {
-      selected.value = null;
-    };
+      selected.value = null
+    }
 
     return {
       blocks,
@@ -140,7 +205,8 @@ export const useBlockStore = defineStore(
       appendBlock,
       updateBlock,
       removeSelectedBlock,
-    };
+      duplicateSelected,
+    }
   },
   {
     storage: {
@@ -151,4 +217,4 @@ export const useBlockStore = defineStore(
       },
     },
   },
-);
+)

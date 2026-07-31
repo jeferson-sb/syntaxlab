@@ -4,17 +4,32 @@ import {
   ChevronLeft,
   LayoutGrid,
   FolderOpen,
-  Infinity
+  Infinity,
+  MoreVertical,
+  Undo2,
+  Redo2,
+  Copy,
 } from 'lucide-vue-next';
+import {
+  DropdownMenuRoot,
+  DropdownMenuTrigger,
+  DropdownMenuPortal,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from 'reka-ui';
 import { storeToRefs } from 'pinia';
 import { useBoardStore } from '@/store/board';
 import { useProjectStore } from '@/store/project';
+import { useBlockStore } from '@/store/block';
+import { useHistoryStore } from '@/store/history';
 import type { Board } from '@/types/canvasBoard';
 
 type BoardInput = Omit<Board, 'projectId'>;
 
 const boardStore = useBoardStore();
 const projectStore = useProjectStore();
+const blockStore = useBlockStore();
+const historyStore = useHistoryStore();
 const { isCreateDialogOpen, currentBoardId } = storeToRefs(boardStore);
 const { currentProject, projectBoards, projects, isProjectDialogOpen, currentProjectId } = storeToRefs(projectStore);
 
@@ -65,11 +80,36 @@ const selectProject = (projectId: string) => {
             </button>
           </div>
           <div class="boards-list">
-            <button type="button" v-for="board in projectBoards" :key="board.id"
-              :class="{ active: currentBoardId === board.id, 'board-item': true }" @click="selectBoard(board.id)">
-              <LayoutGrid :size="14" />
-              <span>{{ board.name }}</span>
-            </button>
+            <div v-for="board in projectBoards" :key="board.id"
+              :class="{ active: currentBoardId === board.id, 'board-item': true }">
+              <button type="button" class="board-item-label" @click="selectBoard(board.id)">
+                <LayoutGrid :size="14" />
+                <span>{{ board.name }}</span>
+              </button>
+
+              <DropdownMenuRoot v-if="board.id === currentBoardId">
+                <DropdownMenuTrigger class="board-menu-trigger" title="Board actions" @click.stop>
+                  <MoreVertical :size="14" />
+                </DropdownMenuTrigger>
+
+                <DropdownMenuPortal>
+                  <DropdownMenuContent class="dropdown-content" :side-offset="8" align="start">
+                    <DropdownMenuItem class="dropdown-item" @click="historyStore.undo(board.id)">
+                      <Undo2 :size="16" />
+                      Undo
+                    </DropdownMenuItem>
+                    <DropdownMenuItem class="dropdown-item" @click="historyStore.redo(board.id)">
+                      <Redo2 :size="16" />
+                      Redo
+                    </DropdownMenuItem>
+                    <DropdownMenuItem class="dropdown-item" @click="blockStore.duplicateSelected()">
+                      <Copy :size="16" />
+                      Duplicate
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenuPortal>
+              </DropdownMenuRoot>
+            </div>
           </div>
         </div>
       </div>
@@ -213,23 +253,10 @@ const selectProject = (projectId: string) => {
 .board-item {
   display: flex;
   align-items: center;
-  gap: var(--size-2);
-  font-size: var(--font-size-fluid-0);
-  text-wrap: balance;
-  line-height: var(--font-lineheight-1);
   color: var(--text-2);
-  cursor: pointer;
-  padding: var(--size-2);
-  border: none;
-  background: transparent;
   border-radius: var(--radius-2);
-  text-align: left;
   transition: color 150ms, background-color 150ms;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-
-  & svg {
-    flex-shrink: 0;
-  }
 
   &:hover {
     color: var(--blue-4);
@@ -240,6 +267,78 @@ const selectProject = (projectId: string) => {
     color: var(--blue-4);
     background: var(--surface-3);
     font-weight: var(--font-weight-6);
+  }
+}
+
+.board-item-label {
+  display: flex;
+  align-items: center;
+  gap: var(--size-2);
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: var(--font-size-fluid-0);
+  text-wrap: balance;
+  line-height: var(--font-lineheight-1);
+  color: inherit;
+  cursor: pointer;
+  padding: var(--size-2);
+  border: none;
+  background: transparent;
+  text-align: left;
+
+  & svg {
+    flex-shrink: 0;
+  }
+}
+
+.board-menu-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: var(--size-1);
+  margin-inline-end: var(--size-1);
+  border: none;
+  background: transparent;
+  color: inherit;
+  border-radius: var(--radius-2);
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 150ms, background-color 150ms;
+
+  &:hover {
+    opacity: 1;
+    background: var(--surface-4);
+  }
+}
+
+:deep(.dropdown-content) {
+  position: relative;
+  min-width: 180px;
+  background: var(--surface-2);
+  border: var(--border-size-1) solid var(--border-color);
+  border-radius: var(--radius-3);
+  padding: var(--size-2);
+  box-shadow: var(--shadow-3);
+  z-index: var(--layer-important);
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--size-2);
+  padding: var(--size-2) var(--size-3);
+  background: var(--surface-3);
+  color: var(--text-1);
+  font-size: var(--font-size-1);
+  cursor: pointer;
+  transition: background 150ms ease;
+
+  &:hover,
+  &:focus {
+    background: var(--surface-2);
+    outline: none;
   }
 }
 
