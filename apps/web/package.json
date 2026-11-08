@@ -33,7 +33,7 @@
     "@vue/test-utils": "^2.4.6",
     "@vue/tsconfig": "^0.8.1",
     "elysia": "^1.4.25",
-    "happy-dom": "^20.7.0",
+    "happy-dom": "^21.0.4",
     "playwright": "^1.58.2",
     "shiki": "^3.22.0",
     "typescript": "~5.9.3",
